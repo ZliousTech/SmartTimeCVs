@@ -1,0 +1,15 @@
+﻿<script src="~/theme/assets/js/bundles/datatablescripts.bundle.js"></script>
+<script src="~/theme/assets/js/plugins/datatables/datatables.buttons.min.js"></script>
+<script src="~/theme/assets/js/plugins/datatables/buttons.bootstrap4.min.js"></script>
+<script src="~/theme/assets/js/plugins/datatables/buttons.colvis.min.js"></script>
+<script src="~/theme/assets/js/plugins/datatables/buttons.flash.min.js"></script>
+<script src="~/theme/assets/js/plugins/datatables/buttons.html5.min.js"></script>
+<script src="~/theme/assets/js/plugins/datatables/buttons.print.min.js"></script>
+<script src="~/theme/assets/js/bundles/jquery-datatable.js"></script>
+
+<script>
+	$(document).ready(function () {
+		initDatatable(tableExportedColumns(), tableExcludedSearchColumns());
+		toggleStatusRequest();
+	})
+</script>

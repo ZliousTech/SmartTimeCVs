@@ -1,0 +1,39 @@
+﻿<aside id="leftsidebar" class="sidebar">
+	<div class="menu">
+		<ul class="list">
+			<li>
+				<div class="user-info">
+					<div class="image">
+						<a href="profile.html">
+							<img src="~/theme/assets/imges/logo.svg" alt="User">
+						</a>
+					</div>
+					<div class="detail">
+						<h4>Hamza</h4>
+						<small>Full Stack Developer</small>
+					</div>
+					<a href="events.html" title="Events"><i class="zmdi zmdi-calendar"></i></a>
+					<a href="mail-inbox.html" title="Inbox"><i class="zmdi zmdi-email"></i></a>
+					<a href="contact.html" title="Contact List"><i class="zmdi zmdi-account-box-phone"></i></a>
+					<a href="chat.html" title="Chat App"><i class="zmdi zmdi-comments"></i></a>
+					<a href="sign-in.html" title="Sign out"><i class="zmdi zmdi-power"></i></a>
+				</div>
+			</li>
+			<li class="open" active-when="Home">
+				<a asp-controller="Home" asp-action="Index">
+					<i class="material-icons">dashboard</i><span>Dashboard</span>
+				</a>
+			</li>
+			<li active-when="JobApplication">
+				<a href="javascript:void(0);" class="menu-toggle">
+					<i class="material-icons">description</i><span>CVs</span>
+				</a>
+				<ul class="ml-menu">
+					<li active-when="JobApplication">
+						<a asp-controller="JobApplication" asp-action="Index">Job Application</a>
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</aside>

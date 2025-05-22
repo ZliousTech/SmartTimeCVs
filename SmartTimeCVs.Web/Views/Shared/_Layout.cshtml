@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZLIOUS | SMART-TIME-CVs</title>
+    <!--begin::Font files-->
+    <link rel="stylesheet" href="~/theme/assets/fonts/material-design-iconic-fontd1f1.woff">
+    <link rel="stylesheet" href="~/theme/assets/fonts/material-design-iconic-fontd1f1.woff2">
+    <!--begin::Font files-->
+    <!--begin::Theme css files-->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="~/Theme/assets/css/plugins/bootstrap.min.css">
+    <link rel="stylesheet" href="~/Theme/assets/css/plugins/jquery-jvectormap-2.0.3.min.css" />
+    <link rel="stylesheet" href="~/Theme/assets/css/plugins/morris.min.css" />
+    @await RenderSectionAsync("Styles", required: false)
+    <link rel="stylesheet" href="~/lib/sweetalert2/dist/sweetalert2.css" />
+    <link rel="stylesheet" href="~/theme/assets/css/plugins/dropzone.css" />
+    <link rel="stylesheet" href="~/Theme/assets/css/main.css">
+    <link rel="stylesheet" href="~/Theme/assets/css/color_skins.css">
+    <!--end::Theme css files-->
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SmartTimeCVs.Web.styles.css" asp-append-version="true" />
+</head>
+<body class="theme-cyan">
+    
+    <div class="page-loader-wrapper">
+        <div class="loader">
+            <div class="m-t-30">
+				<img class="zmdi-hc-spin" src="~/theme/assets/imges/logo.svg" width="48" height="48"
+                     alt="Compass">
+            </div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <div class="overlay"></div>
+
+    <partial name="_Header" />
+    <partial name="_RightAside" />
+    <partial name="_LeftAside" />
+
+    <section class="content home">
+        <div class="block-header">
+            <div class="row">
+                <div class="col-lg-5 col-md-4 col-sm-12">
+                    <h2>
+                        @ViewData["Title"]
+                        <small class="text-muted mb-3">Welcome to ZLIOUS | SMART-TIME-CVs</small>
+                    </h2>
+                </div>
+                <div class="col-lg-7 col-md-8 col-sm-12">
+                    <ul class="breadcrumb float-md-right justify-content-center">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="@ViewData["ControllerName"]" asp-action="Index" class="text-center">
+                                <div class="row js-path">
+                                    <div class="breadcrumb-item mt-1 pl-3">
+                                        <i class="material-icons align-self-center text-center">@ViewData["Icon"]</i>
+                                    </div>
+                                    <div class="breadcrumb-item align-self-center pr-3">@ViewData["Path"]</div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    </section>
+
+    <span class="d-none" id="Message">@TempData["Message"]</span>
+
+    <partial name="_Modal" />
+
+	<!--begin::Theme js files -->
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/Theme/assets/js/bundles/morrisscripts.bundle.js"></script>
+    <script src="~/Theme/assets/js/bundles/libscripts.bundle.js"></script>
+	<script src="~/Theme/assets/js/bundles/vendorscripts.bundle.js"></script>
+    <script src="~/theme/assets/js/plugins/moment.js"></script>
+	<script src="~/lib/sweetalert2/dist/sweetalert2.min.js"></script>
+    <script src="~/Theme/assets/js/bundles/jvectormap.bundle.js"></script>
+    <script src="~/Theme/assets/js/bundles/knob.bundle.js"></script>
+    <script src="~/Theme/assets/js/bundles/sparkline.bundle.js"></script>
+    <script src="~/Theme/assets/js/bundles/mainscripts.bundle.js"></script>
+	<script src="~/theme/assets/js/plugins/dropzone.js"></script>
+    <script src="~/Theme/assets/js/index.js"></script>
+    @await RenderSectionAsync("Plugins", required: false)
+	<script src="~/lib/bootbox.js/bootbox.min.js"></script>
+    <!--end::Theme js files -->
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

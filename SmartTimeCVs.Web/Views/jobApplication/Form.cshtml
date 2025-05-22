@@ -1,0 +1,759 @@
+﻿@model JobApplicationViewModel
+@{
+    ViewData["Title"] = "Job Application";
+    ViewData["ControllerName"] = "JobApplication";
+    ViewData["Path"] = "CVs / Job Applications / " + (Model?.Id > 0 ? "Edit" : "Create");
+    ViewData["Icon"] = "assignment";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/theme/assets/css/plugins/bootstrap-select.css" />
+    <link rel="stylesheet" href="~/css/custom/advanced-custom-file-uploader.css" />
+    <link rel="stylesheet" href="~/theme/assets/css/plugins/bootstrap-material-datetimepicker.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
+    <a href="~/lib/font-awesome/webfonts/fa-solid-900.woff2"></a>
+    <link rel="stylesheet" href="~/css/custom/advanced-custom-file-uploader.css" />
+}
+
+
+<div class="card shadow">
+    <div class="card-header">
+        <h2 class="text-center theme-main-color mb-5"><b>@ViewData["Title"]</b></h2>
+    </div>
+    <div class="card-body">
+        <form asp-action="@((Model is not null &&  Model?.Id > 0) ? "Edit" : "Create")" enctype="multipart/form-data" id="jobForm"
+              data-ajax-method="post"
+              data-ajax="true"
+              data-ajax-begin="onRequestBegin"
+              data-ajax-success="onRequestSuccess"
+              data-ajax-failure="onRequestFailure"
+              data-ajax-complete="onRequestComplete">
+            @if (Model?.Id > 0)
+            {
+                <input type="hidden" asp-for="Id" />
+            }
+
+            <!-- Step 1: Basic Info -->
+            <div class="form-step" id="step-1">
+                <div class="row clearfix mb-3">
+                    <div class="col-12">
+                        <div class="card member-card">
+                            <div class="member-img">
+                                <div class="image-upload-container">
+                                    <div class="image-preview" id="imagePreview" style="background-image: url('/images/CVs/@(Model?.ImageUrl is null? "ProfileImagePlaceholder.jpg" : Model.ImageUrl)');"></div>
+                                    <label class="btn-icon edit-icon" id="editButton">
+                                        <i class="fas fa-pencil-alt"></i>
+                                        <input type="file" asp-for="ImageFile" accept=".jpg, .jpeg, .png" style="display: none;" />
+                                    </label>
+                                    <label class="btn-icon delete-icon" id="deleteButton">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </label>
+                                </div>
+                                <span asp-validation-for="ImageFile" class="text-danger mb-5 js-image-span-validation"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row clearfix mb-3">
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">Full Name <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="text" class="form-control
+                            @(ViewData.ModelState["FullName"] is null? "" :
+                            ViewData.ModelState["FullName"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
+                                   placeholder="Full Name" asp-for="FullName">
+                            <span asp-validation-for="FullName" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-1">Gender <span class="text-danger">*</span></h2>
+                        <div class="">
+                            <select class="form-control js-select2
+                                @(ViewData?.ModelState["GenderId"] is null ? "" :
+                                ViewData.ModelState["GenderId"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")"
+                                    asp-for="GenderId" asp-items="ViewBag.GenderList">
+                            </select>
+                        </div>
+                        <span asp-validation-for="GenderId" class="text-danger mb-5"></span>
+                    </div>
+                </div>
+
+                <div class="row clearfix mb-3">
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">Date Of Birth <span class="text-danger">*</span></h2>
+                        <div class="input-group mb-0">
+                            <span class="input-group-addon @(ViewData.ModelState["DateOfBirth"] is null? "" :
+                                ViewData.ModelState["DateOfBirth"]?.Errors.Any() == true ? "form-control-icon-invalid" :"form-control-icon-valid")">
+                                <i class="zmdi zmdi-calendar"></i>
+                            </span>
+                            <input type="datetime" class="form-control datetimepicker
+							@(ViewData.ModelState["DateOfBirth"] is null? "" :
+                            ViewData.ModelState["DateOfBirth"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
+                                   value="@Model?.DateOfBirth?.ToString("dd-MMM-yyyy")"
+                                   placeholder="Please choose a date..." asp-for="DateOfBirth">
+                        </div>
+                        <span asp-validation-for="DateOfBirth" class="text-danger mb-5 mt-0"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">Place Of Birth <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="text" class="form-control
+                            @(ViewData.ModelState["PlaceOfBirth"] is null? "" :
+                            ViewData.ModelState["PlaceOfBirth"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
+                                   placeholder="Place Of Birth" asp-for="PlaceOfBirth">
+                            <span asp-validation-for="PlaceOfBirth" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row clearfix mb-3">
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">Mobile Number <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="number" class="form-control
+							@(ViewData?.ModelState["MobileNumber"] is null? "" :
+                            ViewData.ModelState["MobileNumber"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")" asp-for="MobileNumber" min="0">
+                            <span asp-validation-for="MobileNumber" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">National Number <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="number" class="form-control
+							@(ViewData?.ModelState["NationalID"] is null? "" :
+							ViewData.ModelState["NationalID"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")" asp-for="NationalID" min="0">
+                            <span asp-validation-for="NationalID" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row clearfix mb-3">
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-2">Address <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input class="form-control
+							@(ViewData?.ModelState["Address"] is null? "" :
+                            ViewData.ModelState["Address"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")" asp-for="Address">
+                            <span asp-validation-for="Address" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-1">Marital Status  <span class="text-danger">*</span></h2>
+                        <div class="">
+                            <select class="form-control js-select2
+                                @(ViewData?.ModelState["MaritalStatusId"] is null ? "" :
+                                ViewData.ModelState["MaritalStatusId"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")"
+                                    asp-for="MaritalStatusId" asp-items="ViewBag.MaritalStatusList">
+                            </select>
+                        </div>
+                        <span asp-validation-for="MaritalStatusId" class="text-danger mb-5"></span>
+                    </div>
+                </div>
+
+                <div class="row clearfix mb-3">
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-1">Nationality <span class="text-danger">*</span></h2>
+                        <div class="">
+                            <select class="form-control js-select2
+                                @(ViewData?.ModelState["Nationality"] is null ? "" :
+                                ViewData.ModelState["Nationality"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")"
+                                    asp-for="Nationality" asp-items="ViewBag.NationalityList">
+                            </select>
+                        </div>
+                        <span asp-validation-for="Nationality" class="text-danger mb-5"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-1">Nationality <span class="text-danger">*</span></h2>
+                        <div class="">
+                            <select class="form-control js-select2
+                                @(ViewData?.ModelState["ApplyingFor"] is null ? "" :
+                                ViewData.ModelState["ApplyingFor"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")"
+                                    asp-for="ApplyingFor" asp-items="ViewBag.ApplyingForList">
+                            </select>
+                        </div>
+                        <span asp-validation-for="ApplyingFor" class="text-danger mb-5"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Education -->
+            <div class="form-step d-none" id="step-2">
+                <div class="row clearfix mb-3">
+
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-2">University Name <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input asp-for="UniversityName" placeholder="Enter university name" class="form-control @(ViewData?.ModelState["UniversityName"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")" />
+                            <span asp-validation-for="UniversityName" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-2">University Graduation Year <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="number" asp-for="UniversityGraduationYear" placeholder="Enter graduation year"
+                                   class="form-control @(ViewData?.ModelState["UniversityGraduationYear"]?.Errors.Any() == true ?
+                                 "form-control-invalid" : "form-control-valid")" value="@DateTime.Now.Year" />
+                            <span asp-validation-for="UniversityGraduationYear" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-2">Collage <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="number" asp-for="Collage" placeholder="Enter graduation year" class="form-control @(ViewData?.ModelState["Collage"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")" />
+                            <span asp-validation-for="Collage" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-2">High School Name <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input asp-for="HighSchoolName" placeholder="Enter high school name" class="form-control @(ViewData?.ModelState["HighSchoolName"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")" />
+                            <span asp-validation-for="HighSchoolName" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-2">High School Graduation Year <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="number" asp-for="HighSchoolGraduationYear" placeholder="Enter graduation year"
+                                   class="form-control @(ViewData?.ModelState["HighSchoolGraduationYear"]?.Errors.Any() == true ?
+                                   "form-control-invalid" : "form-control-valid")" value="@DateTime.Now.AddYears(-4).Year" />
+                            <span asp-validation-for="HighSchoolGraduationYear" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Skills -->
+            <div class="form-step d-none" id="step-3">
+                <div class="row clearfix mb-3">
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-1">English Level <span class="text-danger">*</span></h2>
+                        <select class="form-control js-select2 w-100
+                            @(ViewData?.ModelState["EnglishLevelId"] is null ? "" :
+                            ViewData.ModelState["EnglishLevelId"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")"
+                                asp-for="EnglishLevelId" asp-items="ViewBag.EnglishLevelList">
+                        </select>
+                        <span asp-validation-for="EnglishLevelId" class="text-danger mb-5"></span>
+                    </div>
+                </div>
+
+                <div class="row clearfix mb-3">
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-1">Other Language</h2>
+                        <input asp-for="OtherLanguage" placeholder="Enter other language"
+                               class="form-control @(ViewData?.ModelState["OtherLanguage"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")" />
+                        <span asp-validation-for="OtherLanguage" class="text-danger mb-5"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-1">Other Language Level <span class="text-danger">*</span></h2>
+                        <select class="form-control js-select2
+                            @(ViewData?.ModelState["OtherLanguageLevelId"] is null ? "" :
+                            ViewData.ModelState["OtherLanguageLevelId"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")"
+                                asp-for="OtherLanguageLevelId" asp-items="ViewBag.OtherLanguageLevelList">
+                        </select>
+                        <span asp-validation-for="OtherLanguageLevelId" class="text-danger mb-5"></span>
+                    </div>
+                </div>
+
+                <div class="row clearfix mb-3">
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-1">Computer Skills Level <span class="text-danger">*</span></h2>
+                        <select class="form-control js-select2
+                                @(ViewData?.ModelState["ComputerSkillsLevelId"] is null ? "" :
+                                ViewData.ModelState["ComputerSkillsLevelId"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")"
+                                asp-for="ComputerSkillsLevelId" asp-items="ViewBag.ComputerSkillsLevelList">
+                        </select>
+                        <span asp-validation-for="ComputerSkillsLevelId" class="text-danger mb-5"></span>
+                    </div>
+                </div>
+
+                <div class="row clearfix mb-3">
+                    <div class="col-12 mb-3">
+                        <h2 class="card-inside-title mb-2">Additional Courses Completed</h2>
+                        <div class="form-group form-float">
+                            <textarea class="form-control no-resize" placeholder="Additional Courses Completed" asp-for="AdditionalCoursesCompleted"></textarea>
+                            <span asp-validation-for="AdditionalCoursesCompleted" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Current Employer -->
+            <div class="form-step" id="step-4">
+                <div class="row clearfix mb-3">
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">Current Employer Name <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="text" class="form-control
+                            @(ViewData.ModelState["CurrentEmployerName"] is null? "" :
+                            ViewData.ModelState["CurrentEmployerName"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
+                                   placeholder="Current Employer Name" asp-for="CurrentEmployerName">
+                            <span asp-validation-for="CurrentEmployerName" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">Current Employer Address <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="text" class="form-control
+                            @(ViewData.ModelState["CurrentEmployerAddress"] is null? "" :
+                            ViewData.ModelState["CurrentEmployerAddress"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
+                                   placeholder="Current Employer Address" asp-for="CurrentEmployerAddress">
+                            <span asp-validation-for="CurrentEmployerAddress" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row clearfix mb-3">
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">Current Job Description <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="text" class="form-control
+                            @(ViewData.ModelState["CurrentJobDescription"] is null? "" :
+                            ViewData.ModelState["CurrentJobDescription"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
+                                   placeholder="Current Job Description" asp-for="CurrentJobDescription">
+                            <span asp-validation-for="CurrentJobDescription" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">Current Work Period <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="text" class="form-control
+                            @(ViewData.ModelState["CurrentWorkPeriod"] is null? "" :
+                            ViewData.ModelState["CurrentWorkPeriod"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
+                                   placeholder="Current Work Period" asp-for="CurrentWorkPeriod">
+                            <span asp-validation-for="CurrentWorkPeriod" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row clearfix mb-3">
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">Current Salary <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="number" class="form-control
+                            @(ViewData.ModelState["CurrentSalary"] is null? "" :
+                            ViewData.ModelState["CurrentSalary"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
+                                   placeholder="Current Salary" asp-for="CurrentSalary">
+                            <span asp-validation-for="CurrentSalary" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">Reason For Leaving <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="text" class="form-control
+                            @(ViewData.ModelState["ReasonForLeavingCurrent"] is null? "" :
+                            ViewData.ModelState["ReasonForLeavingCurrent"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
+                                   placeholder="Reason For Leaving" asp-for="ReasonForLeavingCurrent">
+                            <span asp-validation-for="ReasonForLeavingCurrent" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row clearfix mb-3">
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">Ready To Join From <span class="text-danger">*</span></h2>
+                        <div class="input-group mb-0">
+                            <span class="input-group-addon @(ViewData.ModelState["ReadyToJoinFrom"] is null? "" :
+                                ViewData.ModelState["ReadyToJoinFrom"]?.Errors.Any() == true ? "form-control-icon-invalid" :"form-control-icon-valid")">
+                                <i class="zmdi zmdi-calendar"></i>
+                            </span>
+                            <input type="text" class="form-control datetimepicker
+							@(ViewData.ModelState["ReadyToJoinFrom"] is null? "" :
+                            ViewData.ModelState["ReadyToJoinFrom"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
+                                   value="@Model?.ReadyToJoinFrom?.ToString("dd-MMM-yyyy")"
+                                   placeholder="Please choose a date..." asp-for="ReadyToJoinFrom">
+                        </div>
+                        <span asp-validation-for="ReadyToJoinFrom" class="text-danger mb-5 mt-0"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Work Experience -->
+            <div class="form-step d-none" id="step-5">
+                <div class="row clearfix mb-3">
+                    <div id="workExperienceContainer" class="col-12">
+                        @if (Model?.WorkExperiences != null && Model.WorkExperiences.Any())
+                        {
+                            for (int i = 0; i < Model.WorkExperiences.Count; i++)
+                            {
+                                <div class="work-experience-entry border rounded p-3 mb-3">
+                                    <div class="row clearfix mb-3">
+                                        <div class="col-md-6"></div>
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeExperienceBtn">Remove</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="row clearfix mb-3">
+                                        <div class="col-md-6">
+                                            <h2 class="card-inside-title mb-2">Employer Name <span class="text-danger">*</span></h2>
+                                            <div class="form-group form-float">
+                                                <input type="text" class="form-control"
+                                                       name="WorkExperiences[@i].EmployerName"
+                                                       value="@Model.WorkExperiences[i].EmployerName"
+                                                       placeholder="Employer Name" />
+                                                <span class="text-danger mb-5"
+                                                      data-valmsg-for="WorkExperiences[@i].EmployerName"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row clearfix mb-3">
+                                        <div class="col-md-6">
+                                            <h2 class="card-inside-title mb-2">From <span class="text-danger">*</span></h2>
+                                            <div class="input-group mb-0">
+                                                <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
+                                                <input type="text" class="form-control datetimepicker"
+                                                       name="WorkExperiences[@i].From"
+                                                       value="@Model.WorkExperiences[i].From?.ToString("dd-MMM-yyyy")"
+                                                       placeholder="Please choose a date..." />
+                                            </div>
+                                            <span class="text-danger mb-5 mt-0"
+                                                  data-valmsg-for="WorkExperiences[@i].From"></span>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <h2 class="card-inside-title mb-2">To <span class="text-danger">*</span></h2>
+                                            <div class="input-group mb-0">
+                                                <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
+                                                <input type="text" class="form-control datetimepicker"
+                                                       name="WorkExperiences[@i].To"
+                                                       value="@Model.WorkExperiences[i].To?.ToString("dd-MMM-yyyy")"
+                                                       placeholder="Please choose a date..." />
+                                            </div>
+                                            <span class="text-danger mb-5 mt-0"
+                                                  data-valmsg-for="WorkExperiences[@i].To"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row clearfix mb-3">
+                                        <div class="col-md-6">
+                                            <h2 class="card-inside-title mb-2">Reason for Leaving <span class="text-danger">*</span></h2>
+                                            <div class="form-group form-float">
+                                                <input type="text" class="form-control"
+                                                       name="WorkExperiences[@i].ReasonForLeaving"
+                                                       value="@Model.WorkExperiences[i].ReasonForLeaving"
+                                                       placeholder="Reason for Leaving" />
+                                                <span class="text-danger mb-5"
+                                                      data-valmsg-for="WorkExperiences[@i].ReasonForLeaving"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row clearfix mb-3">
+                                        <div class="col-12 mb-3">
+                                            <h2 class="card-inside-title mb-2">Job Description</h2>
+                                            <div class="form-group form-float">
+                                                <textarea class="form-control no-resize"
+                                                          name="WorkExperiences[@i].JobDescription"
+                                                          placeholder="Job Description">@Model.WorkExperiences[i].JobDescription</textarea>
+                                                <span class="text-danger mb-5"
+                                                      data-valmsg-for="WorkExperiences[@i].JobDescription"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div class="col-12 text-center">
+                        <button type="button" class="btn btn-primary text-center" id="addExperienceBtn">
+                            <div class="row">
+                                <div class="col-md-3 px-2 align-self-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                                    </svg>
+                                </div>
+                                <div class="col-md-9 px-1 align-self-center">
+                                    Add Experience
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: File Uploads -->
+            <div class="form-step d-none" id="step-6">
+                <div class="row clearfix">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label asp-for="AttachmentFile" class="control-label">Attachment</label>
+
+                            <!-- Preview section -->
+                            @if (!string.IsNullOrEmpty(Model?.AttachmentUrl))
+                            {
+                                <div class="mb-3">
+                                    @if (Model.AttachmentUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <!-- PDF Preview -->
+                                        <embed src="@Url.Content("~/images/attachments/" + Model.AttachmentUrl)"
+                                               type="application/pdf"
+                                               style="border: 1px solid #ccc; border-radius: 10px;" />
+                                    }
+                                    else
+                                    {
+                                        <!-- Download link for other file types -->
+                                        <a href="@Url.Content("~/images/attachments/" + Model.AttachmentUrl)"
+                                           target="_blank" class="btn btn-round btn-primary mt-2">
+                                           <div class="row">
+                                               <div class="col-md-2 align-self-center">
+                                                    <i class="material-icons">attachment</i>
+                                               </div>
+                                                <div class="col-md-10 align-self-center">
+                                                    <b>
+                                                        View Current Attachment
+                                                    </b>
+                                               </div>
+                                           </div>
+                                        </a>
+                                    }
+                                </div>
+                            }
+
+                            <!-- File uploader -->
+                            <div class="custom-file-uploader"
+                                 style="border: 2px dashed #ccc; padding: 60px; text-align: center; border-radius: 20px; background: #eee !important;">
+                                <input asp-for="AttachmentFile" type="file" class="form-control-file" style="display: none;" id="real-attachment-upload" />
+
+                                <div id="attachment-drop-area" onclick="document.getElementById('real-attachment-upload').click()" style="cursor: pointer;">
+                                    <i class="material-icons" style="font-size: 80px; color:#777">touch_app</i>
+                                    <h5>Drop files here or click to upload.</h5>
+                                    <p id="selected-file-name" class="text-muted"></p>
+                                </div>
+                            </div>
+
+                            <span asp-validation-for="AttachmentFile" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-secondary" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
+                <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextPrev(1)">Next</button>
+                <button type="submit" class="btn btn-success d-none" id="submitBtn" data-index-url="/JobApplication">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<template id="workExperienceTemplate">
+    <div class="work-experience-entry border rounded p-3 mb-3">
+
+        <div class="row clearfix mb-3">
+            <div class="col-md-6">
+            </div>
+            <div class="col-md-6">
+                <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeExperienceBtn">Remove</button>
+            </div>
+        </div>
+
+        <div class="row clearfix mb-3">
+            <div class="col-md-6">
+                <h2 class="card-inside-title mb-2">Employer Name <span class="text-danger">*</span></h2>
+                <div class="form-group form-float">
+                    <input type="text" class="form-control
+                        @(ViewData.ModelState[$"WorkExperiences[index].EmployerName"]?.Errors.Any() == true ? "form-control-invalid" :
+                          ViewData.ModelState.ContainsKey($"WorkExperiences[index].EmployerName") ? "form-control-valid" : "")"
+                           name="WorkExperiences[index].EmployerName"
+                           placeholder="Employer Name" />
+                    <span class="text-danger mb-5"
+                          data-valmsg-for="WorkExperiences[index].EmployerName"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row clearfix mb-3">
+            <div class="col-md-6">
+                <h2 class="card-inside-title mb-2">From <span class="text-danger">*</span></h2>
+                <div class="input-group mb-0">
+                    <span class="input-group-addon
+                        @(ViewData.ModelState[$"WorkExperiences[index].From"]?.Errors.Any() == true ? "form-control-icon-invalid" :
+                          ViewData.ModelState.ContainsKey($"WorkExperiences[index].From") ? "form-control-icon-valid" : "")">
+                        <i class="zmdi zmdi-calendar"></i>
+                    </span>
+                    <input type="text" class="form-control datetimepicker
+                        @(ViewData.ModelState[$"WorkExperiences[index].From"]?.Errors.Any() == true ? "form-control-invalid" :
+                          ViewData.ModelState.ContainsKey($"WorkExperiences[index].From") ? "form-control-valid" : "")"
+                           name="WorkExperiences[index].From"
+                           placeholder="Please choose a date..." />
+                </div>
+                <span class="text-danger mb-5 mt-0"
+                      data-valmsg-for="WorkExperiences[index].From"></span>
+            </div>
+
+            <div class="col-md-6">
+                <h2 class="card-inside-title mb-2">To <span class="text-danger">*</span></h2>
+                <div class="input-group mb-0">
+                    <span class="input-group-addon
+                        @(ViewData.ModelState[$"WorkExperiences[index].To"]?.Errors.Any() == true ? "form-control-icon-invalid" :
+                          ViewData.ModelState.ContainsKey($"WorkExperiences[index].To") ? "form-control-icon-valid" : "")">
+                        <i class="zmdi zmdi-calendar"></i>
+                    </span>
+                    <input type="text" class="form-control datetimepicker
+                        @(ViewData.ModelState[$"WorkExperiences[index].To"]?.Errors.Any() == true ? "form-control-invalid" :
+                          ViewData.ModelState.ContainsKey($"WorkExperiences[index].To") ? "form-control-valid" : "")"
+                           name="WorkExperiences[index].To"
+                           placeholder="Please choose a date..." />
+                </div>
+                <span class="text-danger mb-5 mt-0"
+                      data-valmsg-for="WorkExperiences[index].To"></span>
+            </div>
+        </div>
+
+        <div class="row clearfix mb-3">
+            <div class="col-md-6">
+                <h2 class="card-inside-title mb-2">Reason for Leaving <span class="text-danger">*</span></h2>
+                <div class="form-group form-float">
+                    <input type="text" class="form-control
+                        @(ViewData.ModelState[$"WorkExperiences[index].ReasonForLeaving"]?.Errors.Any() == true ? "form-control-invalid" :
+                          ViewData.ModelState.ContainsKey($"WorkExperiences[index].ReasonForLeaving") ? "form-control-valid" : "")"
+                           name="WorkExperiences[index].ReasonForLeaving"
+                           placeholder="Reason for Leaving" />
+                    <span class="text-danger mb-5"
+                          data-valmsg-for="WorkExperiences[index].ReasonForLeaving"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row clearfix mb-3">
+            <div class="col-12 mb-3">
+                <h2 class="card-inside-title mb-2">Job Description</h2>
+                <div class="form-group form-float">
+                    <textarea class="form-control no-resize"
+                              name="WorkExperiences[index].JobDescription"
+                              placeholder="Job Description"></textarea>
+                    <span class="text-danger mb-5"
+                          data-valmsg-for="WorkExperiences[index].JobDescription"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+
+
+
+@section Scripts {
+    <script>
+        let currentStep = 0;
+        showStep(currentStep);
+
+        let workExperienceIndex = @((Model?.WorkExperiences?.Count ?? 0));
+
+        $(document).find('.datetimepicker').bootstrapMaterialDatePicker({
+            format: 'DD-MMM-YYYY',
+            time: false,
+            clearButton: true,
+            weekStart: 1
+        });
+
+        document.getElementById("addExperienceBtn").addEventListener("click", function () {
+            addWorkExperienceEntry();
+        });
+
+        document.getElementById("workExperienceContainer").addEventListener("click", function (e) {
+            if (e.target.classList.contains("removeExperienceBtn")) {
+                e.target.closest(".work-experience-entry").remove();
+
+                reindexWorkExperiences();
+            }
+        });
+
+        const input = document.getElementById('real-attachment-upload');
+        const fileNameLabel = document.getElementById('selected-file-name');
+
+        input.addEventListener('change', function () {
+            if (input.files.length > 0) {
+                fileNameLabel.innerText = input.files[0].name;
+            } else {
+                fileNameLabel.innerText = '';
+            }
+        });
+
+        function addWorkExperienceEntry() {
+            const template = document.getElementById("workExperienceTemplate").content.cloneNode(true);
+            let html = template.querySelector(".work-experience-entry").innerHTML;
+            html = html.replace(/index/g, workExperienceIndex);
+
+            const wrapper = document.createElement("div");
+            wrapper.classList.add("work-experience-entry", "border", "rounded", "p-3", "mb-3");
+            wrapper.innerHTML = html;
+
+            document.getElementById("workExperienceContainer").appendChild(wrapper);
+
+            // Initialize bootstrapMaterialDatePicker for the new inputs inside this wrapper
+            $(wrapper).find('.datetimepicker').bootstrapMaterialDatePicker({
+                format: 'DD-MMM-YYYY',
+                time: false,
+                clearButton: true,
+                weekStart: 1
+            });
+
+            workExperienceIndex++;
+        }
+
+
+        function showStep(n) {
+            const steps = document.getElementsByClassName("form-step");
+            for (let i = 0; i < steps.length; i++) {
+                steps[i].classList.add("d-none");
+            }
+            steps[n].classList.remove("d-none");
+
+            document.getElementById("prevBtn").style.display = n === 0 ? "none" : "inline";
+            document.getElementById("nextBtn").classList.toggle("d-none", n === steps.length - 1);
+            document.getElementById("submitBtn").classList.toggle("d-none", n !== steps.length - 1);
+        }
+
+        function nextPrev(n) {
+            const form = $("#jobForm");
+
+            // Only validate on forward steps
+            if (n === 1 && !form.valid()) return;
+
+            const steps = document.getElementsByClassName("form-step");
+            if (currentStep + n >= steps.length || currentStep + n < 0) return;
+            currentStep += n;
+            showStep(currentStep);
+        }
+
+        function reindexWorkExperiences() {
+            const entries = document.querySelectorAll("#workExperienceContainer .work-experience-entry");
+            workExperienceIndex = entries.length; // Keep it in sync for newly added ones
+
+            entries.forEach((entry, newIndex) => {
+                const fields = entry.querySelectorAll("input, textarea, span[data-valmsg-for]");
+                fields.forEach(field => {
+                    if (field.name) {
+                        field.name = field.name.replace(/WorkExperiences\[\d+\]/, `WorkExperiences[${newIndex}]`);
+                    }
+                    if (field.getAttribute("data-valmsg-for")) {
+                        field.setAttribute("data-valmsg-for", field.getAttribute("data-valmsg-for").replace(/WorkExperiences\[\d+\]/, `WorkExperiences[${newIndex}]`));
+                    }
+                });
+            });
+        }
+    </script>
+}
+
+
+@section Plugins {
+    <partial name="_CustomValidationsJS" />
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/shared/form-image-validator.js" asp-append-version="true"></script>
+    <script src="~/js/shared/form-select-validator.js" asp-append-version="true"></script>
+    <script src="~/js/shared/form-price-validator.js" asp-append-version="true"></script>
+}
