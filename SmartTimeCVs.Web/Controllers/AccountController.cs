@@ -9,7 +9,7 @@ namespace SmartTimeCVs.Web.Controllers
     {
         public IActionResult Login()
         {
-            return Redirect("https://smarttime.zlioustech.com/");
+            return Redirect("https://smarttime.zlioustech.com/web/login");
         }
 
         public IActionResult Logout()

@@ -40,9 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Common">
-      <HintPath>..\Common\Common.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
 </Project>
