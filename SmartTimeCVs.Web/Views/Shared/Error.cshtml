@@ -1,25 +1,75 @@
 ﻿@model ErrorViewModel
 @{
-    ViewData["Title"] = "Error";
+    ViewData["Title"] = "Oops! Something went wrong";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<style>
+    .error-page {
+        background: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
+        background-image: url('/images/error-bg.svg'); /* Add your custom background image here */
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px;
+    }
 
-@if (Model.ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
-}
+    .error-box {
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        max-width: 1000px;
+        width: 100%;
+    }
 
-<h3>Development Mode</h3>
-<p>
-    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
-</p>
-<p>
-    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-    It can result in displaying sensitive information from exceptions to end users.
-    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-    and restarting the app.
-</p>
+    .error-icon {
+        font-size: 60px;
+        color: #dc3545;
+    }
+
+    .request-id {
+        background-color: #f1f1f1;
+        padding: 10px 15px;
+        border-radius: 8px;
+        display: inline-block;
+        font-family: monospace;
+    }
+
+    .btn-home {
+        margin-top: 20px;
+    }
+</style>
+
+<div class="error-page">
+    <div class="error-box">
+        <div class="error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h1 class="text-danger">Oops! Something went wrong.</h1>
+        <p class="lead">An unexpected error occurred while processing your request.</p>
+
+        @if (Model.ShowRequestId)
+        {
+            <p>
+                <strong>Exception:</strong>
+                <span class="request-id">@Model.Exception</span>
+            </p>
+        }
+
+        <hr />
+
+        <p class="text-muted">
+            We're working to fix this issue. You can try again later or return to the homepage.
+        </p>
+
+        <a href="/" class="btn btn-primary btn-home">
+            <i class="fas fa-home"></i> Back to Home
+        </a>
+    </div>
+</div>

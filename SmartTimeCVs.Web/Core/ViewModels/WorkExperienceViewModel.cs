@@ -2,6 +2,7 @@
 {
     public int Id { get; set; }
 
+    [Required]
     [MaxLength(250, ErrorMessage = Errors.MaxLength), Display(Name = "Employer Name")]
     public string EmployerName { get; set; } = null!;
 
@@ -14,6 +15,10 @@
 
     [MaxLength(500, ErrorMessage = Errors.MaxLength), Display(Name = "Reason for Leaving")]
     public string ReasonForLeaving { get; set; } = null!;
+
+    [Display(Name = "Attachment")]
+    public IFormFile? AttachmentFile { get; set; }
+    public string? AttachmentUrl { get; set; }
 
     #region Table Relations.
 

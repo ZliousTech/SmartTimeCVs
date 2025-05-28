@@ -11,6 +11,7 @@ namespace SmartTimeCVs.Web.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
 
         private readonly List<string> _allowedExtensions = new() { ".jpg", ".jpeg", ".png" };
+        private readonly List<string> _allowedAttachmentExtensions = new() { ".jpg", ".jpeg", ".png", ".pdf", ".docx" };
         private const int _maxAllowedSize = 5242880; // 5 MB.
 
         public JobApplicationController(ApplicationDbContext context, IMapper mapper, IWebHostEnvironment webHostEnvironment)
@@ -20,23 +21,36 @@ namespace SmartTimeCVs.Web.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var jobApplications = _context.JobApplication
-                .Include(p => p.WorkExperience)
-                .Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
-                .OrderByDescending(p => p.Id)
-                .AsNoTracking()
-                .ToList();
+            try
+            {
+                var jobApplications = await _context.JobApplication
+                        .Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
+                        .OrderByDescending(p => p.Id)
+                        .AsNoTracking()
+                        .ToListAsync();
 
-            var viewModel = _mapper.Map<IEnumerable<JobApplicationViewModel>>(jobApplications);
+                var viewModel = _mapper.Map<IEnumerable<JobApplicationViewModel>>(jobApplications);
 
-            return View(viewModel);
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new ErrorViewModel { Exception = ex.Message });
+            }
         }
 
         public IActionResult Create()
         {
-            return View("Form", PopulateViewModel());
+            try
+            {
+                return View("Form", PopulateViewModel());
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new ErrorViewModel { Exception = ex.Message });
+            }
         }
 
         [HttpPost]
@@ -50,7 +64,8 @@ namespace SmartTimeCVs.Web.Controllers
                 if (!ModelState.IsValid)
                     return View("Form", PopulateViewModel(model));
 
-                // Process ImageFile
+                #region Process ImageFile.
+
                 if (model.ImageFile != null)
                 {
                     var imageFileName = await ProcessFileAsync(model.ImageFile, "CVs", "ImageFile");
@@ -59,14 +74,35 @@ namespace SmartTimeCVs.Web.Controllers
                     model.ImageUrl = imageFileName;
                 }
 
-                // Process AttachmentFile
+                #endregion Process ImageFile.
+
+                #region Process AttachmentFile.
+
                 if (model.AttachmentFile != null)
                 {
-                    var attachmentFileName = await ProcessFileAsync(model.AttachmentFile, "attachments", "AttachmentFile");
+                    var attachmentFileName = await ProcessFileAsync(model.AttachmentFile, "attachments", "AttachmentFile", true);
                     if (!ModelState.IsValid)
                         return View("Form", PopulateViewModel(model));
                     model.AttachmentUrl = attachmentFileName;
                 }
+
+                #endregion Process AttachmentFile.
+
+                #region Process Work Experience Attachments.
+
+                foreach (var workExperience in model.WorkExperiences)
+                {
+                    var workExperienceAttachment = workExperience.AttachmentFile;
+                    if (workExperienceAttachment != null)
+                    {
+                        var attachmentFileName = await ProcessFileAsync(workExperienceAttachment, "workExperienceAttachments", "WorkExperienceAttachmentFile", true);
+                        if (!ModelState.IsValid)
+                            return View("Form", PopulateViewModel(model));
+                        workExperience.AttachmentUrl = attachmentFileName;
+                    }
+                }
+
+                #endregion Process Work Experience Attachments.
 
                 // Map ViewModel to Entity
                 var jobApplication = _mapper.Map<JobApplication>(model);
@@ -74,12 +110,20 @@ namespace SmartTimeCVs.Web.Controllers
                 jobApplication.CreatedOn = DateTime.Now;
                 jobApplication.LastUpdatedOn = DateTime.Now;
 
+                // Map and link Universites
+                var universites = _mapper.Map<List<University>>(model.Universities);
+                jobApplication.Univesity = universites;
+
+                // Map and link Courses
+                var courses = _mapper.Map<List<Course>>(model.Courses);
+                jobApplication.Course = courses;
+
                 // Map and link WorkExperiences
                 var workExperiences = _mapper.Map<List<WorkExperience>>(model.WorkExperiences);
                 jobApplication.WorkExperience = workExperiences;
 
                 // Add and save
-                _context.JobApplication.Add(jobApplication);
+                await _context.JobApplication.AddAsync(jobApplication);
                 await _context.SaveChangesAsync();
 
                 await transaction.CommitAsync();
@@ -87,30 +131,45 @@ namespace SmartTimeCVs.Web.Controllers
                 TempData["Message"] = Messages.Saved;
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
                 ModelState.AddModelError(string.Empty, "An error occurred while saving the data.");
-                return View("Form", PopulateViewModel(model));
+                return View("Error", new ErrorViewModel { Exception = ex.Message });
             }
         }
 
 
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var jobApp = _context.JobApplication.Find(id);
+            try
+            {
+                var jobApp = await _context.JobApplication.FindAsync(id);
 
-            if (jobApp is null)
-                return NotFound();
+                if (jobApp is null)
+                    return NotFound();
 
-            var realtedWorkExperience = _context.WorkExperience.Where(e => e.JobApplicationId == id).ToList();
+                var realtedUniversites = await _context.University.Where(u => u.JobApplicationId == id).ToListAsync();
+                var realtedCourses = await _context.Course.Where(c => c.JobApplicationId == id).ToListAsync();
+                var realtedWorkExperience = await _context.WorkExperience.Where(e => e.JobApplicationId == id).ToListAsync();
 
-            var viewModel = _mapper.Map<JobApplicationViewModel>(jobApp);
+                var viewModel = _mapper.Map<JobApplicationViewModel>(jobApp);
 
-            if (realtedWorkExperience is not null)
-                viewModel.WorkExperiences = _mapper.Map<List<WorkExperienceViewModel>>(realtedWorkExperience);
+                if (realtedUniversites is not null)
+                    viewModel.Universities = _mapper.Map<List<UniversityViewModel>>(realtedUniversites);
 
-            return View("Form", PopulateViewModel(viewModel));
+                if (realtedCourses is not null)
+                    viewModel.Courses = _mapper.Map<List<CourseViewModel>>(realtedCourses);
+
+                if (realtedWorkExperience is not null)
+                    viewModel.WorkExperiences = _mapper.Map<List<WorkExperienceViewModel>>(realtedWorkExperience);
+
+                return View("Form", PopulateViewModel(viewModel));
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new ErrorViewModel { Exception = ex.Message });
+            }
         }
 
         [HttpPost]
@@ -127,6 +186,8 @@ namespace SmartTimeCVs.Web.Controllers
                 }
 
                 var jobApplication = await _context.JobApplication
+                    .Include(j => j.Univesity)
+                    .Include(j => j.Course)
                     .Include(j => j.WorkExperience)
                     .FirstOrDefaultAsync(j => j.Id == model.Id);
 
@@ -135,7 +196,8 @@ namespace SmartTimeCVs.Web.Controllers
 
                 model.CompanyId = GlobalVariablesService.CompanyId;
 
-                // Handle image file
+                #region Handle image file.
+
                 if (model.ImageFile != null)
                 {
                     var imageFileName = await ProcessFileAsync(model.ImageFile, "CVs", "ImageFile");
@@ -149,10 +211,13 @@ namespace SmartTimeCVs.Web.Controllers
                     model.ImageUrl = jobApplication.ImageUrl;
                 }
 
-                // Handle attachment file
+                #endregion Handle image file.
+
+                #region Handle attachment file.
+
                 if (model.AttachmentFile != null)
                 {
-                    var attachmentFileName = await ProcessFileAsync(model.AttachmentFile, "attachments", "AttachmentFile");
+                    var attachmentFileName = await ProcessFileAsync(model.AttachmentFile, "attachments", "AttachmentFile", true);
                     if (!ModelState.IsValid)
                         return View("Form", PopulateViewModel(model));
 
@@ -163,9 +228,75 @@ namespace SmartTimeCVs.Web.Controllers
                     model.AttachmentUrl = jobApplication.AttachmentUrl;
                 }
 
+                #endregion Handle attachment file.
+
+                #region Process Work Experience Attachments.
+
+                var workExperienceList = model.WorkExperiences.ToList();
+                var originalWorkExperienceList = jobApplication.WorkExperience.ToList();
+
+                for (int workExperienceIndex = 0; workExperienceIndex < workExperienceList.Count; workExperienceIndex++)
+                {
+                    var workExperienceAttachment = workExperienceList[workExperienceIndex].AttachmentFile;
+
+                    if (workExperienceAttachment != null)
+                    {
+                        var attachmentFileName = await ProcessFileAsync(workExperienceAttachment, "workExperienceAttachments", "WorkExperienceAttachmentFile", true);
+
+                        if (!ModelState.IsValid)
+                            return View("Form", PopulateViewModel(model));
+
+                        workExperienceList[workExperienceIndex].AttachmentUrl = attachmentFileName;
+                    }
+                    else
+                    {
+                        workExperienceList[workExperienceIndex].AttachmentUrl = originalWorkExperienceList[workExperienceIndex].AttachmentUrl;
+                    }
+                }
+
+                model.WorkExperiences = workExperienceList;
+
+                #endregion Process Work Experience Attachments.
+
                 // Update job application data using AutoMapper
                 _mapper.Map(model, jobApplication);
                 jobApplication.LastUpdatedOn = DateTime.Now;
+
+                #region Prepare universities for update.
+
+                // Remove existing work experiences from DB
+                var existingUniversites = await _context.University
+                    .Where(w => w.JobApplicationId == jobApplication.Id)
+                    .ToListAsync();
+
+                _context.University.RemoveRange(existingUniversites);
+
+                // Add new work experiences
+                var newUniversites = _mapper.Map<List<University>>(model.Universities);
+                newUniversites.ForEach(u => { u.JobApplicationId = jobApplication.Id; u.LastUpdatedOn = DateTime.Now; });
+
+                jobApplication.Univesity = newUniversites;
+
+                #endregion Prepare universities for update.
+
+                #region Prepare courses for update.
+
+                // Remove existing work experiences from DB
+                var existingCourses = await _context.Course
+                    .Where(w => w.JobApplicationId == jobApplication.Id)
+                    .ToListAsync();
+
+                _context.Course.RemoveRange(existingCourses);
+
+                // Add new work experiences
+                var newCourses = _mapper.Map<List<Course>>(model.Courses);
+                newCourses.ForEach(c => { c.JobApplicationId = jobApplication.Id; c.LastUpdatedOn = DateTime.Now; });
+
+                jobApplication.Course = newCourses;
+
+                #endregion Prepare courses for update.
+
+                #region Prepare work experiences for update.
 
                 // Remove existing work experiences from DB
                 var existingWorkExperiences = await _context.WorkExperience
@@ -176,9 +307,11 @@ namespace SmartTimeCVs.Web.Controllers
 
                 // Add new work experiences
                 var newWorkExperiences = _mapper.Map<List<WorkExperience>>(model.WorkExperiences);
-                newWorkExperiences.ForEach(e => e.JobApplicationId = jobApplication.Id);
+                newWorkExperiences.ForEach(e => { e.JobApplicationId = jobApplication.Id; e.LastUpdatedOn = DateTime.Now; });
 
                 jobApplication.WorkExperience = newWorkExperiences;
+
+                #endregion Prepare work experiences for update.
 
                 _context.Update(jobApplication);
                 await _context.SaveChangesAsync();
@@ -187,47 +320,56 @@ namespace SmartTimeCVs.Web.Controllers
                 TempData["Message"] = Messages.Updated;
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
                 ModelState.AddModelError(string.Empty, "An error occurred while updating the data.");
-                return View("Form", PopulateViewModel(model));
+                return View("Error", new ErrorViewModel { Exception = ex.Message });
             }
         }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ToggleStatus(int id)
+        public async Task<IActionResult> ToggleStatus(int id)
         {
-            var jobApplication = _context.JobApplication.Find(id);
-
-            if (jobApplication is null)
-                return NotFound();
-
-            var relatedWorkExperience = _context.WorkExperience.Where(e => e.JobApplicationId == id).ToList();
-
-            jobApplication.IsDeleted = !jobApplication.IsDeleted;
-            jobApplication.LastUpdatedOn = DateTime.Now;
-
-            relatedWorkExperience.ForEach(e =>
+            try
             {
-                e.IsDeleted = !e.IsDeleted;
-                e.LastUpdatedOn = DateTime.Now;
-            });
+                var jobApplication = await _context.JobApplication.FindAsync(id);
 
+                if (jobApplication is null)
+                    return NotFound();
 
-            _context.JobApplication.Update(jobApplication);
-            _context.WorkExperience.UpdateRange(relatedWorkExperience);
-            _context.SaveChanges();
+                var relatedUniversities = await _context.University.Where(e => e.JobApplicationId == id).ToListAsync();
+                var relatedCourses = await _context.Course.Where(e => e.JobApplicationId == id).ToListAsync();
+                var relatedWorkExperience = await _context.WorkExperience.Where(e => e.JobApplicationId == id).ToListAsync();
 
-            return Ok(jobApplication.LastUpdatedOn?.ToTableDate());
+                jobApplication.IsDeleted = !jobApplication.IsDeleted;
+                jobApplication.LastUpdatedOn = DateTime.Now;
+
+                relatedUniversities.ForEach(u => { u.IsDeleted = !u.IsDeleted; u.LastUpdatedOn = DateTime.Now; });
+                relatedCourses.ForEach(c => { c.IsDeleted = !c.IsDeleted; c.LastUpdatedOn = DateTime.Now; });
+                relatedWorkExperience.ForEach(e => { e.IsDeleted = !e.IsDeleted; e.LastUpdatedOn = DateTime.Now; });
+
+                _context.JobApplication.Update(jobApplication);
+                _context.University.UpdateRange(relatedUniversities);
+                _context.Course.UpdateRange(relatedCourses);
+                _context.WorkExperience.UpdateRange(relatedWorkExperience);
+                await _context.SaveChangesAsync();
+
+                return Ok(jobApplication.LastUpdatedOn?.ToTableDate());
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new ErrorViewModel { Exception = ex.Message });
+            }
         }
 
-        public IActionResult AllowName(JobApplicationViewModel model)
+        public async Task<IActionResult> AllowName(JobApplicationViewModel model)
         {
-            var item = _context.JobApplication
-                .SingleOrDefault(i => i.FullName.Trim().ToLower() == model.FullName.Trim().ToLower() && i.CompanyId == GlobalVariablesService.CompanyId);
+            var item = await _context.JobApplication
+                .SingleOrDefaultAsync(i => i.FullName.Trim().ToLower() == model.FullName.Trim().ToLower() && i.CompanyId == GlobalVariablesService.CompanyId);
+
             var isAllowed = item is null || item.Id.Equals(model.Id);
 
             return Json(isAllowed);
@@ -319,7 +461,7 @@ namespace SmartTimeCVs.Web.Controllers
                 new SelectListItem { Value = "Dominica", Text = "Dominica" },
                 new SelectListItem { Value = "Dominican Republic", Text = "Dominican Republic" },
                 new SelectListItem { Value = "Ecuador", Text = "Ecuador" },
-                new SelectListItem { Value = "Egypt", Text = "Egypt" },
+                new SelectListItem { Value = "Egypt", Text = "Egypt", Selected = true },
                 new SelectListItem { Value = "El Salvador", Text = "El Salvador" },
                 new SelectListItem { Value = "Equatorial Guinea", Text = "Equatorial Guinea" },
                 new SelectListItem { Value = "Eritrea", Text = "Eritrea" },
@@ -472,32 +614,34 @@ namespace SmartTimeCVs.Web.Controllers
             return new List<SelectListItem>
             {
                 new SelectListItem { Value = "Teacher", Text = "Teacher" },
-                new SelectListItem { Value = "AssistantTeacher", Text = "Assistant Teacher" },
-                new SelectListItem { Value = "SchoolCounselor", Text = "School Counselor" },
-                new SelectListItem { Value = "AdminAssistant", Text = "Administrative Assistant" },
+                new SelectListItem { Value = "Assistant Teacher", Text = "Assistant Teacher" },
+                new SelectListItem { Value = "School Counselor", Text = "School Counselor" },
+                new SelectListItem { Value = "Admin Assistant", Text = "Administrative Assistant" },
                 new SelectListItem { Value = "Janitor", Text = "Janitor" },
                 new SelectListItem { Value = "Security", Text = "Security Guard" },
                 new SelectListItem { Value = "Principal", Text = "Principal" },
-                new SelectListItem { Value = "VicePrincipal", Text = "Vice Principal" },
+                new SelectListItem { Value = "Vice Principal", Text = "Vice Principal" },
                 new SelectListItem { Value = "Librarian", Text = "Librarian" },
-                new SelectListItem { Value = "ITSupport", Text = "IT Support" }
+                new SelectListItem { Value = "IT Support", Text = "IT Support" }
             };
         }
 
-        private async Task<string?> ProcessFileAsync(IFormFile file, string folderName, string fieldName)
+        private async Task<string> ProcessFileAsync(IFormFile file, string folderName, string fieldName, bool isAttachemnt = false)
         {
+            var allowedExtensionsAccordingToType = isAttachemnt ? _allowedAttachmentExtensions : _allowedExtensions;
+
             var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
 
-            if (!_allowedExtensions.Contains(ext))
+            if (!allowedExtensionsAccordingToType.Contains(ext))
             {
                 ModelState.AddModelError(fieldName, "Invalid file extension.");
-                return null;
+                return string.Empty;
             }
 
             if (file.Length > _maxAllowedSize)
             {
                 ModelState.AddModelError(fieldName, "File size exceeds 5 MB.");
-                return null;
+                return string.Empty;
             }
 
             string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", folderName);

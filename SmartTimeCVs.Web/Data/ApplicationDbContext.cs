@@ -10,6 +10,8 @@ namespace SmartTimeCVs.Web.Data
         }
 
         public DbSet<JobApplication> JobApplication { get; set; }
+        public DbSet<University> University { get; set; }
+        public DbSet<Course> Course { get; set; }
         public DbSet<WorkExperience> WorkExperience { get; set; }
         public DbSet<GenderType> GenderType { get; set; }
         public DbSet<LevelType> LevelType { get; set; }
@@ -18,6 +20,8 @@ namespace SmartTimeCVs.Web.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<JobApplication>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
+            builder.Entity<University>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
+            builder.Entity<Course>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Entity<WorkExperience>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
 
             builder.Entity<JobApplication>()

@@ -15,6 +15,7 @@ public class JobApplicationViewModel : BaseModel
     [Remote("AllowName", "JobApplication", AdditionalFields = "Id", ErrorMessage = Errors.Duplicated)]
     public string FullName { get; set; } = null!;
 
+    [Required]
     [Display(Name = "Date of Birth")]
     public DateTime? DateOfBirth { get; set; }
 
@@ -45,20 +46,13 @@ public class JobApplicationViewModel : BaseModel
 
     #region Education.
 
-    [MaxLength(250, ErrorMessage = Errors.MaxLength), Display(Name = "University / Institute Name")]
-    public string UniversityName { get; set; } = null!;
-
-    [Display(Name = "Graduation Year")]
-    public int UniversityGraduationYear { get; set; }
-
-    [MaxLength(250, ErrorMessage = Errors.MaxLength), Display(Name = "Collage")]
-    public string Collage { get; set; } = null!;
-
     [MaxLength(250, ErrorMessage = Errors.MaxLength), Display(Name = "High School Name")]
     public string HighSchoolName { get; set; } = null!;
 
     [Display(Name = "High School Graduation Year")]
     public int HighSchoolGraduationYear { get; set; }
+
+    public List<UniversityViewModel> Universities { get; set; } = new();
 
     #endregion Education.
 
@@ -79,8 +73,7 @@ public class JobApplicationViewModel : BaseModel
     public int ComputerSkillsLevelId { get; set; }
     public LevelType? ComputerSkillsLevel { get; set; }
 
-    [MaxLength(500, ErrorMessage = Errors.MaxLength), Display(Name = "Additional Courses Completed")]
-    public string AdditionalCoursesCompleted { get; set; } = null!;
+    public List<CourseViewModel> Courses { get; set; } = new();
 
     #endregion Language & Skills.
 

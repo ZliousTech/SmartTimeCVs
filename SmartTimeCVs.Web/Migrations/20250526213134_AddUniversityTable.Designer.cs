@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartTimeCVs.Web.Data;
 
@@ -11,9 +12,11 @@ using SmartTimeCVs.Web.Data;
 namespace SmartTimeCVs.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250526213134_AddUniversityTable")]
+    partial class AddUniversityTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -224,51 +227,6 @@ namespace SmartTimeCVs.Web.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.Course", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CourseAddress")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("CourseName")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<DateTime?>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.Property<DateTime?>("From")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("JobApplicationId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("LastUpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("To")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("JobApplicationId");
-
-                    b.ToTable("Course");
-                });
-
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.GenderType", b =>
                 {
                     b.Property<int>("Id")
@@ -294,6 +252,11 @@ namespace SmartTimeCVs.Web.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdditionalCoursesCompleted")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -485,9 +448,7 @@ namespace SmartTimeCVs.Web.Migrations
                         .HasColumnType("nvarchar(250)");
 
                     b.Property<DateTime?>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -520,9 +481,6 @@ namespace SmartTimeCVs.Web.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AttachmentUrl")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CreatedOn")
                         .ValueGeneratedOnAdd()
@@ -617,15 +575,6 @@ namespace SmartTimeCVs.Web.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.Course", b =>
-                {
-                    b.HasOne("SmartTimeCVs.Web.Core.Models.JobApplication", "JobApplication")
-                        .WithMany("Course")
-                        .HasForeignKey("JobApplicationId");
-
-                    b.Navigation("JobApplication");
-                });
-
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.JobApplication", b =>
                 {
                     b.HasOne("SmartTimeCVs.Web.Core.Models.LevelType", "ComputerSkillsLevel")
@@ -694,8 +643,6 @@ namespace SmartTimeCVs.Web.Migrations
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.JobApplication", b =>
                 {
-                    b.Navigation("Course");
-
                     b.Navigation("Univesity");
 
                     b.Navigation("WorkExperience");

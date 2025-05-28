@@ -8,7 +8,7 @@
         [Key]
         public int Id { get; set; }
 
-        public string? ImageUrl { get; set; }
+        public string ImageUrl { get; set; } = null!;
 
         [MaxLength(250)]
         public string FullName { get; set; } = null!;
@@ -41,17 +41,11 @@
         #region Education.
 
         [MaxLength(250)]
-        public string UniversityName { get; set; } = null!;
-
-        public int UniversityGraduationYear { get; set; }
-
-        [MaxLength(250)]
-        public string Collage { get; set; } = null!;
-
-        [MaxLength(250)]
         public string HighSchoolName { get; set; } = null!;
 
         public int HighSchoolGraduationYear { get; set; }
+
+        public ICollection<University> Univesity { get; set; } = new List<University>();
 
         #endregion Education.
 
@@ -69,8 +63,7 @@
         public int ComputerSkillsLevelId { get; set; }
         public LevelType? ComputerSkillsLevel { get; set; }
 
-        [MaxLength(500)]
-        public string AdditionalCoursesCompleted { get; set; } = null!;
+        public ICollection<Course> Course { get; set; } = new List<Course>();
 
         #endregion Language & Skills.
 
