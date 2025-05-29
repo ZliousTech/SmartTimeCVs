@@ -16,6 +16,7 @@ namespace SmartTimeCVs.Web.Data
         public DbSet<GenderType> GenderType { get; set; }
         public DbSet<LevelType> LevelType { get; set; }
         public DbSet<MaritalStatusType> MaritalStatusType { get; set; }
+        public DbSet<AttachmentFile> AttachmentFile { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -23,6 +24,7 @@ namespace SmartTimeCVs.Web.Data
             builder.Entity<University>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Entity<Course>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Entity<WorkExperience>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
+            builder.Entity<AttachmentFile>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
 
             builder.Entity<JobApplication>()
                 .HasOne(j => j.EnglishLevel)

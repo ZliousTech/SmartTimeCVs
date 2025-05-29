@@ -22,6 +22,9 @@
 
             // WorkExperienc
             CreateMap<WorkExperience, WorkExperienceViewModel>().ReverseMap();
+
+            // AttachmentFiles
+            CreateMap<AttachmentFile, AttachmentFileViewModel>().ReverseMap();
         }
     }
 }
