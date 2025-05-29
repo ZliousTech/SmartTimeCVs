@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using SmartTimeCVs.Web.Core.Enums;
+﻿using SmartTimeCVs.Web.Core.Enums;
 
 namespace SmartTimeCVs.Web.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class JobApplicationController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -68,7 +67,7 @@ namespace SmartTimeCVs.Web.Controllers
 
                 if (model.ImageFile != null)
                 {
-                    var imageFileName = await ProcessFileAsync(model.ImageFile, "CVs", "ImageFile");
+                    var imageFileName = await ProcessFileAsync(model.ImageFile, "profileImages", "ImageFile");
                     if (!ModelState.IsValid)
                         return View("Form", PopulateViewModel(model));
                     model.ImageUrl = imageFileName;
@@ -76,17 +75,17 @@ namespace SmartTimeCVs.Web.Controllers
 
                 #endregion Process ImageFile.
 
-                #region Process AttachmentFile.
+                #region Process CV AttachmentFile.
 
                 if (model.AttachmentFile != null)
                 {
-                    var attachmentFileName = await ProcessFileAsync(model.AttachmentFile, "attachments", "AttachmentFile", true);
+                    var attachmentFileName = await ProcessFileAsync(model.AttachmentFile, "cvAttachments", "AttachmentFile", true);
                     if (!ModelState.IsValid)
                         return View("Form", PopulateViewModel(model));
                     model.AttachmentUrl = attachmentFileName;
                 }
 
-                #endregion Process AttachmentFile.
+                #endregion Process CV AttachmentFile.
 
                 #region Process Work Experience Attachments.
 
@@ -200,7 +199,7 @@ namespace SmartTimeCVs.Web.Controllers
 
                 if (model.ImageFile != null)
                 {
-                    var imageFileName = await ProcessFileAsync(model.ImageFile, "CVs", "ImageFile");
+                    var imageFileName = await ProcessFileAsync(model.ImageFile, "profileImages", "ImageFile");
                     if (!ModelState.IsValid)
                         return View("Form", PopulateViewModel(model));
 
@@ -213,11 +212,11 @@ namespace SmartTimeCVs.Web.Controllers
 
                 #endregion Handle image file.
 
-                #region Handle attachment file.
+                #region Handle CV attachment file.
 
                 if (model.AttachmentFile != null)
                 {
-                    var attachmentFileName = await ProcessFileAsync(model.AttachmentFile, "attachments", "AttachmentFile", true);
+                    var attachmentFileName = await ProcessFileAsync(model.AttachmentFile, "cvAttachments", "AttachmentFile", true);
                     if (!ModelState.IsValid)
                         return View("Form", PopulateViewModel(model));
 
@@ -228,7 +227,7 @@ namespace SmartTimeCVs.Web.Controllers
                     model.AttachmentUrl = jobApplication.AttachmentUrl;
                 }
 
-                #endregion Handle attachment file.
+                #endregion Handle CV attachment file.
 
                 #region Process Work Experience Attachments.
 
@@ -387,16 +386,26 @@ namespace SmartTimeCVs.Web.Controllers
 
             var levels = InitEnumList<LevelsEnum>();
             ViewBag.EnglishLevelList = levels;
-            ViewBag.OtherLanguageLevelList = levels;
+            ViewBag.OtherLanguageLevelList = InitEnumList<LevelsEnum>(false);
             ViewBag.ComputerSkillsLevelList = levels;
 
             return model ?? new JobApplicationViewModel();
         }
 
-        private List<SelectListItem> InitEnumList<E>()
+        private List<SelectListItem> InitEnumList<E>(bool isReqiured = true)
             where E : Enum
         {
             List<SelectListItem> enumValues = new List<SelectListItem>();
+
+            if (!isReqiured)
+            {
+                enumValues.Add(new SelectListItem
+                {
+                    Text = "--Please Select--",
+                    Value = "",
+                    Selected = true
+                });
+            }
 
             foreach (var value in Enum.GetValues(typeof(E)))
             {

@@ -42,7 +42,7 @@
                         <div class="card member-card">
                             <div class="member-img">
                                 <div class="image-upload-container">
-                                    <div class="image-preview" id="imagePreview" style="background-image: url('/images/CVs/@(Model?.ImageUrl is null? "ProfileImagePlaceholder.jpg" : Model.ImageUrl)');"></div>
+                                    <div class="image-preview" id="imagePreview" style="background-image: url('/images/profileImages/@(Model?.ImageUrl is null? "ProfileImagePlaceholder.jpg" : Model.ImageUrl)');"></div>
                                     <label class="btn-icon edit-icon" id="editButton">
                                         <i class="fas fa-pencil-alt"></i>
                                         <input type="file" asp-for="ImageFile" accept=".jpg, .jpeg, .png" style="display: none;" />
@@ -240,12 +240,12 @@
                                         </div>
 
                                         <div class="col-md-6">
-                                            <h2 class="card-inside-title mb-2">Collage Name <span class="text-danger">*</span></h2>
+                                            <h2 class="card-inside-title mb-2">Collage / Specialization Name <span class="text-danger">*</span></h2>
                                             <div class="form-group form-float">
                                                 <input type="text" class="form-control"
                                                        name="Universities[@i].Collage"
                                                        value="@Model.Universities[i].Collage"
-                                                       placeholder="Collage Name" />
+                                                       placeholder="Collage / Specialization Name" />
                                                 <span class="text-danger mb-5"
                                                       data-valmsg-for="Universities[@i].Collage"></span>
                                             </div>
@@ -310,11 +310,11 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <h2 class="card-inside-title mb-1">Other Language Level <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-1">Other Language Level</h2>
                         <select class="form-control js-select2
                             @(ViewData?.ModelState["OtherLanguageLevelId"] is null ? "" :
                             ViewData.ModelState["OtherLanguageLevelId"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")"
-                                asp-for="OtherLanguageLevelId" asp-items="ViewBag.OtherLanguageLevelList">
+                                asp-for="OtherLanguageLevelId" asp-items="ViewBag.OtherLanguageLevelList" disabled>
                         </select>
                         <span asp-validation-for="OtherLanguageLevelId" class="text-danger mb-5"></span>
                     </div>
@@ -458,19 +458,6 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">Current Work Period <span class="text-danger">*</span></h2>
-                        <div class="form-group form-float">
-                            <input type="text" class="form-control
-                            @(ViewData?.ModelState["CurrentWorkPeriod"] is null? "" :
-                            ViewData.ModelState["CurrentWorkPeriod"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
-                                   placeholder="Current Work Period" asp-for="CurrentWorkPeriod">
-                            <span asp-validation-for="CurrentWorkPeriod" class="text-danger mb-5"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row clearfix mb-3">
-                    <div class="col-md-6">
                         <h2 class="card-inside-title mb-2">Current Salary</h2>
                         <div class="form-group form-float">
                             <input type="number" class="form-control
@@ -480,6 +467,42 @@
                             <span asp-validation-for="CurrentSalary" class="text-danger mb-5"></span>
                         </div>
                     </div>
+                </div>
+
+                <div class="row clearfix mb-3">
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">From <span class="text-danger">*</span></h2>
+                        <div class="input-group mb-0">
+                            <span class="input-group-addon @(ViewData?.ModelState["CurrentFrom"] is null? "" :
+                                ViewData.ModelState["CurrentFrom"]?.Errors.Any() == true ? "form-control-icon-invalid" :"form-control-icon-valid")">
+                                <i class="zmdi zmdi-calendar"></i>
+                            </span>
+                            <input type="text" class="form-control datetimepicker
+							@(ViewData?.ModelState["CurrentFrom"] is null? "" :
+                            ViewData.ModelState["CurrentFrom"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
+                                   value="@Model?.CurrentFrom?.ToString("dd-MMM-yyyy")"
+                                   placeholder="Please choose a date..." asp-for="CurrentFrom">
+                        </div>
+                        <span asp-validation-for="CurrentFrom" class="text-danger mb-5 mt-0"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">To <span class="text-danger">*</span></h2>
+                        <div class="input-group mb-0">
+                            <span class="input-group-addon @(ViewData?.ModelState["CurrentTo"] is null? "" :
+                                ViewData.ModelState["CurrentTo"]?.Errors.Any() == true ? "form-control-icon-invalid" :"form-control-icon-valid")">
+                                <i class="zmdi zmdi-calendar"></i>
+                            </span>
+                            <input type="text" class="form-control datetimepicker
+							@(ViewData?.ModelState["CurrentTo"] is null? "" :
+                            ViewData.ModelState["CurrentTo"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
+                                   value="@Model?.CurrentTo?.ToString("dd-MMM-yyyy")"
+                                   placeholder="Please choose a date..." asp-for="CurrentTo">
+                        </div>
+                        <span asp-validation-for="CurrentTo" class="text-danger mb-5 mt-0"></span>
+                    </div>
+                </div>
+
+                <div class="row clearfix mb-3">
                     <div class="col-md-6">
                         <h2 class="card-inside-title mb-2">Reason For Leaving <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
@@ -490,9 +513,6 @@
                             <span asp-validation-for="ReasonForLeavingCurrent" class="text-danger mb-5"></span>
                         </div>
                     </div>
-                </div>
-
-                <div class="row clearfix mb-3">
                     <div class="col-md-6">
                         <h2 class="card-inside-title mb-2">Ready To Join From <span class="text-danger">*</span></h2>
                         <div class="input-group mb-0">
@@ -667,7 +687,7 @@
                 <div class="row clearfix">
                     <div class="col-12">
                         <div class="form-group">
-                            <label asp-for="AttachmentFile" class="control-label">Attachment</label>
+                            <label asp-for="AttachmentFile" class="control-label">CV Attachment</label>
 
                             <!-- Preview section -->
                             @if (!string.IsNullOrEmpty(Model?.AttachmentUrl))
@@ -676,14 +696,14 @@
                                     @if (Model.AttachmentUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
                                     {
                                         <!-- PDF Preview -->
-                                        <embed src="@Url.Content("~/images/attachments/" + Model.AttachmentUrl)"
+                                        <embed src="@Url.Content("~/images/cvAttachments/" + Model.AttachmentUrl)"
                                                type="application/pdf"
                                                style="border: 1px solid #ccc; border-radius: 10px;" />
                                     }
                                     else
                                     {
                                         <!-- Download link for other file types -->
-                                        <a href="@Url.Content("~/images/attachments/" + Model.AttachmentUrl)"
+                                        <a href="@Url.Content("~/images/cvAttachments/" + Model.AttachmentUrl)"
                                            target="_blank" class="btn btn-round btn-primary mt-2">
                                            <div class="row">
                                                <div class="col-md-2 align-self-center">
@@ -691,7 +711,7 @@
                                                </div>
                                                 <div class="col-md-10 align-self-center">
                                                     <b>
-                                                        View Current Attachment
+                                                        View Current CV Attachment
                                                     </b>
                                                </div>
                                            </div>
@@ -765,13 +785,13 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <h2 class="card-inside-title mb-2">Collage Name <span class="text-danger">*</span></h2>
+                <h2 class="card-inside-title mb-2">Collage / Specialization Name <span class="text-danger">*</span></h2>
                 <div class="form-group form-float">
                     <input type="text" class="form-control
                         @(ViewData.ModelState[$"Universities[index].Collage"]?.Errors.Any() == true ? "form-control-invalid" :
                           ViewData.ModelState.ContainsKey($"Universities[index].Collage") ? "form-control-valid" : "")"
                            name="Universities[index].Collage"
-                           placeholder="Collage Name" />
+                           placeholder="Collage / Specialization Name" />
                     <span class="text-danger mb-5"
                           data-valmsg-for="Universities[index].Collage"></span>
                 </div>
@@ -1004,6 +1024,16 @@
             setupAddRemoveHandlers("Experience", addWorkExperienceEntry, reindexWorkExperiences);
 
             setupFileInput();
+        });
+
+        $("#OtherLanguage").on('change', function () {
+            if ($(this).val().length > 0) {
+                $('#OtherLanguageLevelId').prop('disabled', false);
+            }
+            else {
+                $('#OtherLanguageLevelId').val("").trigger('change');
+                $('#OtherLanguageLevelId').prop('disabled', true);
+            }
         });
 
         function initDatePickers(context = document) {

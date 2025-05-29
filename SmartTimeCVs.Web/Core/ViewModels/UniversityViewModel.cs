@@ -9,7 +9,7 @@
         public string UniversityName { get; set; } = null!;
 
         [Required]
-        [MaxLength(250, ErrorMessage = Errors.MaxLength), Display(Name = "Collage")]
+        [MaxLength(250, ErrorMessage = Errors.MaxLength), Display(Name = "Collage / Specialization")]
         public string Collage { get; set; } = null!;
 
         [Required]

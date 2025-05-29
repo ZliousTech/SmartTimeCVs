@@ -1,118 +1,120 @@
 ﻿namespace SmartTimeCVs.Web.Core.Models
 {
-    [Index(nameof(FullName), IsUnique = true)]
-    public class JobApplication : BaseModel
-    {
-        #region Basic Information.
+	[Index(nameof(FullName), IsUnique = true)]
+	public class JobApplication : BaseModel
+	{
+		#region Basic Information.
 
-        [Key]
-        public int Id { get; set; }
+		[Key]
+		public int Id { get; set; }
 
-        public string ImageUrl { get; set; } = null!;
+		public string ImageUrl { get; set; } = null!;
 
-        [MaxLength(250)]
-        public string FullName { get; set; } = null!;
+		[MaxLength(250)]
+		public string FullName { get; set; } = null!;
 
-        public DateTime? DateOfBirth { get; set; }
+		public DateTime? DateOfBirth { get; set; }
 
-        [MaxLength(500)]
-        public string PlaceOfBirth { get; set; } = null!;
+		[MaxLength(500)]
+		public string PlaceOfBirth { get; set; } = null!;
 
-        public int GenderId { get; set; }
-        public GenderType? Gender { get; set; }
+		public int GenderId { get; set; }
+		public GenderType? Gender { get; set; }
 
-        [MaxLength(500)]
-        public string Address { get; set; } = null!;
+		[MaxLength(500)]
+		public string Address { get; set; } = null!;
 
-        [MaxLength(18)]
-        public string NationalID { get; set; } = null!;
+		[MaxLength(18)]
+		public string NationalID { get; set; } = null!;
 
-        [MaxLength(15)]
-        public string MobileNumber { get; set; } = null!;
+		[MaxLength(15)]
+		public string MobileNumber { get; set; } = null!;
 
-        [MaxLength(250)]
-        public string Nationality { get; set; } = null!;
+		[MaxLength(250)]
+		public string Nationality { get; set; } = null!;
 
-        public int MaritalStatusId { get; set; }
-        public MaritalStatusType? MaritalStatus { get; set; }
+		public int MaritalStatusId { get; set; }
+		public MaritalStatusType? MaritalStatus { get; set; }
 
-        #endregion Basic Information.
+		#endregion Basic Information.
 
-        #region Education.
+		#region Education.
 
-        [MaxLength(250)]
-        public string HighSchoolName { get; set; } = null!;
+		[MaxLength(250)]
+		public string HighSchoolName { get; set; } = null!;
 
-        public int HighSchoolGraduationYear { get; set; }
+		public int HighSchoolGraduationYear { get; set; }
 
-        public ICollection<University> Univesity { get; set; } = new List<University>();
+		public ICollection<University> Univesity { get; set; } = new List<University>();
 
-        #endregion Education.
+		#endregion Education.
 
-        #region Language & Skills.
+		#region Language & Skills.
 
-        public int EnglishLevelId { get; set; }
-        public LevelType? EnglishLevel { get; set; }
+		public int EnglishLevelId { get; set; }
+		public LevelType? EnglishLevel { get; set; }
 
-        [MaxLength(50)]
-        public string OtherLanguage { get; set; } = null!;
+		[MaxLength(50)]
+		public string? OtherLanguage { get; set; }
 
-        public int OtherLanguageLevelId { get; set; }
-        public LevelType? OtherLanguageLevel { get; set; }
+		public int? OtherLanguageLevelId { get; set; }
+		public LevelType? OtherLanguageLevel { get; set; }
 
-        public int ComputerSkillsLevelId { get; set; }
-        public LevelType? ComputerSkillsLevel { get; set; }
+		public int ComputerSkillsLevelId { get; set; }
+		public LevelType? ComputerSkillsLevel { get; set; }
 
-        public ICollection<Course> Course { get; set; } = new List<Course>();
+		public ICollection<Course> Course { get; set; } = new List<Course>();
 
-        #endregion Language & Skills.
+		#endregion Language & Skills.
 
-        #region Current Employment Information.
+		#region Current Employment Information.
 
-        [MaxLength(250)]
-        public string CurrentEmployerName { get; set; } = null!;
+		[MaxLength(250)]
+		public string CurrentEmployerName { get; set; } = null!;
 
-        [MaxLength(500)]
-        public string CurrentEmployerAddress { get; set; } = null!;
+		[MaxLength(500)]
+		public string CurrentEmployerAddress { get; set; } = null!;
 
-        [MaxLength(2500)]
-        public string CurrentJobDescription { get; set; } = null!;
+		[MaxLength(2500)]
+		public string CurrentJobDescription { get; set; } = null!;
 
-        [MaxLength(250)]
-        public string CurrentWorkPeriod { get; set; } = null!;
+		public decimal? CurrentSalary { get; set; }
 
-        public decimal? CurrentSalary { get; set; }
+		public DateTime? CurrentFrom { get; set; }
 
-        [MaxLength(500)]
-        public string ReasonForLeavingCurrent { get; set; } = null!;
+		public DateTime? CurrentTo { get; set; }
 
-        public DateTime? ReadyToJoinFrom { get; set; }
 
-        #endregion Current Employment Information.
+		[MaxLength(500)]
+		public string ReasonForLeavingCurrent { get; set; } = null!;
 
-        #region Previous Work Experience.
+		public DateTime? ReadyToJoinFrom { get; set; }
 
-        public ICollection<WorkExperience> WorkExperience { get; set; } = new List<WorkExperience>();
+		#endregion Current Employment Information.
 
-        #endregion Previous Work Experience.
+		#region Previous Work Experience.
 
-        #region Application Information.
+		public ICollection<WorkExperience> WorkExperience { get; set; } = new List<WorkExperience>();
 
-        [MaxLength(100)]
-        public string? ApplyingFor { get; set; }
+		#endregion Previous Work Experience.
 
-        [MaxLength(500)]
-        public string? AdminFeedback { get; set; }
+		#region Application Information.
 
-        public bool IsAccepted { get; set; } = false;
+		[MaxLength(100)]
+		public string? ApplyingFor { get; set; }
 
-        #endregion Application Information.
+		[MaxLength(500)]
+		public string? AdminFeedback { get; set; }
 
-        #region Attachment.
-        public string? AttachmentUrl { get; set; }
+		public bool IsAccepted { get; set; } = false;
 
-        #endregion Attachment.
+		#endregion Application Information.
 
-        public string? CompanyId { get; set; }
-    }
+		#region Attachment.
+		public string? AttachmentUrl { get; set; }
+
+		#endregion Attachment.
+
+		public string? CompanyId { get; set; }
+	}
 }

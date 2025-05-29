@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartTimeCVs.Web.Data;
 
@@ -11,9 +12,11 @@ using SmartTimeCVs.Web.Data;
 namespace SmartTimeCVs.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250529161650_AddDateFromToInCurrentWorkSection")]
+    partial class AddDateFromToInCurrentWorkSection
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -403,7 +406,7 @@ namespace SmartTimeCVs.Web.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("OtherLanguageLevelId")
+                    b.Property<int>("OtherLanguageLevelId")
                         .HasColumnType("int");
 
                     b.Property<string>("PlaceOfBirth")
@@ -655,7 +658,8 @@ namespace SmartTimeCVs.Web.Migrations
                     b.HasOne("SmartTimeCVs.Web.Core.Models.LevelType", "OtherLanguageLevel")
                         .WithMany()
                         .HasForeignKey("OtherLanguageLevelId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("ComputerSkillsLevel");
 
