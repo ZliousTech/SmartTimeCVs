@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using SmartTimeCVs.Web.Core.Enums;
+﻿using SmartTimeCVs.Web.Core.Enums;
 
 namespace SmartTimeCVs.Web.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class JobApplicationController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -31,7 +30,7 @@ namespace SmartTimeCVs.Web.Controllers
                         .AsNoTracking()
                         .ToListAsync();
 
-                var viewModel = _mapper.Map<IEnumerable<JobApplicationViewModel>>(jobApplications);
+                var viewModel = _mapper.Map<List<JobApplicationViewModel>>(jobApplications);
 
                 return View(viewModel);
             }
@@ -68,7 +67,7 @@ namespace SmartTimeCVs.Web.Controllers
 
                 if (model.ImageFile != null)
                 {
-                    var imageFileName = await ProcessFileAsync(model.ImageFile, "CVs", "ImageFile");
+                    var imageFileName = await ProcessFileAsync(model.ImageFile, "profileImages", "ImageFile");
                     if (!ModelState.IsValid)
                         return View("Form", PopulateViewModel(model));
                     model.ImageUrl = imageFileName;
@@ -76,17 +75,17 @@ namespace SmartTimeCVs.Web.Controllers
 
                 #endregion Process ImageFile.
 
-                #region Process AttachmentFile.
+                #region Process CV AttachmentFile.
 
                 if (model.AttachmentFile != null)
                 {
-                    var attachmentFileName = await ProcessFileAsync(model.AttachmentFile, "attachments", "AttachmentFile", true);
+                    var attachmentFileName = await ProcessFileAsync(model.AttachmentFile, "cvAttachments", "AttachmentFiles", true);
                     if (!ModelState.IsValid)
                         return View("Form", PopulateViewModel(model));
                     model.AttachmentUrl = attachmentFileName;
                 }
 
-                #endregion Process AttachmentFile.
+                #endregion Process CV AttachmentFile.
 
                 #region Process Work Experience Attachments.
 
@@ -103,6 +102,22 @@ namespace SmartTimeCVs.Web.Controllers
                 }
 
                 #endregion Process Work Experience Attachments.
+
+                #region Process Attachments.
+
+                foreach (var attachment in model.AttachmentFiles)
+                {
+                    var attachmentFile = attachment.AttachmentFile;
+                    if (attachmentFile != null)
+                    {
+                        var attachmentFileName = await ProcessFileAsync(attachmentFile, "attachments", "AttachmentFiles", true);
+                        if (!ModelState.IsValid)
+                            return View("Form", PopulateViewModel(model));
+                        attachment.AttachmentUrl = attachmentFileName;
+                    }
+                }
+
+                #endregion Process Attachments.
 
                 // Map ViewModel to Entity
                 var jobApplication = _mapper.Map<JobApplication>(model);
@@ -121,6 +136,10 @@ namespace SmartTimeCVs.Web.Controllers
                 // Map and link WorkExperiences
                 var workExperiences = _mapper.Map<List<WorkExperience>>(model.WorkExperiences);
                 jobApplication.WorkExperience = workExperiences;
+
+                // Map and link Attachments
+                var attachments = _mapper.Map<List<AttachmentFile>>(model.AttachmentFiles);
+                jobApplication.AttachmentFiles = attachments;
 
                 // Add and save
                 await _context.JobApplication.AddAsync(jobApplication);
@@ -151,7 +170,8 @@ namespace SmartTimeCVs.Web.Controllers
 
                 var realtedUniversites = await _context.University.Where(u => u.JobApplicationId == id).ToListAsync();
                 var realtedCourses = await _context.Course.Where(c => c.JobApplicationId == id).ToListAsync();
-                var realtedWorkExperience = await _context.WorkExperience.Where(e => e.JobApplicationId == id).ToListAsync();
+                var realtedWorkExperiences = await _context.WorkExperience.Where(e => e.JobApplicationId == id).ToListAsync();
+                var realtedAttachments = await _context.AttachmentFile.Where(e => e.JobApplicationId == id).ToListAsync();
 
                 var viewModel = _mapper.Map<JobApplicationViewModel>(jobApp);
 
@@ -161,8 +181,11 @@ namespace SmartTimeCVs.Web.Controllers
                 if (realtedCourses is not null)
                     viewModel.Courses = _mapper.Map<List<CourseViewModel>>(realtedCourses);
 
-                if (realtedWorkExperience is not null)
-                    viewModel.WorkExperiences = _mapper.Map<List<WorkExperienceViewModel>>(realtedWorkExperience);
+                if (realtedWorkExperiences is not null)
+                    viewModel.WorkExperiences = _mapper.Map<List<WorkExperienceViewModel>>(realtedWorkExperiences);
+
+                if (realtedAttachments is not null)
+                    viewModel.AttachmentFiles = _mapper.Map<List<AttachmentFileViewModel>>(realtedAttachments);
 
                 return View("Form", PopulateViewModel(viewModel));
             }
@@ -189,6 +212,7 @@ namespace SmartTimeCVs.Web.Controllers
                     .Include(j => j.Univesity)
                     .Include(j => j.Course)
                     .Include(j => j.WorkExperience)
+                    .Include(j => j.AttachmentFiles)
                     .FirstOrDefaultAsync(j => j.Id == model.Id);
 
                 if (jobApplication == null)
@@ -200,7 +224,7 @@ namespace SmartTimeCVs.Web.Controllers
 
                 if (model.ImageFile != null)
                 {
-                    var imageFileName = await ProcessFileAsync(model.ImageFile, "CVs", "ImageFile");
+                    var imageFileName = await ProcessFileAsync(model.ImageFile, "profileImages", "ImageFile");
                     if (!ModelState.IsValid)
                         return View("Form", PopulateViewModel(model));
 
@@ -213,11 +237,11 @@ namespace SmartTimeCVs.Web.Controllers
 
                 #endregion Handle image file.
 
-                #region Handle attachment file.
+                #region Handle CV attachment file.
 
                 if (model.AttachmentFile != null)
                 {
-                    var attachmentFileName = await ProcessFileAsync(model.AttachmentFile, "attachments", "AttachmentFile", true);
+                    var attachmentFileName = await ProcessFileAsync(model.AttachmentFile, "cvAttachments", "AttachmentFiles", true);
                     if (!ModelState.IsValid)
                         return View("Form", PopulateViewModel(model));
 
@@ -228,7 +252,7 @@ namespace SmartTimeCVs.Web.Controllers
                     model.AttachmentUrl = jobApplication.AttachmentUrl;
                 }
 
-                #endregion Handle attachment file.
+                #endregion Handle CV attachment file.
 
                 #region Process Work Experience Attachments.
 
@@ -257,6 +281,34 @@ namespace SmartTimeCVs.Web.Controllers
                 model.WorkExperiences = workExperienceList;
 
                 #endregion Process Work Experience Attachments.
+
+                #region Process Attachments.
+
+                var attachmentList = model.AttachmentFiles.ToList();
+                var originalAttachmentList = jobApplication.AttachmentFiles.ToList();
+
+                for (int attachmentIndex = 0; attachmentIndex < attachmentList.Count; attachmentIndex++)
+                {
+                    var attachment = attachmentList[attachmentIndex].AttachmentFile;
+
+                    if (attachment != null)
+                    {
+                        var attachmentFileName = await ProcessFileAsync(attachment, "attachments", "AttachmentFiles", true);
+
+                        if (!ModelState.IsValid)
+                            return View("Form", PopulateViewModel(model));
+
+                        attachmentList[attachmentIndex].AttachmentUrl = attachmentFileName;
+                    }
+                    else
+                    {
+                        attachmentList[attachmentIndex].AttachmentUrl = originalAttachmentList[attachmentIndex].AttachmentUrl;
+                    }
+                }
+
+                model.AttachmentFiles = attachmentList;
+
+                #endregion Process Attachments.
 
                 // Update job application data using AutoMapper
                 _mapper.Map(model, jobApplication);
@@ -313,6 +365,23 @@ namespace SmartTimeCVs.Web.Controllers
 
                 #endregion Prepare work experiences for update.
 
+                #region Prepare attachments for update.
+
+                // Remove existing attachments from DB
+                var existingAttachments = await _context.AttachmentFile
+                    .Where(a => a.JobApplicationId == jobApplication.Id)
+                    .ToListAsync();
+
+                _context.AttachmentFile.RemoveRange(existingAttachments);
+
+                // Add new attachments
+                var newAttachments = _mapper.Map<List<AttachmentFile>>(model.AttachmentFiles);
+                newAttachments.ForEach(e => { e.JobApplicationId = jobApplication.Id; e.LastUpdatedOn = DateTime.Now; });
+
+                jobApplication.AttachmentFiles = newAttachments;
+
+                #endregion Prepare attachments for update.
+
                 _context.Update(jobApplication);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -342,19 +411,22 @@ namespace SmartTimeCVs.Web.Controllers
 
                 var relatedUniversities = await _context.University.Where(e => e.JobApplicationId == id).ToListAsync();
                 var relatedCourses = await _context.Course.Where(e => e.JobApplicationId == id).ToListAsync();
-                var relatedWorkExperience = await _context.WorkExperience.Where(e => e.JobApplicationId == id).ToListAsync();
+                var relatedWorkExperiences = await _context.WorkExperience.Where(e => e.JobApplicationId == id).ToListAsync();
+                var relatedAttachment = await _context.AttachmentFile.Where(e => e.JobApplicationId == id).ToListAsync();
 
                 jobApplication.IsDeleted = !jobApplication.IsDeleted;
                 jobApplication.LastUpdatedOn = DateTime.Now;
 
                 relatedUniversities.ForEach(u => { u.IsDeleted = !u.IsDeleted; u.LastUpdatedOn = DateTime.Now; });
                 relatedCourses.ForEach(c => { c.IsDeleted = !c.IsDeleted; c.LastUpdatedOn = DateTime.Now; });
-                relatedWorkExperience.ForEach(e => { e.IsDeleted = !e.IsDeleted; e.LastUpdatedOn = DateTime.Now; });
+                relatedWorkExperiences.ForEach(e => { e.IsDeleted = !e.IsDeleted; e.LastUpdatedOn = DateTime.Now; });
+                relatedAttachment.ForEach(e => { e.IsDeleted = !e.IsDeleted; e.LastUpdatedOn = DateTime.Now; });
 
                 _context.JobApplication.Update(jobApplication);
                 _context.University.UpdateRange(relatedUniversities);
                 _context.Course.UpdateRange(relatedCourses);
-                _context.WorkExperience.UpdateRange(relatedWorkExperience);
+                _context.WorkExperience.UpdateRange(relatedWorkExperiences);
+                _context.AttachmentFile.UpdateRange(relatedAttachment);
                 await _context.SaveChangesAsync();
 
                 return Ok(jobApplication.LastUpdatedOn?.ToTableDate());
@@ -387,16 +459,26 @@ namespace SmartTimeCVs.Web.Controllers
 
             var levels = InitEnumList<LevelsEnum>();
             ViewBag.EnglishLevelList = levels;
-            ViewBag.OtherLanguageLevelList = levels;
+            ViewBag.OtherLanguageLevelList = InitEnumList<LevelsEnum>(false);
             ViewBag.ComputerSkillsLevelList = levels;
 
             return model ?? new JobApplicationViewModel();
         }
 
-        private List<SelectListItem> InitEnumList<E>()
+        private List<SelectListItem> InitEnumList<E>(bool isReqiured = true)
             where E : Enum
         {
             List<SelectListItem> enumValues = new List<SelectListItem>();
+
+            if (!isReqiured)
+            {
+                enumValues.Add(new SelectListItem
+                {
+                    Text = "--Please Select--",
+                    Value = "",
+                    Selected = true
+                });
+            }
 
             foreach (var value in Enum.GetValues(typeof(E)))
             {

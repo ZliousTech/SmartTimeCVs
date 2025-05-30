@@ -55,9 +55,9 @@
         public LevelType? EnglishLevel { get; set; }
 
         [MaxLength(50)]
-        public string OtherLanguage { get; set; } = null!;
+        public string? OtherLanguage { get; set; }
 
-        public int OtherLanguageLevelId { get; set; }
+        public int? OtherLanguageLevelId { get; set; }
         public LevelType? OtherLanguageLevel { get; set; }
 
         public int ComputerSkillsLevelId { get; set; }
@@ -78,10 +78,12 @@
         [MaxLength(2500)]
         public string CurrentJobDescription { get; set; } = null!;
 
-        [MaxLength(250)]
-        public string CurrentWorkPeriod { get; set; } = null!;
-
         public decimal? CurrentSalary { get; set; }
+
+        public DateTime? CurrentFrom { get; set; }
+
+        public DateTime? CurrentTo { get; set; }
+
 
         [MaxLength(500)]
         public string ReasonForLeavingCurrent { get; set; } = null!;
@@ -108,10 +110,12 @@
 
         #endregion Application Information.
 
-        #region Attachment.
+        #region Attachments.
         public string? AttachmentUrl { get; set; }
 
-        #endregion Attachment.
+        public ICollection<AttachmentFile> AttachmentFiles { get; set; } = new List<AttachmentFile>();
+
+        #endregion Attachments.
 
         public string? CompanyId { get; set; }
     }

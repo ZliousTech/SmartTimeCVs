@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartTimeCVs.Web.Data;
 
@@ -11,9 +12,11 @@ using SmartTimeCVs.Web.Data;
 namespace SmartTimeCVs.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250529161650_AddDateFromToInCurrentWorkSection")]
+    partial class AddDateFromToInCurrentWorkSection
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -224,38 +227,6 @@ namespace SmartTimeCVs.Web.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.AttachmentFiles", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AttachmentUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("JobApplicationId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("LastUpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("JobApplicationId");
-
-                    b.ToTable("AttachmentFiles", (string)null);
-                });
-
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.Course", b =>
                 {
                     b.Property<int>("Id")
@@ -298,7 +269,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("JobApplicationId");
 
-                    b.ToTable("Course", (string)null);
+                    b.ToTable("Course");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.GenderType", b =>
@@ -316,7 +287,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GenderType", (string)null);
+                    b.ToTable("GenderType");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.JobApplication", b =>
@@ -435,7 +406,7 @@ namespace SmartTimeCVs.Web.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("OtherLanguageLevelId")
+                    b.Property<int>("OtherLanguageLevelId")
                         .HasColumnType("int");
 
                     b.Property<string>("PlaceOfBirth")
@@ -466,7 +437,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("OtherLanguageLevelId");
 
-                    b.ToTable("JobApplication", (string)null);
+                    b.ToTable("JobApplication");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.LevelType", b =>
@@ -483,7 +454,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LevelType", (string)null);
+                    b.ToTable("LevelType");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.MaritalStatusType", b =>
@@ -500,7 +471,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MaritalStatusType", (string)null);
+                    b.ToTable("MaritalStatusType");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.University", b =>
@@ -542,7 +513,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("JobApplicationId");
 
-                    b.ToTable("University", (string)null);
+                    b.ToTable("University");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.WorkExperience", b =>
@@ -595,7 +566,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("JobApplicationId");
 
-                    b.ToTable("WorkExperience", (string)null);
+                    b.ToTable("WorkExperience");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -649,15 +620,6 @@ namespace SmartTimeCVs.Web.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.AttachmentFiles", b =>
-                {
-                    b.HasOne("SmartTimeCVs.Web.Core.Models.JobApplication", "JobApplication")
-                        .WithMany("AttachmentFiles")
-                        .HasForeignKey("JobApplicationId");
-
-                    b.Navigation("JobApplication");
-                });
-
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.Course", b =>
                 {
                     b.HasOne("SmartTimeCVs.Web.Core.Models.JobApplication", "JobApplication")
@@ -696,7 +658,8 @@ namespace SmartTimeCVs.Web.Migrations
                     b.HasOne("SmartTimeCVs.Web.Core.Models.LevelType", "OtherLanguageLevel")
                         .WithMany()
                         .HasForeignKey("OtherLanguageLevelId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("ComputerSkillsLevel");
 
@@ -734,8 +697,6 @@ namespace SmartTimeCVs.Web.Migrations
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.JobApplication", b =>
                 {
-                    b.Navigation("AttachmentFiles");
-
                     b.Navigation("Course");
 
                     b.Navigation("Univesity");

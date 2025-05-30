@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartTimeCVs.Web.Data;
 
@@ -11,9 +12,11 @@ using SmartTimeCVs.Web.Data;
 namespace SmartTimeCVs.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250529184815_MakeJobApplicationOptionalInAttachmentFile")]
+    partial class MakeJobApplicationOptionalInAttachmentFile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -253,7 +256,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("JobApplicationId");
 
-                    b.ToTable("AttachmentFiles", (string)null);
+                    b.ToTable("AttachmentFiles");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.Course", b =>
@@ -298,7 +301,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("JobApplicationId");
 
-                    b.ToTable("Course", (string)null);
+                    b.ToTable("Course");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.GenderType", b =>
@@ -316,7 +319,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GenderType", (string)null);
+                    b.ToTable("GenderType");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.JobApplication", b =>
@@ -466,7 +469,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("OtherLanguageLevelId");
 
-                    b.ToTable("JobApplication", (string)null);
+                    b.ToTable("JobApplication");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.LevelType", b =>
@@ -483,7 +486,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LevelType", (string)null);
+                    b.ToTable("LevelType");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.MaritalStatusType", b =>
@@ -500,7 +503,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MaritalStatusType", (string)null);
+                    b.ToTable("MaritalStatusType");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.University", b =>
@@ -542,7 +545,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("JobApplicationId");
 
-                    b.ToTable("University", (string)null);
+                    b.ToTable("University");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.WorkExperience", b =>
@@ -595,7 +598,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("JobApplicationId");
 
-                    b.ToTable("WorkExperience", (string)null);
+                    b.ToTable("WorkExperience");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

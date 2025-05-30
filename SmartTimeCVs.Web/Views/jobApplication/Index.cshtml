@@ -54,7 +54,7 @@
 					{
 						<tr>
 							<td class="d-none">@jobApp.Id</td>
-							<td class="text-center" scope="row"><img class="rounded-circle" src="~/images/CVs/@(jobApp.ImageUrl is null? "ProfileImagePlaceholder.jpg" : jobApp.ImageUrl)" width="40" height="40" alt="Application image"></td>
+							<td class="text-center" scope="row"><img class="rounded-circle" src="~/images/profileImages/@(jobApp.ImageUrl is null? "ProfileImagePlaceholder.jpg" : jobApp.ImageUrl)" width="40" height="40" alt="Application image"></td>
 							<td scope="row">
 								<span class="list-name">@jobApp.FullName</span>
 								<br />
@@ -68,7 +68,7 @@
 								@if (!string.IsNullOrEmpty(jobApp.AttachmentUrl))
 								{
 									<a class="btn btn-sm btn-round btn-primary"
-									   href="~/images/attachments/@jobApp.AttachmentUrl"
+									   href="~/images/cvAttachments/@jobApp.AttachmentUrl"
 									   target="_blank"
 									   download>
 										<div class="row">

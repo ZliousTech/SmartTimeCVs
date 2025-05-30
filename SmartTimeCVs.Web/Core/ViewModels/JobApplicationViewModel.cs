@@ -63,10 +63,10 @@ public class JobApplicationViewModel : BaseModel
     public LevelType? EnglishLevel { get; set; }
 
     [MaxLength(50, ErrorMessage = Errors.MaxLength), Display(Name = "Other Language")]
-    public string OtherLanguage { get; set; } = null!;
+    public string? OtherLanguage { get; set; }
 
     [Display(Name = "Other Language Level")]
-    public int OtherLanguageLevelId { get; set; }
+    public int? OtherLanguageLevelId { get; set; }
     public LevelType? OtherLanguageLevel { get; set; }
 
     [Display(Name = "Computer Skills Level")]
@@ -88,11 +88,16 @@ public class JobApplicationViewModel : BaseModel
     [MaxLength(2500, ErrorMessage = Errors.MaxLength), Display(Name = "Job Description")]
     public string CurrentJobDescription { get; set; } = null!;
 
-    [MaxLength(250, ErrorMessage = Errors.MaxLength), Display(Name = "Work Period")]
-    public string CurrentWorkPeriod { get; set; } = null!;
-
     [Display(Name = "Current Salary")]
     public decimal? CurrentSalary { get; set; }
+
+    [Required]
+    [Display(Name = "From")]
+    public DateTime? CurrentFrom { get; set; }
+
+    [Required]
+    [Display(Name = "To")]
+    public DateTime? CurrentTo { get; set; }
 
     [MaxLength(500, ErrorMessage = Errors.MaxLength), Display(Name = "Reason for Leaving")]
     public string ReasonForLeavingCurrent { get; set; } = null!;
@@ -122,9 +127,11 @@ public class JobApplicationViewModel : BaseModel
 
     #region Attachment.
 
-    [Display(Name = "Attachment")]
+    [Display(Name = "CV Attachment")]
     public IFormFile? AttachmentFile { get; set; }
     public string? AttachmentUrl { get; set; }
+
+    public List<AttachmentFileViewModel> AttachmentFiles { get; set; } = new();
 
     #endregion Attachment.
 
