@@ -1,8 +1,10 @@
-﻿using SmartTimeCVs.Web.Core.Enums;
+﻿using Microsoft.AspNetCore.Authorization;
+using SmartTimeCVs.Web.Core.Enums;
 
 namespace SmartTimeCVs.Web.Controllers
 {
-    //[Authorize]
+    [Authorize]
+
     public class JobApplicationController : Controller
     {
         private readonly ApplicationDbContext _context;

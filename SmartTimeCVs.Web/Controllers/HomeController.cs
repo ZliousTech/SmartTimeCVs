@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using System.Diagnostics;
 
 namespace SmartTimeCVs.Web.Controllers
 {
-    //[Authorize]
+    [Authorize]
+
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
