@@ -266,7 +266,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("JobApplicationId");
 
-                    b.ToTable("Course");
+                    b.ToTable("Course", (string)null);
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.GenderType", b =>
@@ -284,7 +284,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GenderType");
+                    b.ToTable("GenderType", (string)null);
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.JobApplication", b =>
@@ -434,7 +434,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("OtherLanguageLevelId");
 
-                    b.ToTable("JobApplication");
+                    b.ToTable("JobApplication", (string)null);
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.LevelType", b =>
@@ -451,7 +451,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LevelType");
+                    b.ToTable("LevelType", (string)null);
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.MaritalStatusType", b =>
@@ -468,7 +468,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MaritalStatusType");
+                    b.ToTable("MaritalStatusType", (string)null);
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.University", b =>
@@ -510,7 +510,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("JobApplicationId");
 
-                    b.ToTable("University");
+                    b.ToTable("University", (string)null);
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.WorkExperience", b =>
@@ -563,7 +563,7 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("JobApplicationId");
 
-                    b.ToTable("WorkExperience");
+                    b.ToTable("WorkExperience", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
