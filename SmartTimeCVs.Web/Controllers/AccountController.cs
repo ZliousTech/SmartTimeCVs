@@ -29,7 +29,6 @@ namespace SmartTimeCVs.Web.Controllers
 
                 if (SysBase.PtrCode(CompanyGuidID, PrtCode))
                 {
-
                     if (!string.IsNullOrWhiteSpace(CompanyGuidID))
                     {
                         GlobalVariablesService.CompanyId = CompanyGuidID;

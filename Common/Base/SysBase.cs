@@ -66,10 +66,10 @@ namespace Common.Base
                             else //Company is exist
                             {
                                 //Check PrtCode.
-                                if (CalculateSentTime(Decrypt(PrtCode)).ToLower() == "logout")
-                                {
-                                    return false;
-                                }
+                                //if (CalculateSentTime(Decrypt(PrtCode)).ToLower() == "logout")
+                                //{
+                                //    return false;
+                                //}
                             }
                         }
                         else
