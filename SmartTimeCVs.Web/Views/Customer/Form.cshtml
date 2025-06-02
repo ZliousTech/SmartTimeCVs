@@ -1,9 +1,9 @@
 ﻿@model JobApplicationViewModel
 @{
-    ViewData["Title"] = "Job Application";
-    ViewData["ControllerName"] = "JobApplication";
-    ViewData["Path"] = "CVs / Job Applications / " + (Model?.Id > 0 ? "Edit" : "Create");
-    ViewData["Icon"] = "assignment";
+    ViewData["Title"] = "Customers";
+    ViewData["ControllerName"] = "Customer";
+    ViewData["Path"] = "CVs / Customers / " + (Model?.Id > 0 ? "Edit" : "Create");
+    ViewData["Icon"] = "assignment_ind";
 }
 
 @section Styles {
@@ -832,7 +832,7 @@
             <div class="d-flex justify-content-between mt-4">
                 <button type="button" class="btn btn-round btn-secondary" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
                 <button type="button" class="btn btn-round btn-primary" id="nextBtn" onclick="nextPrev(1)">Next</button>                
-                <button type="submit" class="btn btn-round btn-success float-end" id="submitBtn" data-index-url="/JobApplication">
+                <button type="submit" class="btn btn-round btn-success float-end" id="submitBtn" data-index-url="/Customer">
                     <div class="row">
                         <div class="col-5 px-2 js-correct-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
