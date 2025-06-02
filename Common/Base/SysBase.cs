@@ -92,24 +92,44 @@ namespace Common.Base
             return true;
         }
 
-        private static DataTable GetDataTble(string cmdStr, string ConnectionStr)
+        public static string CheckShortLink_SmartTimeCVs(string bsslValue)
         {
-            SqlConnection Conn = new SqlConnection(ConnectionStr);
-            if (Conn.State == ConnectionState.Closed) Conn.Open();
-            SqlCommand cmd = new SqlCommand(cmdStr, Conn);
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataSet ds = new DataSet();
-            DataTable dt = new DataTable();
-            da.Fill(ds);
-            dt = ds.Tables[0];
-            if (Conn.State == ConnectionState.Open)
+            string? CompanyGuidID = "";
+            
+            try
             {
-                Conn.Close();
-                cmd.Cancel();
-                da.Dispose();
-                ds.Dispose();
+                using (var client = new HttpClient())
+                {
+                    string SmartTimeAPIUri = "https://smarttimeapi.zlioustech.com";
+                    client.BaseAddress = new Uri($"{SmartTimeAPIUri}/api/Company/");
+                    var endpoint = $"CheckShortLinkSTCV/{bsslValue}";
+                    var response = client.GetAsync(endpoint).Result;
+                    if (response != null && response.IsSuccessStatusCode)
+                    {
+                        string jsonDataString = response.Content.ReadAsStringAsync().Result;
+                        dynamic jsonData = JsonConvert.DeserializeObject(jsonDataString);
+                        if (jsonData != null && jsonData?.status == "True")
+                        {
+                            CompanyGuidID = jsonData?.data.companyGuidID;
+                        }
+                        else
+                        {
+                            return CompanyGuidID;
+                        }
+                    }
+                    else
+                    {
+                        return CompanyGuidID;
+                    }
+                }
             }
-            return dt;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return CompanyGuidID;
+            }
+
+            return CompanyGuidID;
         }
 
         private static string CalculateSentTime(string SentTime)

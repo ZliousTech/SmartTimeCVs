@@ -22,6 +22,19 @@ namespace SmartTimeCVs.Web.Controllers
         {
             try
             {
+                /** SOF Check the short link **/
+                var request = HttpContext.Request;
+                var fullUrl = $"{request.Scheme}://{request.Host}{request.Path}{request.QueryString}";
+                string? bsslValue = HttpContext.Request.Query["bssl"];
+
+                if(!String.IsNullOrWhiteSpace(bsslValue))
+                {
+                    CompanyGuidID = SysBase.CheckShortLink_SmartTimeCVs(bsslValue);
+                }
+                /** EOF Check the short link **/
+
+
+                /** Start the action registration to register the company guid id **/
                 if (CompanyGuidID is null || PrtCode is null)
                 {
                     HttpContext.SignOutAsync();
