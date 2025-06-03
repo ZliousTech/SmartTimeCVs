@@ -12,7 +12,7 @@ public class JobApplicationViewModel : BaseModel
 
     [Required]
     [MaxLength(250, ErrorMessage = Errors.MaxLength), Display(Name = "Full Name")]
-    [Remote("AllowName", "JobApplication", AdditionalFields = "Id", ErrorMessage = Errors.Duplicated)]
+    [Remote("AllowName", "Customer", AdditionalFields = "Id", ErrorMessage = Errors.Duplicated)]
     public string FullName { get; set; } = null!;
 
     [Required]

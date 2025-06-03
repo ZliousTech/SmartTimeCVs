@@ -39,9 +39,14 @@
 
     <partial name="_Header" />
     <partial name="_RightAside" />
-    <partial name="_LeftAside" />
 
-    <section class="content home">
+    @* Left Aside *@
+    @if (ViewData["HideSidebars"] as bool? != true)
+    {
+        <partial name="_LeftAside" />
+    }
+
+    <section class="content home" style="@( (ViewData["HideSidebars"] as bool? != true) ? "" : "margin-left: 0px !important;" )">
         <div class="block-header">
             <div class="row">
                 <div class="col-lg-5 col-md-4 col-sm-12">

@@ -50,10 +50,12 @@ namespace SmartTimeCVs.Web.Controllers
             }
         }
 
-        public IActionResult Create()
+        public IActionResult Create(bool isFromJobApplicationView = false)
         {
             try
             {
+                HandleSidebarsViewAndReturnToController(isFromJobApplicationView);
+
                 return View("Form", PopulateViewModel());
             }
             catch (Exception ex)
@@ -168,10 +170,12 @@ namespace SmartTimeCVs.Web.Controllers
             }
         }
 
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, bool isFromJobApplicationView = false)
         {
             try
             {
+                HandleSidebarsViewAndReturnToController(isFromJobApplicationView);
+
                 var jobApp = await _context.JobApplication.FindAsync(id);
 
                 if (jobApp is null)
@@ -417,6 +421,20 @@ namespace SmartTimeCVs.Web.Controllers
         }
 
         #region Private Area.
+
+        private void HandleSidebarsViewAndReturnToController(bool isFromJobApplicationView)
+        {
+            if (isFromJobApplicationView)
+            {
+                ViewData["HideSidebars"] = false;
+                ViewData["ControllerName"] = "JobApplication";
+            }
+            else
+            {
+                ViewData["HideSidebars"] = true;
+                ViewData["ControllerName"] = "Customer";
+            }
+        }
 
         private JobApplicationViewModel PopulateViewModel(JobApplicationViewModel? model = null)
         {

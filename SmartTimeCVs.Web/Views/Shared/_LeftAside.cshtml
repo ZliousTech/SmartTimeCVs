@@ -24,16 +24,13 @@
 					<i class="material-icons">dashboard</i><span>Dashboard</span>
 				</a>
 			</li>
-			<li active-when="JobApplication,Customer">
+			<li active-when="JobApplication">
 				<a href="javascript:void(0);" class="menu-toggle">
 					<i class="material-icons">description</i><span>CVs</span>
 				</a>
 				<ul class="ml-menu">
 					<li active-when="JobApplication">
 						<a asp-controller="JobApplication" asp-action="Index">Job Application</a>
-					</li>
-					<li active-when="Customer">
-						<a asp-controller="Customer" asp-action="Index">Customer</a>
 					</li>
 				</ul>
 			</li>
