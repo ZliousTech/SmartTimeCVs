@@ -38,10 +38,7 @@ namespace SmartTimeCVs.Web.Controllers
 
 
                 /** Start the action registration to register the company guid id **/
-                if (CompanyGuidID is null || PrtCode is null)
-                {
-                    HttpContext.SignOutAsync();
-                }
+                if (CompanyGuidID is null || PrtCode is null) return RedirectToAction("Logout");
 
                 if (SysBase.PtrCode(CompanyGuidID, PrtCode))
                 {
@@ -65,13 +62,13 @@ namespace SmartTimeCVs.Web.Controllers
                 }
                 else
                 {
-                    HttpContext.SignOutAsync();
+                    return RedirectToAction("Logout");
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                HttpContext.SignOutAsync();
+                return RedirectToAction("Logout");
             }
 
             return IsCompanyRequest ? RedirectToAction("Index", "Home") : RedirectToAction("Index", "Customer");
