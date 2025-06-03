@@ -20,6 +20,8 @@ namespace SmartTimeCVs.Web.Controllers
 
         public IActionResult Register([FromQuery] string CompanyGuidID, [FromQuery] string PrtCode)
         {
+            bool IsCompanyRequest = true;
+
             try
             {
                 /** SOF Check the short link **/
@@ -27,9 +29,10 @@ namespace SmartTimeCVs.Web.Controllers
                 var fullUrl = $"{request.Scheme}://{request.Host}{request.Path}{request.QueryString}";
                 string? bsslValue = HttpContext.Request.Query["bssl"];
 
-                if(!String.IsNullOrWhiteSpace(bsslValue))
+                if (!String.IsNullOrWhiteSpace(bsslValue))
                 {
                     CompanyGuidID = SysBase.CheckShortLink_SmartTimeCVs(bsslValue);
+                    IsCompanyRequest = false;
                 }
                 /** EOF Check the short link **/
 
@@ -52,6 +55,7 @@ namespace SmartTimeCVs.Web.Controllers
                         //new Claim(ClaimTypes.Sid, _CompanyGuidID),
                         new(ClaimTypes.Sid, CompanyGuidID!),
                         new("CompanyGuidID", CompanyGuidID!),
+                        new("IsCompanyRequest", IsCompanyRequest.ToString()),
                     };
 
                     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -70,7 +74,7 @@ namespace SmartTimeCVs.Web.Controllers
                 HttpContext.SignOutAsync();
             }
 
-            return RedirectToAction("Index", "Home");
+            return IsCompanyRequest ? RedirectToAction("Index", "Home") : RedirectToAction("Index", "Customer");
         }
     }
 }
