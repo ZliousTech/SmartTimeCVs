@@ -83,6 +83,19 @@
 
                 <div class="row clearfix mb-3">
                     <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">Email <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="email" class="form-control
+                            @(ViewData.ModelState["Email"] is null? "" :
+                            ViewData.ModelState["Email"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
+                                   placeholder="Email" asp-for="Email">
+                            <span asp-validation-for="Email" class="text-danger mb-5"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row clearfix mb-3">
+                    <div class="col-md-6">
                         <h2 class="card-inside-title mb-2">Date Of Birth <span class="text-danger">*</span></h2>
                         <div class="input-group mb-0">
                             <input type="date" style="border-radius: 30px;" class="form-control
@@ -643,6 +656,7 @@
                                             </div>
                                         }
                                         <div class="col-12 mb-3">
+                                            <h2 class="card-inside-title mb-2">Work Experience Attachment</h2>
                                             <div class="custom-file-uploader"
                                                  style="border: 2px dashed #ccc; padding: 60px; text-align: center; border-radius: 20px; background: #eee !important;">
                                                 <input asp-for="@Model.WorkExperiences[i].AttachmentFile" type="file" class="form-control-file attachment-input" style="display: none;" id="workExperiencesAttachmentFile_@i" />
@@ -1075,6 +1089,7 @@
 
         <div class="row clearfix mb-3">
             <div class="col-12 mb-3">
+                <h2 class="card-inside-title mb-2">Work Experience Attachment</h2>
                 <div class="custom-file-uploader"
                      style="border: 2px dashed #ccc; padding: 60px; text-align: center; border-radius: 20px; background: #eee !important;">
                     <input name="WorkExperiences[index].AttachmentFile" type="file" class="form-control-file attachment-input" style="display: none;" id="workExperiencesAttachmentFile_index" />

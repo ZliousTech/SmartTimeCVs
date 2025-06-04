@@ -1,6 +1,8 @@
 ﻿namespace SmartTimeCVs.Web.Core.Models
 {
     [Index(nameof(FullName), IsUnique = true)]
+    [Index(nameof(NationalID), IsUnique = true)]
+    [Index(nameof(Email), IsUnique = true)]
     public class JobApplication : BaseModel
     {
         #region Basic Information.
@@ -12,6 +14,9 @@
 
         [MaxLength(250)]
         public string FullName { get; set; } = null!;
+
+        [MaxLength(250)]
+        public string Email { get; set; } = null!;
 
         public DateTime? DateOfBirth { get; set; }
 
@@ -70,13 +75,13 @@
         #region Current Employment Information.
 
         [MaxLength(250)]
-        public string CurrentEmployerName { get; set; } = null!;
+        public string? CurrentEmployerName { get; set; }
 
         [MaxLength(500)]
-        public string CurrentEmployerAddress { get; set; } = null!;
+        public string? CurrentEmployerAddress { get; set; }
 
         [MaxLength(2500)]
-        public string CurrentJobDescription { get; set; } = null!;
+        public string? CurrentJobDescription { get; set; }
 
         public decimal? CurrentSalary { get; set; }
 
@@ -84,9 +89,8 @@
 
         public DateTime? CurrentTo { get; set; }
 
-
         [MaxLength(500)]
-        public string ReasonForLeavingCurrent { get; set; } = null!;
+        public string? ReasonForLeavingCurrent { get; set; }
 
         public DateTime? ReadyToJoinFrom { get; set; }
 
@@ -105,8 +109,6 @@
 
         [MaxLength(500)]
         public string? AdminFeedback { get; set; }
-
-        public bool IsAccepted { get; set; } = false;
 
         #endregion Application Information.
 

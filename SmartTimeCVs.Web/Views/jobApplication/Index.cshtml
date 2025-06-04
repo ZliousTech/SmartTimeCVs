@@ -45,7 +45,7 @@
 						<th class="js-status-header">Status</th>
 						<th>Date Of Birth</th>
 						<th>Mobile</th>
-						<th>Application Status</th>
+						<th>Email</th>
 						<th class="js-no-export">Attachment</th>
 						<th class="js-no-export">Actions</th>
 					</tr>
@@ -64,7 +64,7 @@
 							<td class="js-td-status"><span class="badge badge-@(jobApp.IsDeleted? "danger" : "success") js-status">@(jobApp.IsDeleted ? "Deleted" : "Available")</span></td>
 							<td>@jobApp.DateOfBirth?.ToDateOfBirth()</td>
 							<td>@jobApp.MobileNumber</td>
-							<td><span class="badge bg-@(jobApp.IsAccepted? "light-blue" : "red")">@(jobApp.IsAccepted ? "Accepted" : "Rejected")</span></td>
+							<td><span class="list-name">@jobApp.Email</span></td>
 							<td class="text-center">
 								@if (!string.IsNullOrEmpty(jobApp.AttachmentUrl))
 								{

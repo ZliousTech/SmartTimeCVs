@@ -20,21 +20,46 @@
 
 <div class="card shadow-sm">
     <div class="card-header">
-        <div class="row">
-            <div class="col-6"><i class="material-icons breadcrumb theme-main-color align-self-center">@ViewData["Icon"]</i></div>
-        </div>
+        @if (!string.IsNullOrWhiteSpace(ViewBag.CompanyLogo) && !string.IsNullOrWhiteSpace(ViewBag.HomePageHtml))
+        {
+            <div class="row mt-2">
+                <div class="col-md-3" style="text-align: end;">
+                    <div class="form-group">
+                        <div class="image">
+                            <br><br>
+                            <img src="@ViewBag.CompanyLogo" alt="Company Logo" class="mb-2" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="form-group">
+                        <h4><span id="LblCompName" title="Light House">Light House</span></h4>
+                        <br>
+                        <span id="LblTxtCompanyHomePageText">
+                            @Html.Raw(ViewBag.HomePageHtml)
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-6"><i class="material-icons breadcrumb theme-main-color align-self-center">@ViewData["Icon"]</i></div>
+            </div>
+        }
     </div>
     <div class="card-body">
         <div class="body table-responsive">
             <div class="row clearfix mb-3">
                 <div class="col-md-6">
-                    <h2 class="card-inside-title mb-2">National Number <span class="text-danger">*</span></h2>
+                    <h2 class="card-inside-title mb-2">Email <span class="text-danger">*</span></h2>
                     <div class="form-group form-float">
-                        <input id="nationalNumber" type="text" class="form-control" placeholder="National Number">
+                        <input id="email" type="email" class="form-control" placeholder="Email">
                     </div>
                 </div>
                 <div class="col-md-6 mt-2" style="text-align: end;">
-                    <a id="startBtn" asp-controller="Customer" asp-action="GetCustomer" asp-route-nationalId=""
+                    <a id="startBtn" asp-controller="Customer" asp-action="GetCustomer" asp-route-email=""
                        class="btn btn-lg btn-round btn-primary font-bold waves-effect float-end disabled-link">
 
                         Start
@@ -49,18 +74,18 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('#nationalNumber').on('input', function () {
-                var nationalId = $(this).val().trim();
+            $('#email').on('input', function () {
+                var email = $(this).val().trim();
                 var $startBtn = $('#startBtn');
 
-                if (nationalId.length === 0) {
+                if (email.length === 0) {
                     $startBtn.addClass("disabled-link");
                     $startBtn.attr("href", "#");
                 } else {
                     $startBtn.removeClass("disabled-link");
 
                     // Generate the URL using the known pattern
-                    $startBtn.attr("href", `/Customer/GetCustomer?nationalId=${encodeURIComponent(nationalId)}`);
+                    $startBtn.attr("href", `/Customer/GetCustomer?email=${encodeURIComponent(email)}`);
                 }
             });
         });

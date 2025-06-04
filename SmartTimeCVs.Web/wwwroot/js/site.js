@@ -132,11 +132,17 @@ function updateDatatableData(row, currentStatus, btn, lastUpdatedOn, currentPage
 // End DataTables
 
 // Begin sweetAlerts
-function showSuccessMessage(message = "Saved Successfully") {
+function showSuccessMessage(message = "Operation Saved Successfully", redirectTo = "") {
 	Swal.fire({
 		icon: "success",
 		title: "Success",
-		text: message
+		text: message,
+		allowOutsideClick: false, // Prevent clicking outside to close
+		allowEscapeKey: false     // Prevent Esc key to close
+	}).then(() => {
+		if (redirectTo !== "") {
+			window.location.href = redirectTo;
+		}
 	});
 }
 
@@ -213,9 +219,12 @@ function onRequestBegin() {
 	$('body :submit').attr('disabled', 'disabled');
 }
 
-function onRequestSuccess() {
-	window.location.href = $('body :submit').data('index-url');
+function onRequestSuccess(response) {
+	if (response.success) {
+		showSuccessMessage(response.message, $('body :submit').data('index-url'));
+	}
 }
+
 
 function onModalRequestSuccess(row) {
 	$('#Modal').modal('hide');
@@ -247,9 +256,6 @@ function onRequestComplete() {
 
 $(document).ready(function () {
 
-	var message = $('#Message').text();
-	if (message !== '') {
-		showSuccessMessage(message);
-	}
+	
 })
 // End javascript

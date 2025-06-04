@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using SmartTimeCVs.Web.Core.Dtos;
 using SmartTimeCVs.Web.Core.Enums;
 
 namespace SmartTimeCVs.Web.Controllers
@@ -22,7 +23,7 @@ namespace SmartTimeCVs.Web.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             string CompanyGuidID;
             string IsCompanyRequest = "";
@@ -34,20 +35,27 @@ namespace SmartTimeCVs.Web.Controllers
             else return RedirectToAction("Logout", "Account");
             if (IsCompanyRequest == "True") return RedirectToAction("Logout", "Account");
 
+            using var httpClient = new HttpClient();
+            var response = await httpClient.GetFromJsonAsync<SmartTimeCompanyDTO>
+                            ("https://smarttimeapi.zlioustech.com/api/Company/GetCompanyLogoHomePageText/88aa34452c5141e8b7b68443cad9b7e7");
+
+            ViewBag.HomePageHtml = response?.Data?.HomePageTextEn;
+            ViewBag.CompanyLogo = response?.Data?.CompanyLogo;
+
             return View();
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCustomer(string nationalId)
+        public async Task<IActionResult> GetCustomer(string email)
         {
             try
             {
                 var customer = await _context.JobApplication
-                        .FirstOrDefaultAsync(j => j.CompanyId == GlobalVariablesService.CompanyId && j.NationalID.Equals(nationalId));
+                        .FirstOrDefaultAsync(j => j.CompanyId == GlobalVariablesService.CompanyId && j.Email.Equals(email));
 
                 if (customer is null)
                 {
-                    return RedirectToAction(nameof(Create));
+                    return RedirectToAction(nameof(Create), new { email = email });
                 }
                 else
                 {
@@ -60,13 +68,15 @@ namespace SmartTimeCVs.Web.Controllers
             }
         }
 
-        public IActionResult Create(bool isFromJobApplicationView = false)
+        public IActionResult Create(bool isFromJobApplicationView = false, string email = "")
         {
             try
             {
                 HandleSidebarsViewAndReturnToController(isFromJobApplicationView);
 
-                return View("Form", PopulateViewModel());
+                var initJobApplicationWithEmail = !string.IsNullOrWhiteSpace(email) ? new JobApplicationViewModel { Email = email } : null;
+
+                return View("Form", PopulateViewModel(initJobApplicationWithEmail));
             }
             catch (Exception ex)
             {
@@ -169,8 +179,7 @@ namespace SmartTimeCVs.Web.Controllers
 
                 await transaction.CommitAsync();
 
-                TempData["Message"] = Messages.Saved;
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = true, message = Messages.Saved });
             }
             catch (Exception ex)
             {
@@ -409,8 +418,8 @@ namespace SmartTimeCVs.Web.Controllers
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                TempData["Message"] = Messages.Updated;
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = true, message = Messages.Updated });
+
             }
             catch (Exception ex)
             {
@@ -423,7 +432,29 @@ namespace SmartTimeCVs.Web.Controllers
         public async Task<IActionResult> AllowName(JobApplicationViewModel model)
         {
             var item = await _context.JobApplication
-                .SingleOrDefaultAsync(j => j.FullName.Trim().ToLower() == model.FullName.Trim().ToLower() && j.CompanyId == GlobalVariablesService.CompanyId);
+                .SingleOrDefaultAsync(j => j.FullName.Trim().ToLower() == model.FullName.Trim().ToLower() &&
+                                           j.CompanyId == GlobalVariablesService.CompanyId);
+
+            var isAllowed = item is null || item.Id.Equals(model.Id);
+
+            return Json(isAllowed);
+        }
+
+        public async Task<IActionResult> AllowEmail(JobApplicationViewModel model)
+        {
+            var item = await _context.JobApplication
+                .SingleOrDefaultAsync(j => j.Email.Trim().ToLower() == model.Email.Trim().ToLower() &&
+                                           j.CompanyId == GlobalVariablesService.CompanyId);
+
+            var isAllowed = item is null || item.Id.Equals(model.Id);
+
+            return Json(isAllowed);
+        }
+
+        public async Task<IActionResult> AllowNationalID(JobApplicationViewModel model)
+        {
+            var item = await _context.JobApplication
+                .SingleOrDefaultAsync(j => j.NationalID.Trim().ToLower() == model.NationalID.Trim().ToLower());
 
             var isAllowed = item is null || item.Id.Equals(model.Id);
 

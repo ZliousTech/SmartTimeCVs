@@ -12,8 +12,13 @@ public class JobApplicationViewModel : BaseModel
 
     [Required]
     [MaxLength(250, ErrorMessage = Errors.MaxLength), Display(Name = "Full Name")]
-    [Remote("AllowName", "Customer", AdditionalFields = "Id", ErrorMessage = Errors.Duplicated)]
+    [Remote("AllowName", "Customer", AdditionalFields = nameof(Id), ErrorMessage = Errors.Duplicated)]
     public string FullName { get; set; } = null!;
+
+    [Required]
+    [MaxLength(250, ErrorMessage = Errors.MaxLength), Display(Name = "Email")]
+    [Remote("AllowEmail", "Customer", AdditionalFields = nameof(Id), ErrorMessage = Errors.Duplicated)]
+    public string Email { get; set; } = null!;
 
     [Required]
     [Display(Name = "Date of Birth")]
@@ -30,6 +35,7 @@ public class JobApplicationViewModel : BaseModel
     public string Address { get; set; } = null!;
 
     [MaxLength(18, ErrorMessage = Errors.MaxLength), Display(Name = "NationalID")]
+    [Remote("AllowNationalID", "Customer", AdditionalFields = nameof(Id), ErrorMessage = Errors.Duplicated)]
     public string NationalID { get; set; } = null!;
 
     [MaxLength(15, ErrorMessage = Errors.MaxLength), Display(Name = "MobileNumber")]
@@ -80,27 +86,25 @@ public class JobApplicationViewModel : BaseModel
     #region Current Employment Information.
 
     [MaxLength(250, ErrorMessage = Errors.MaxLength), Display(Name = "Current Employer")]
-    public string CurrentEmployerName { get; set; } = null!;
+    public string? CurrentEmployerName { get; set; }
 
     [MaxLength(500, ErrorMessage = Errors.MaxLength), Display(Name = "Employer Address")]
-    public string CurrentEmployerAddress { get; set; } = null!;
+    public string? CurrentEmployerAddress { get; set; }
 
     [MaxLength(2500, ErrorMessage = Errors.MaxLength), Display(Name = "Job Description")]
-    public string CurrentJobDescription { get; set; } = null!;
+    public string? CurrentJobDescription { get; set; }
 
     [Display(Name = "Current Salary")]
     public decimal? CurrentSalary { get; set; }
 
-    [Required]
     [Display(Name = "From")]
     public DateTime? CurrentFrom { get; set; }
 
-    [Required]
     [Display(Name = "To")]
     public DateTime? CurrentTo { get; set; }
 
     [MaxLength(500, ErrorMessage = Errors.MaxLength), Display(Name = "Reason for Leaving")]
-    public string ReasonForLeavingCurrent { get; set; } = null!;
+    public string? ReasonForLeavingCurrent { get; set; }
 
     [Display(Name = "Ready To Join From")]
     public DateTime? ReadyToJoinFrom { get; set; }
@@ -120,8 +124,6 @@ public class JobApplicationViewModel : BaseModel
 
     [MaxLength(500, ErrorMessage = Errors.MaxLength), Display(Name = "Admin Feedback")]
     public string? AdminFeedback { get; set; }
-
-    public bool IsAccepted { get; set; } = false;
 
     #endregion Application Information.
 
