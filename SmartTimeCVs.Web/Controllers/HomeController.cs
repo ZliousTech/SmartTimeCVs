@@ -24,7 +24,6 @@ namespace SmartTimeCVs.Web.Controllers
                 IsCompanyRequest = HttpContext.User.Claims.First(c => c.Type == "IsCompanyRequest").Value.ToString();
             }
             else return RedirectToAction("Logout", "Account");
-
             if (IsCompanyRequest == "False") return RedirectToAction("Logout", "Account");
 
             return View();
