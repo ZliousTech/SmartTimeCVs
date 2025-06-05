@@ -38,7 +38,7 @@ namespace SmartTimeCVs.Web.Controllers
 
 
                 /** Start the action registration to register the company guid id **/
-                if (CompanyGuidID is null || PrtCode is null) return RedirectToAction("Logout");
+                if (CompanyGuidID is null) return RedirectToAction("Logout");
 
                 if (SysBase.PtrCode(CompanyGuidID, PrtCode))
                 {
@@ -49,8 +49,6 @@ namespace SmartTimeCVs.Web.Controllers
 
                     var claims = new List<Claim>
                     {
-                        //new Claim(ClaimTypes.Sid, _CompanyGuidID),
-                        new(ClaimTypes.Sid, CompanyGuidID!),
                         new("CompanyGuidID", CompanyGuidID!),
                         new("IsCompanyRequest", IsCompanyRequest.ToString()),
                     };
