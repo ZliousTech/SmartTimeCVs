@@ -37,7 +37,7 @@ namespace SmartTimeCVs.Web.Controllers
 
             using var httpClient = new HttpClient();
             var response = await httpClient.GetFromJsonAsync<SmartTimeCompanyDTO>
-                            ("https://smarttimeapi.zlioustech.com/api/Company/GetCompanyLogoHomePageText/88aa34452c5141e8b7b68443cad9b7e7");
+                            ($"https://smarttimeapi.zlioustech.com/api/Company/GetCompanyLogoHomePageText/{CompanyGuidID}");
 
             ViewBag.HomePageHtml = response?.Data?.HomePageTextEn;
             ViewBag.CompanyLogo = response?.Data?.CompanyLogo;
