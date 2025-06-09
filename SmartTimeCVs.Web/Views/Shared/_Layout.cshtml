@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -52,7 +53,7 @@
                 <div class="col-lg-5 col-md-4 col-sm-12">
                     <h2>
                         @ViewData["Title"]
-                        <small class="text-muted mb-3">Welcome to ZLIOUS | SMART-TIME-CVs</small>
+                        <small class="text-muted mb-3">@Localizer["WelcomeToZLIOUS"]</small>
                     </h2>
                 </div>
                 <div class="col-lg-7 col-md-8 col-sm-12">

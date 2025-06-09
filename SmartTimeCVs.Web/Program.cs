@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Razor;
 using SmartTimeCVs.Web.Core.Mapping;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//adding multi-language support
+AddingMultiLanguageSupportServices(builder);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -32,6 +36,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+
+//adding multi-language support
+AddingMultiLanguageSupport(app);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -62,3 +69,28 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
+
+
+//adding multi-language support (Methods)
+static void AddingMultiLanguageSupportServices(WebApplicationBuilder? builder)
+{
+    if (builder == null) { throw new Exception("builder==null"); }
+    ;
+
+    builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+    builder.Services.AddMvc()
+            .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix);
+    builder.Services.Configure<RequestLocalizationOptions>(options =>
+    {
+        var supportedCultures = new[] { "en", "fr", "de", "it", "ar" };
+        options.SetDefaultCulture(supportedCultures[0])
+            .AddSupportedCultures(supportedCultures)
+            .AddSupportedUICultures(supportedCultures);
+    });
+}
+
+static void AddingMultiLanguageSupport(WebApplication? app)
+{
+    app?.UseRequestLocalization();
+}

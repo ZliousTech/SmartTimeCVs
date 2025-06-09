@@ -95,7 +95,8 @@ namespace Common.Base
         public static string CheckShortLink_SmartTimeCVs(string bsslValue)
         {
             string? CompanyGuidID = "";
-            
+            string? UseHomePageText = "";
+
             try
             {
                 using (var client = new HttpClient())
@@ -111,25 +112,26 @@ namespace Common.Base
                         if (jsonData != null && jsonData?.status == "True")
                         {
                             CompanyGuidID = jsonData?.data.companyGuidID;
+                            UseHomePageText = jsonData?.data.useHomePageText;
                         }
                         else
                         {
-                            return CompanyGuidID;
+                            return String.Concat(CompanyGuidID, "|", UseHomePageText);
                         }
                     }
                     else
                     {
-                        return CompanyGuidID;
+                        return String.Concat(CompanyGuidID, "|", UseHomePageText);
                     }
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                return CompanyGuidID;
+                return String.Concat(CompanyGuidID, "|", UseHomePageText);
             }
 
-            return CompanyGuidID;
+            return String.Concat(CompanyGuidID, "|", UseHomePageText);
         }
 
         private static string CalculateSentTime(string SentTime)

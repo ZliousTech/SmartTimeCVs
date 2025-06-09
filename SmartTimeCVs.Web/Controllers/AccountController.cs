@@ -21,6 +21,7 @@ namespace SmartTimeCVs.Web.Controllers
         public IActionResult Register([FromQuery] string CompanyGuidID, [FromQuery] string PrtCode)
         {
             bool IsCompanyRequest = true;
+            bool UseHomePageText = false;
 
             try
             {
@@ -31,7 +32,9 @@ namespace SmartTimeCVs.Web.Controllers
 
                 if (!String.IsNullOrWhiteSpace(bsslValue))
                 {
-                    CompanyGuidID = SysBase.CheckShortLink_SmartTimeCVs(bsslValue);
+                    string[] CompanyGuidIDAndUseHomePageText = SysBase.CheckShortLink_SmartTimeCVs(bsslValue).Split('|');
+                    CompanyGuidID = CompanyGuidIDAndUseHomePageText[0];
+                    UseHomePageText =  bool.Parse(CompanyGuidIDAndUseHomePageText[1]);
                     IsCompanyRequest = false;
                 }
                 /** EOF Check the short link **/
@@ -69,7 +72,10 @@ namespace SmartTimeCVs.Web.Controllers
                 return RedirectToAction("Logout");
             }
 
-            return IsCompanyRequest ? RedirectToAction("Index", "Home") : RedirectToAction("Index", "Customer");
+            if(UseHomePageText)
+                return IsCompanyRequest ? RedirectToAction("Index", "Home") : RedirectToAction("Index", "Biography");
+            else
+                return IsCompanyRequest ? RedirectToAction("Index", "Home") : RedirectToAction("Index", "SBiography");
         }
     }
 }

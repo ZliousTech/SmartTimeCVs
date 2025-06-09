@@ -1,12 +1,17 @@
-﻿@{
+﻿@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+@{
     ViewData["HideSidebars"] = true;
-    ViewData["Title"] = "Customers";
+    ViewData["Title"] = Localizer["TheBiography"];
     ViewData["ControllerName"] = "Customer";
-    ViewData["Path"] = "Customer / Index";
+    //ViewData["Path"] = "Customer / Index";
     ViewData["Icon"] = "assignment_ind";
 }
 
 @section Styles {
+    <link rel="stylesheet" href="~/theme/assets/css/plugins/bootstrap-select.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
+    <a href="~/lib/font-awesome/webfonts/fa-solid-900.woff2"></a>
+    <link rel="stylesheet" href="~/css/custom/advanced-custom-file-uploader.css" />
     <link rel="stylesheet" href="~/theme/assets/css/plugins/datatables.bootstrap4.min.css" />
     <link rel="stylesheet" href="~/lib/animate.css/animate.min.css" />
     <style>
@@ -52,18 +57,31 @@
     <div class="card-body">
         <div class="body table-responsive">
             <div class="row clearfix mb-3">
+                <div class="col-md-6 mb-3">
+                    <h2><label for="languageSelect" class="card-inside-title mb-2">@Localizer["SelectLanguage"]</label></h2>
+                    <form id="langForm" method="post" asp-controller="LanguageSwitcher" asp-action="SetLanguage">
+                        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                        @{
+                            var currentCulture = Thread.CurrentThread.CurrentUICulture.Name;
+                        }
+                        <select id="languageSelect" name="culture" class="form-control js-select2" onchange="this.form.submit()">
+                            <option value="en-US" selected="@(currentCulture == "en" ? "selected" : null)">English</option>
+                            <option value="ar-JO" selected="@(currentCulture == "ar" ? "selected" : null)">العربية</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+            <div class="row clearfix mb-3">
                 <div class="col-md-6">
-                    <h2 class="card-inside-title mb-2">Email <span class="text-danger">*</span></h2>
+                    <h2 class="card-inside-title mb-2">@Localizer["Email"] <span class="text-danger">*</span></h2>
                     <div class="form-group form-float">
-                        <input id="email" type="email" class="form-control" placeholder="Email">
+                        <input id="email" type="email" class="form-control" placeholder="@Localizer["Email"]">
                     </div>
                 </div>
                 <div class="col-md-6 mt-2" style="text-align: end;">
-                    <a id="startBtn" asp-controller="Customer" asp-action="GetCustomer" asp-route-email=""
-                       class="btn btn-lg btn-round btn-primary font-bold waves-effect float-end disabled-link">
-
-                        Start
-                    </a>
+                    <h2><label for="languageSelect" class="card-inside-title mb-1">@Localizer["StartApplication"]</label></h2>
+                    <a id="startBtn" asp-controller="Biography" asp-action="GetCustomer" asp-route-email=""
+                       class="btn btn-lg btn-round btn-primary font-bold waves-effect float-end disabled-link">@Localizer["Start"]</a>
                 </div>
             </div>
         </div>
@@ -85,7 +103,7 @@
                     $startBtn.removeClass("disabled-link");
 
                     // Generate the URL using the known pattern
-                    $startBtn.attr("href", `/Customer/GetCustomer?email=${encodeURIComponent(email)}`);
+                    $startBtn.attr("href", `/Biography/GetCustomer?email=${encodeURIComponent(email)}`);
                 }
             });
         });

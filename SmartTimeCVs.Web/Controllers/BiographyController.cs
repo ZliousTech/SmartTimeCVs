@@ -1,26 +1,28 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Localization;
 using SmartTimeCVs.Web.Core.Dtos;
 using SmartTimeCVs.Web.Core.Enums;
 
 namespace SmartTimeCVs.Web.Controllers
 {
     [Authorize]
-
-    public class CustomerController : Controller
+    public class BiographyController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
         private readonly List<string> _allowedExtensions = new() { ".jpg", ".jpeg", ".png" };
         private readonly List<string> _allowedAttachmentExtensions = new() { ".jpg", ".jpeg", ".png", ".pdf", ".docx" };
         private const int _maxAllowedSize = 5242880; // 5 MB.
 
-        public CustomerController(ApplicationDbContext context, IMapper mapper, IWebHostEnvironment webHostEnvironment)
+        public BiographyController(ApplicationDbContext context, IMapper mapper, IWebHostEnvironment webHostEnvironment, IStringLocalizer<SharedResource> localizer)
         {
             _context = context;
             _mapper = mapper;
             _webHostEnvironment = webHostEnvironment;
+            _localizer = localizer;
         }
 
         public async Task<IActionResult> Index()
@@ -39,8 +41,9 @@ namespace SmartTimeCVs.Web.Controllers
             var response = await httpClient.GetFromJsonAsync<SmartTimeCompanyDTO>
                             ($"https://smarttimeapi.zlioustech.com/api/Company/GetCompanyLogoHomePageText/{CompanyGuidID}");
 
-            ViewBag.CompanyName = response?.Data?.CompanyNameEn;
-            ViewBag.HomePageHtml = response?.Data?.HomePageTextEn;
+            var currentCulture = Thread.CurrentThread.CurrentUICulture.Name;
+            ViewBag.CompanyName = currentCulture.Contains("en") ? response?.Data?.CompanyNameEn : response?.Data?.CompanyNameNative;
+            ViewBag.HomePageHtml = currentCulture.Contains("en") ? response?.Data?.HomePageTextEn : response?.Data?.HomePageTextNative;
             ViewBag.CompanyLogo = response?.Data?.CompanyLogo;
 
             return View();
@@ -474,7 +477,7 @@ namespace SmartTimeCVs.Web.Controllers
             else
             {
                 ViewData["HideSidebars"] = true;
-                ViewData["ControllerName"] = "Customer";
+                ViewData["ControllerName"] = "Biography";
             }
         }
 
