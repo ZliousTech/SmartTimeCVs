@@ -9,6 +9,8 @@
 
     public class CompanyData
     {
+        public string? CompanyNameEn { get; set; }
+        public string? CompanyNameNative { get; set; }
         public string? CompanyLogo { get; set; }
         public string? HomePageTextEn { get; set; }
         public string? HomePageTextNative { get; set; }

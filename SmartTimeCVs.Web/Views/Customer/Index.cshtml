@@ -20,7 +20,7 @@
 
 <div class="card shadow-sm">
     <div class="card-header">
-        @if (!string.IsNullOrWhiteSpace(ViewBag.CompanyLogo) && !string.IsNullOrWhiteSpace(ViewBag.HomePageHtml))
+        @if (!string.IsNullOrWhiteSpace(ViewBag.CompanyLogo) && !string.IsNullOrWhiteSpace(ViewBag.HomePageHtml) && !string.IsNullOrWhiteSpace(ViewBag.CompanyName))
         {
             <div class="row mt-2">
                 <div class="col-md-3" style="text-align: end;">
@@ -33,7 +33,7 @@
                 </div>
                 <div class="col-md-9">
                     <div class="form-group">
-                        <h4><span id="LblCompName" title="Light House">Light House</span></h4>
+                        <h4><span id="LblCompName">@ViewBag.CompanyName</span></h4>
                         <br>
                         <span id="LblTxtCompanyHomePageText">
                             @Html.Raw(ViewBag.HomePageHtml)
