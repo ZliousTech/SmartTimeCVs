@@ -20,6 +20,9 @@ namespace SmartTimeCVs.Web.Controllers
 
         public IActionResult Register([FromQuery] string CompanyGuidID, [FromQuery] string PrtCode)
         {
+            //https://localhost:7061/Account/Register/?bssl=304q66q4
+            //https://localhost:7061/Account/Register/?bssl=PjVCjr4Q
+
             bool IsCompanyRequest = true;
             bool UseHomePageText = false;
 

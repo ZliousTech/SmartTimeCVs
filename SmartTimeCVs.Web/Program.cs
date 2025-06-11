@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.Options;
 using SmartTimeCVs.Web.Core.Mapping;
 using System.Reflection;
 
@@ -55,6 +56,8 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.UseRequestLocalization();
+
 app.UseRouting();
 
 app.UseAuthentication();
@@ -89,6 +92,11 @@ static void AddingMultiLanguageSupportServices(WebApplicationBuilder? builder)
             .AddSupportedUICultures(supportedCultures);
     });
 }
+
+var localizationOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>()?.Value;
+if (localizationOptions != null)
+    app.UseRequestLocalization(localizationOptions);
+
 
 static void AddingMultiLanguageSupport(WebApplication? app)
 {

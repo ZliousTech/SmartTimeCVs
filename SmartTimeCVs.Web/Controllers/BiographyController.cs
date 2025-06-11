@@ -5,7 +5,7 @@ using SmartTimeCVs.Web.Core.Enums;
 
 namespace SmartTimeCVs.Web.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class BiographyController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -27,6 +27,8 @@ namespace SmartTimeCVs.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
+            
+
             string CompanyGuidID;
             string IsCompanyRequest = "";
             if (HttpContext.User.Identity!.IsAuthenticated)

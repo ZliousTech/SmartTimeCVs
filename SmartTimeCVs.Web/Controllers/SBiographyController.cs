@@ -5,7 +5,7 @@ using SmartTimeCVs.Web.Core.Enums;
 
 namespace SmartTimeCVs.Web.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class SBiographyController : Controller
     {
         private readonly ApplicationDbContext _context;

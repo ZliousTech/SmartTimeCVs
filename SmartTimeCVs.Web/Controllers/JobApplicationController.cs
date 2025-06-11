@@ -2,7 +2,7 @@
 
 namespace SmartTimeCVs.Web.Controllers
 {
-    [Authorize]
+    //[Authorize]
 
     public class JobApplicationController : Controller
     {
@@ -17,16 +17,15 @@ namespace SmartTimeCVs.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            string CompanyGuidID;
-            string IsCompanyRequest = "";
-            if (HttpContext.User.Identity!.IsAuthenticated)
-            {
-                CompanyGuidID = HttpContext.User.Claims.First(c => c.Type == "CompanyGuidID").Value.ToString();
-                IsCompanyRequest = HttpContext.User.Claims.First(c => c.Type == "IsCompanyRequest").Value.ToString();
-            }
-            else return RedirectToAction("Logout", "Account");
-            if (IsCompanyRequest == "False") return RedirectToAction("Logout", "Account");
-
+            //string CompanyGuidID;
+            //string IsCompanyRequest = "";
+            //if (HttpContext.User.Identity!.IsAuthenticated)
+            //{
+            //    CompanyGuidID = HttpContext.User.Claims.First(c => c.Type == "CompanyGuidID").Value.ToString();
+            //    IsCompanyRequest = HttpContext.User.Claims.First(c => c.Type == "IsCompanyRequest").Value.ToString();
+            //}
+            //else return RedirectToAction("Logout", "Account");
+            //if (IsCompanyRequest == "False") return RedirectToAction("Logout", "Account");
             try
             {
                 var jobApplications = await _context.JobApplication
