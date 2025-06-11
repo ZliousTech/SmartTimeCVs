@@ -63,19 +63,6 @@
                         <input id="email" type="email" class="form-control" placeholder="Email">
                     </div>
                 </div> *@
-                <div class="col-md-6 mb-3">
-                    <h2><label for="languageSelect" class="card-inside-title mb-2">@Localizer["SelectLanguage"]</label></h2>
-                    <form id="langForm" method="post" asp-controller="LanguageSwitcher" asp-action="SetLanguage">
-                        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                        @{
-                            var currentCulture = Thread.CurrentThread.CurrentUICulture.Name;
-                        }
-                        <select id="languageSelect" name="culture" class="form-control js-select2" onchange="this.form.submit()">
-                            <option value="en-US" selected="@(currentCulture == "en" ? "selected" : null)">English</option>
-                            <option value="ar-JO" selected="@(currentCulture == "ar" ? "selected" : null)">العربية</option>
-                        </select>
-                    </form>
-                </div>
                 <div class="col-md-6 mt-2" style="text-align: end;">
                     <a id="startBtn" asp-controller="SBiography" asp-action="GetCustomer" asp-route-email=""
                        class="btn btn-lg btn-round btn-primary font-bold waves-effect float-end">@Localizer["Start"]</a>
