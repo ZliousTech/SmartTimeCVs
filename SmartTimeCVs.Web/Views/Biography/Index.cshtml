@@ -2,8 +2,8 @@
 @{
     ViewData["HideSidebars"] = true;
     ViewData["Title"] = Localizer["TheBiography"];
-    ViewData["ControllerName"] = "Customer";
-    //ViewData["Path"] = "Customer / Index";
+    ViewData["ControllerName"] = "Biography";
+    ViewData["Path"] = $"{Localizer["TheBiography"]} / {Localizer["Index"]}";
     ViewData["Icon"] = "assignment_ind";
 }
 
@@ -73,14 +73,13 @@
             </div>
             <div class="row clearfix mb-3">
                 <div class="col-md-6">
-                    <h2 class="card-inside-title mb-2">@Localizer["Email"] <span class="text-danger">*</span></h2>
+                    <h2 class="card-inside-title mb-2">@Localizer["MobileNumber"] <span class="text-danger">*</span></h2>
                     <div class="form-group form-float">
-                        <input id="email" type="email" class="form-control" placeholder="@Localizer["Email"]">
+                        <input id="mobileNumber" type="number" class="form-control" placeholder="@Localizer["MobileNumber"]">
                     </div>
                 </div>
                 <div class="col-md-6 mt-2" style="text-align: end;">
-                    <h2><label for="languageSelect" class="card-inside-title mb-1">@Localizer["StartApplication"]</label></h2>
-                    <a id="startBtn" asp-controller="Biography" asp-action="GetCustomer" asp-route-email=""
+                    <a id="startBtn" asp-controller="Biography" asp-action="GetCustomer" asp-route-mobileNumber=""
                        class="btn btn-lg btn-round btn-primary font-bold waves-effect float-end disabled-link">@Localizer["Start"]</a>
                 </div>
             </div>
@@ -92,18 +91,18 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('#email').on('input', function () {
-                var email = $(this).val().trim();
+            $('#mobileNumber').on('input', function () {
+                var mobileNumber = $(this).val().trim();
                 var $startBtn = $('#startBtn');
 
-                if (email.length === 0) {
+                if (mobileNumber.length === 0) {
                     $startBtn.addClass("disabled-link");
                     $startBtn.attr("href", "#");
                 } else {
                     $startBtn.removeClass("disabled-link");
 
                     // Generate the URL using the known pattern
-                    $startBtn.attr("href", `/Biography/GetCustomer?email=${encodeURIComponent(email)}`);
+                    $startBtn.attr("href", `/Biography/GetCustomer?mobileNumber=${encodeURIComponent(mobileNumber)}`);
                 }
             });
         });

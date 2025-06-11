@@ -4,14 +4,14 @@ using System.Diagnostics;
 
 namespace SmartTimeCVs.Web.Controllers
 {
-    //[Authorize]
+    [Authorize]
 
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-		private readonly IStringLocalizer<SharedResource> _localizer;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
-		public HomeController(ILogger<HomeController> logger, IStringLocalizer<SharedResource> localizer)
+        public HomeController(ILogger<HomeController> logger, IStringLocalizer<SharedResource> localizer)
         {
             _logger = logger;
             _localizer = localizer;
@@ -20,17 +20,17 @@ namespace SmartTimeCVs.Web.Controllers
         public IActionResult Index()
         {
 
-			//string CompanyGuidID;
-			//string IsCompanyRequest = "";
-			//if (HttpContext.User.Identity!.IsAuthenticated)
-			//{
-			//    CompanyGuidID = HttpContext.User.Claims.First(c => c.Type == "CompanyGuidID").Value.ToString();
-			//    IsCompanyRequest = HttpContext.User.Claims.First(c => c.Type == "IsCompanyRequest").Value.ToString();
-			//}
-			//else return RedirectToAction("Logout", "Account");
-			//if (IsCompanyRequest == "False") return RedirectToAction("Logout", "Account");
+            string CompanyGuidID;
+            string IsCompanyRequest = "";
+            if (HttpContext.User.Identity!.IsAuthenticated)
+            {
+                CompanyGuidID = HttpContext.User.Claims.First(c => c.Type == "CompanyGuidID").Value.ToString();
+                IsCompanyRequest = HttpContext.User.Claims.First(c => c.Type == "IsCompanyRequest").Value.ToString();
+            }
+            else return RedirectToAction("Logout", "Account");
+            if (IsCompanyRequest == "False") return RedirectToAction("Logout", "Account");
 
-			return View();
+            return View();
         }
 
         public IActionResult Privacy()

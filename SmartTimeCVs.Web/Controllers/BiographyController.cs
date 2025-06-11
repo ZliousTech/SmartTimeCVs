@@ -5,7 +5,7 @@ using SmartTimeCVs.Web.Core.Enums;
 
 namespace SmartTimeCVs.Web.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class BiographyController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -27,7 +27,7 @@ namespace SmartTimeCVs.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            
+
 
             string CompanyGuidID;
             string IsCompanyRequest = "";
@@ -43,25 +43,20 @@ namespace SmartTimeCVs.Web.Controllers
             var response = await httpClient.GetFromJsonAsync<SmartTimeCompanyDTO>
                             ($"https://smarttimeapi.zlioustech.com/api/Company/GetCompanyLogoHomePageText/{CompanyGuidID}");
 
-            var currentCulture = Thread.CurrentThread.CurrentUICulture.Name;
-            ViewBag.CompanyName = currentCulture.Contains("en") ? response?.Data?.CompanyNameEn : response?.Data?.CompanyNameNative;
-            ViewBag.HomePageHtml = currentCulture.Contains("en") ? response?.Data?.HomePageTextEn : response?.Data?.HomePageTextNative;
-            ViewBag.CompanyLogo = response?.Data?.CompanyLogo;
-
             return View();
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCustomer(string email)
+        public async Task<IActionResult> GetCustomer(string mobileNumber)
         {
             try
             {
                 var customer = await _context.JobApplication
-                        .FirstOrDefaultAsync(j => j.CompanyId == GlobalVariablesService.CompanyId && j.Email.Equals(email));
+                        .FirstOrDefaultAsync(j => j.CompanyId == GlobalVariablesService.CompanyId && j.MobileNumber.Equals(mobileNumber));
 
                 if (customer is null)
                 {
-                    return RedirectToAction(nameof(Create), new { email = email });
+                    return RedirectToAction(nameof(Create), new { mobileNumber = mobileNumber });
                 }
                 else
                 {
@@ -74,15 +69,15 @@ namespace SmartTimeCVs.Web.Controllers
             }
         }
 
-        public IActionResult Create(bool isFromJobApplicationView = false, string email = "")
+        public IActionResult Create(bool isFromJobApplicationView = false, string mobileNumber = "")
         {
             try
             {
                 HandleSidebarsViewAndReturnToController(isFromJobApplicationView);
 
-                var initJobApplicationWithEmail = !string.IsNullOrWhiteSpace(email) ? new JobApplicationViewModel { Email = email } : null;
+                var initJobApplicationWithMobileNumber = !string.IsNullOrWhiteSpace(mobileNumber) ? new JobApplicationViewModel { MobileNumber = mobileNumber } : null;
 
-                return View("Form", PopulateViewModel(initJobApplicationWithEmail));
+                return View("Form", PopulateViewModel(initJobApplicationWithMobileNumber));
             }
             catch (Exception ex)
             {

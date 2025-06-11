@@ -165,4 +165,10 @@
   <data name="Actions" xml:space="preserve">
     <value>الإجراءات</value>
   </data>
+  <data name="Index" xml:space="preserve">
+    <value>الرئيسية</value>
+  </data>
+  <data name="MobileNumber" xml:space="preserve">
+    <value>رقم الهاتف</value>
+  </data>
 </root>

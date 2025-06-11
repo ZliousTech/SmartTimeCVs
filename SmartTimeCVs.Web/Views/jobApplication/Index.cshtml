@@ -7,7 +7,7 @@
 	ViewData["HideSidebars"] = false;
 	ViewData["Title"] = @Localizer["JobApplications"];
 	ViewData["ControllerName"] = "JobApplication";
-	@* ViewData["Path"] = "Job Application / Index"; *@
+	ViewData["Path"] = $"{@Localizer["JobApplications"]} / {@Localizer["Index"]}";
 	ViewData["Icon"] = "description";
 }
 
@@ -21,7 +21,7 @@
 		<div class="row justify-content-center">
 			<div class="col-6"><i class="material-icons breadcrumb theme-main-color align-self-center">@ViewData["Icon"]</i></div>
 			<div class="col-6">
-				<a asp-controller="Customer" asp-action="Create" asp-route-isFromJobApplicationView="true" class="btn btn-round btn-info font-bold waves-effect float-end">
+				<a asp-controller="Biography" asp-action="Create" asp-route-isFromJobApplicationView="true" class="btn btn-round btn-info font-bold waves-effect float-end">
 					<div class="row">
 						<div class="col-md-5 px-2 align-self-center">
 							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
@@ -94,7 +94,7 @@
 											@if (!jobApp.IsDeleted)
 											{
 												<li>
-													<a asp-controller="Customer" asp-action="Edit"
+													<a asp-controller="Biography" asp-action="Edit"
 													   asp-route-id="@jobApp.Id" asp-route-isFromJobApplicationView="true">
 														Edit
 													</a>

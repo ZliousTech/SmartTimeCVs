@@ -2,8 +2,8 @@
 @{
     ViewData["HideSidebars"] = true;
     ViewData["Title"] = Localizer["TheBiography"];
-    ViewData["ControllerName"] = "Customer";
-    //ViewData["Path"] = "Customer / Index";
+    ViewData["ControllerName"] = "Biography";
+    ViewData["Path"] = "Biography / Index";
     ViewData["Icon"] = "assignment_ind";
 }
 
@@ -77,7 +77,6 @@
                     </form>
                 </div>
                 <div class="col-md-6 mt-2" style="text-align: end;">
-                    <h2><label for="languageSelect" class="card-inside-title mb-1">@Localizer["StartApplication"]</label></h2>
                     <a id="startBtn" asp-controller="SBiography" asp-action="GetCustomer" asp-route-email=""
                        class="btn btn-lg btn-round btn-primary font-bold waves-effect float-end">@Localizer["Start"]</a>
                 </div>

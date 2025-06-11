@@ -5,7 +5,7 @@ using SmartTimeCVs.Web.Core.Enums;
 
 namespace SmartTimeCVs.Web.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class SBiographyController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -39,7 +39,7 @@ namespace SmartTimeCVs.Web.Controllers
 
             using var httpClient = new HttpClient();
             var response = await httpClient.GetFromJsonAsync<SmartTimeCompanyDTO>
-                            ($"https://smarttimeapi.zlioustech.com/api/Company/GetCompanyLogoHomePageText/{CompanyGuidID}");
+                            ($"https://smarttimeapi.zlioustech.com/api/Company/GetCompanyLogoHomePageText/{string.Empty}");
 
             var currentCulture = Thread.CurrentThread.CurrentUICulture.Name;
             ViewBag.CompanyName = currentCulture.Contains("en") ? response?.Data?.CompanyNameEn : response?.Data?.CompanyNameNative;

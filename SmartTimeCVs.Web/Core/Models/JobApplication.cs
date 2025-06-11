@@ -41,6 +41,8 @@
         public int MaritalStatusId { get; set; }
         public MaritalStatusType? MaritalStatus { get; set; }
 
+        public decimal ExpectedSalary { get; set; }
+
         #endregion Basic Information.
 
         #region Education.

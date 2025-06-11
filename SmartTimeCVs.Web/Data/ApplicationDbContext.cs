@@ -21,6 +21,7 @@ namespace SmartTimeCVs.Web.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<JobApplication>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
+            builder.Entity<JobApplication>().Property(p => p.ExpectedSalary).HasPrecision(8);
             builder.Entity<University>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Entity<Course>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Entity<WorkExperience>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");

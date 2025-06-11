@@ -1,7 +1,7 @@
 ﻿@model JobApplicationViewModel
 @{
-    ViewData["Title"] = "Customers";
-    ViewData["Path"] = "CVs / Customers / " + (Model?.Id > 0 ? "Edit" : "Create");
+    ViewData["Title"] = "Biographies";
+    ViewData["Path"] = "CVs / Biographies / " + (Model?.Id > 0 ? "Edit" : "Create");
     ViewData["Icon"] = "assignment_ind";
 }
 
@@ -92,6 +92,18 @@
                             <span asp-validation-for="Email" class="text-danger mb-5"></span>
                         </div>
                     </div>
+
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-1">Nationality <span class="text-danger">*</span></h2>
+                        <div class="">
+                            <select class="form-control js-select2
+                                @(ViewData?.ModelState["Nationality"] is null ? "" :
+                                ViewData.ModelState["Nationality"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")"
+                                    asp-for="Nationality" asp-items="ViewBag.NationalityList">
+                            </select>
+                        </div>
+                        <span asp-validation-for="Nationality" class="text-danger mb-5"></span>
+                    </div>
                 </div>
 
                 <div class="row clearfix mb-3">
@@ -174,18 +186,6 @@
 
                 <div class="row clearfix mb-3">
                     <div class="col-md-6 mb-3">
-                        <h2 class="card-inside-title mb-1">Nationality <span class="text-danger">*</span></h2>
-                        <div class="">
-                            <select class="form-control js-select2
-                                @(ViewData?.ModelState["Nationality"] is null ? "" :
-                                ViewData.ModelState["Nationality"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")"
-                                    asp-for="Nationality" asp-items="ViewBag.NationalityList">
-                            </select>
-                        </div>
-                        <span asp-validation-for="Nationality" class="text-danger mb-5"></span>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
                         <h2 class="card-inside-title mb-1">Applying For <span class="text-danger">*</span></h2>
                         <div class="">
                             <select class="form-control js-select2
@@ -195,6 +195,17 @@
                             </select>
                         </div>
                         <span asp-validation-for="ApplyingFor" class="text-danger mb-5"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">Expected Salary <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="number" class="form-control
+							@(ViewData?.ModelState["ExpectedSalary"] is null? "" :
+							ViewData.ModelState["ExpectedSalary"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
+                                   asp-for="ExpectedSalary" required min="1">
+                            <span asp-validation-for="ExpectedSalary" class="text-danger mb-5"></span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -12,12 +12,12 @@ public class JobApplicationViewModel : BaseModel
 
     [Required]
     [MaxLength(250, ErrorMessage = Errors.MaxLength), Display(Name = "Full Name")]
-    [Remote("AllowName", "Customer", AdditionalFields = nameof(Id), ErrorMessage = Errors.Duplicated)]
+    [Remote("AllowName", "Biography", AdditionalFields = nameof(Id), ErrorMessage = Errors.Duplicated)]
     public string FullName { get; set; } = null!;
 
     [Required]
     [MaxLength(250, ErrorMessage = Errors.MaxLength), Display(Name = "Email")]
-    [Remote("AllowEmail", "Customer", AdditionalFields = nameof(Id), ErrorMessage = Errors.Duplicated)]
+    [Remote("AllowEmail", "Biography", AdditionalFields = nameof(Id), ErrorMessage = Errors.Duplicated)]
     public string Email { get; set; } = null!;
 
     [Required]
@@ -35,7 +35,7 @@ public class JobApplicationViewModel : BaseModel
     public string Address { get; set; } = null!;
 
     [MaxLength(18, ErrorMessage = Errors.MaxLength), Display(Name = "NationalID")]
-    [Remote("AllowNationalID", "Customer", AdditionalFields = nameof(Id), ErrorMessage = Errors.Duplicated)]
+    [Remote("AllowNationalID", "Biography", AdditionalFields = nameof(Id), ErrorMessage = Errors.Duplicated)]
     public string NationalID { get; set; } = null!;
 
     [MaxLength(15, ErrorMessage = Errors.MaxLength), Display(Name = "MobileNumber")]
@@ -47,6 +47,10 @@ public class JobApplicationViewModel : BaseModel
     [Display(Name = "MaritalStatus")]
     public int MaritalStatusId { get; set; } = (int)MaritalStatusTypeEnum.Single;
     public MaritalStatusType? MaritalStatus { get; set; }
+
+    [Required]
+    [Display(Name = "Expected Salary")]
+    public decimal ExpectedSalary { get; set; }
 
     #endregion Basic Information.
 

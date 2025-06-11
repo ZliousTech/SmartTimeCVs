@@ -113,13 +113,13 @@ function updateDatatableData(row, currentStatus, btn, lastUpdatedOn, currentPage
 	} else {
 		if (dropdownMenu.data('for-modal') === undefined) {
 			dropdownMenu.html(
-				'<li><a href="Customer/Edit/' + btn.data('id') + '?isFromJobApplicationView=true">Edit</a></li>' +
+				'<li><a href="Biography/Edit/' + btn.data('id') + '?isFromJobApplicationView=true">Edit</a></li>' +
 				'<li class="js-delete-retrieve" data-id=' + btn.data('id') + ' data-url="/' + controllerName + '/ToggleStatus/' + btn.data('id') + '" data-name="' + modelName + '"><a class="js-toggle" href="javascript:;">Delete</a></li>'
 			);
 		}
 		else {
 			dropdownMenu.html(
-				'<li><a href="javascript:;" class="js-render-modal" data-operator="Edit" data-title="' + btn.data('name') + '" data-url="Customer/Edit/' + btn.data('id') + '?isFromJobApplicationView=true" data-update="true">Edit</a></li>' +
+				'<li><a href="javascript:;" class="js-render-modal" data-operator="Edit" data-title="' + btn.data('name') + '" data-url="Biography/Edit/' + btn.data('id') + '?isFromJobApplicationView=true" data-update="true">Edit</a></li>' +
 				'<li class="js-delete-retrieve" data-id=' + btn.data('id') + ' data-url="/' + controllerName + '/ToggleStatus/' + btn.data('id') + '" data-name="' + modelName + '"><a class="js-toggle" href="javascript:;">Delete</a></li>'
 			);
 		}
