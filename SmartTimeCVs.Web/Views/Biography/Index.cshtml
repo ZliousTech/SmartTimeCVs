@@ -57,21 +57,6 @@
     <div class="card-body">
         <div class="body table-responsive">
             <div class="row clearfix mb-3">
-                <div class="col-md-6 mb-3">
-                    <h2><label for="languageSelect" class="card-inside-title mb-2">@Localizer["SelectLanguage"]</label></h2>
-                    <form id="langForm" method="post" asp-controller="LanguageSwitcher" asp-action="SetLanguage">
-                        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                        @{
-                            var currentCulture = Thread.CurrentThread.CurrentUICulture.Name;
-                        }
-                        <select id="languageSelect" name="culture" class="form-control js-select2" onchange="this.form.submit()">
-                            <option value="en-US" selected="@(currentCulture == "en" ? "selected" : null)">English</option>
-                            <option value="ar-JO" selected="@(currentCulture == "ar" ? "selected" : null)">العربية</option>
-                        </select>
-                    </form>
-                </div>
-            </div>
-            <div class="row clearfix mb-3">
                 <div class="col-md-6">
                     <h2 class="card-inside-title mb-2">@Localizer["MobileNumber"] <span class="text-danger">*</span></h2>
                     <div class="form-group form-float">

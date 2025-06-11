@@ -9,6 +9,15 @@ var deleteMessage = "Deleted Successfully"
 var retriveMessage = "Retrived Successfully"
 var messageToShow = saveMessage;
 
+function switchLanguage(cultureCode) {
+	const input = document.getElementById('cultureInput');
+	const form = document.getElementById('langForm');
+	if (input && form) {
+		input.value = cultureCode;
+		form.submit();
+	}
+}
+
 function tableExportedColumns() {
 	var headers = $('th');
 	$.each(headers, function (i) {

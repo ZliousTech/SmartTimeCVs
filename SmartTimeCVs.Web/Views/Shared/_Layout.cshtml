@@ -3,8 +3,10 @@
 
 @{
     var currentCulture = System.Globalization.CultureInfo.CurrentCulture;
+    var toggleToCulture = currentCulture.Name.StartsWith("ar") ? "en-US" : "ar-JO";
     var isRtl = currentCulture.TextInfo.IsRightToLeft;
 }
+
 <!DOCTYPE html>
 <html lang="@currentCulture.Name" dir="@(isRtl ? "rtl" : "ltr")">
 
@@ -47,7 +49,7 @@
 
     <div class="overlay"></div>
 
-    <partial name="_Header" />
+    @await Html.PartialAsync("_Header", toggleToCulture)
     <partial name="_RightAside" />
 
     @* Left Aside *@
@@ -55,6 +57,12 @@
     {
         <partial name="_LeftAside" />
     }
+
+    <form id="langForm" method="post" asp-controller="LanguageSwitcher" asp-action="SetLanguage">
+        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+        <input type="hidden" name="culture" id="cultureInput" value="" />
+    </form>
+
 
     <section class="content home"
         style="@( (ViewData["HideSidebars"] as bool? != true) ? "" : "margin-left: 0px !important;" )">

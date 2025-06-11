@@ -1,4 +1,10 @@
-﻿<nav class="navbar">
+﻿@model string
+
+@{
+    var languageLabel = Model == "ar-JO" ? "العربية" : "English";
+}
+
+<nav class="navbar">
     <div class="col-12">
         <div class="navbar-header">
             <a href="javascript:void(0);" class="bars"></a>
@@ -17,6 +23,12 @@
             </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a href="javascript:void(0);" onclick="switchLanguage('@Model')">
+                    <span class="icon-name mx-1">@languageLabel</span>
+                    <i class="zmdi zmdi-translate"></i>
+                </a>
+            </li>
             <li>
                 <a href="javascript:void(0);" class="fullscreen hidden-sm-down" data-provide="fullscreen"
                    data-close="true"><i class="zmdi zmdi-fullscreen"></i></a>
