@@ -39,7 +39,7 @@ namespace SmartTimeCVs.Web.Controllers
 
             using var httpClient = new HttpClient();
             var response = await httpClient.GetFromJsonAsync<SmartTimeCompanyDTO>
-                            ($"https://smarttimeapi.zlioustech.com/api/Company/GetCompanyLogoHomePageText/{string.Empty}");
+                            ($"https://smarttimeapi.zlioustech.com/api/Company/GetCompanyLogoHomePageText/{CompanyGuidID}");
 
             var currentCulture = Thread.CurrentThread.CurrentUICulture.Name;
             ViewBag.CompanyName = currentCulture.Contains("en") ? response?.Data?.CompanyNameEn : response?.Data?.CompanyNameNative;
