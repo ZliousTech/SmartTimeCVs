@@ -171,4 +171,130 @@
   <data name="MobileNumber" xml:space="preserve">
     <value>رقم الهاتف</value>
   </data>
+  <data name="Gender" xml:space="preserve">
+    <value>النوع</value>
+  </data>
+  <data name="PlaceOfBirth" xml:space="preserve">
+    <value>محل الميلاد</value>
+  </data>
+  <data name="NationalNumber" xml:space="preserve">
+    <value>الرقم القومي</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>العنوان</value>
+  </data>
+  <data name="MaritalStatus" xml:space="preserve">
+    <value>الحاله الاجتماعية</value>
+  </data>
+  <data name="Nationality" xml:space="preserve">
+    <value>الجنسيه</value>
+  </data>
+  <data name="ApplyingFor" xml:space="preserve">
+    <value>تقديم على</value>
+  </data>
+  <data name="JobApplicationSteps" xml:space="preserve">
+    <value>خطوات طلبات التوظيف</value>
+  </data>
+  <data name="ExpectedSalary" xml:space="preserve">
+    <value>الراتب المتوقع</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>التالي</value>
+  </data>
+  <data name="HighSchoolName" xml:space="preserve">
+    <value>اسم المدرسة الثانوية</value>
+  </data>
+  <data name="HighSchoolGraduationYear" xml:space="preserve">
+    <value>سنة التخرج من المدرسة الثانوية</value>
+  </data>
+  <data name="AddUniversity" xml:space="preserve">
+    <value>أضف الجامعة</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>السابق</value>
+  </data>
+  <data name="AddCourse" xml:space="preserve">
+    <value>إضافة دورة</value>
+  </data>
+  <data name="EnglishLevel" xml:space="preserve">
+    <value>مستوى اللغة الإنجليزية</value>
+  </data>
+  <data name="OtherLanguageLevel" xml:space="preserve">
+    <value>مستوى اللغة الأخرى</value>
+  </data>
+  <data name="OtherLanguage" xml:space="preserve">
+    <value>لغة أخرى</value>
+  </data>
+  <data name="ComputerSkillsLevel" xml:space="preserve">
+    <value>مستوى مهارات الكمبيوتر</value>
+  </data>
+  <data name="CurrentEmployerName" xml:space="preserve">
+    <value>اسم صاحب العمل الحالي</value>
+  </data>
+  <data name="CurrentEmployerAddress" xml:space="preserve">
+    <value>عنوان صاحب العمل الحالي</value>
+  </data>
+  <data name="CurrentJobDescription" xml:space="preserve">
+    <value>الوصف الوظيفي الحالي</value>
+  </data>
+  <data name="CurrentSalary" xml:space="preserve">
+    <value>الراتب الحالي</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>من</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>الي</value>
+  </data>
+  <data name="ReasonForLeaving" xml:space="preserve">
+    <value>سبب المغادرة</value>
+  </data>
+  <data name="ReadyToJoinFrom" xml:space="preserve">
+    <value>جاهز للانضمام من</value>
+  </data>
+  <data name="Biographies" xml:space="preserve">
+    <value>السير الذاتية</value>
+  </data>
+  <data name="CourseName" xml:space="preserve">
+    <value>اسم الدورة</value>
+  </data>
+  <data name="CourseAddress" xml:space="preserve">
+    <value>عنوان الدورة</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>حذف</value>
+  </data>
+  <data name="EmployerName" xml:space="preserve">
+    <value>اسم صاحب العمل</value>
+  </data>
+  <data name="JobDescription" xml:space="preserve">
+    <value>المسمى الوظيفي</value>
+  </data>
+  <data name="UniversityName" xml:space="preserve">
+    <value>اسم الجامعة</value>
+  </data>
+  <data name="UniversityGraduationYear" xml:space="preserve">
+    <value>سنة التخرج من الجامعة</value>
+  </data>
+  <data name="SpecializationName" xml:space="preserve">
+    <value>اسم التخصص</value>
+  </data>
+  <data name="Collage" xml:space="preserve">
+    <value>التخصص</value>
+  </data>
+  <data name="WorkExperienceAttachment" xml:space="preserve">
+    <value>مرفق خبرة العمل</value>
+  </data>
+  <data name="AddExperience" xml:space="preserve">
+    <value>أضف الخبرة</value>
+  </data>
+  <data name="AddAttachment" xml:space="preserve">
+    <value>إضافة مرفق</value>
+  </data>
+  <data name="CVAttachment" xml:space="preserve">
+    <value>مرفق السيرة الذاتية</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>حفظ</value>
+  </data>
 </root>

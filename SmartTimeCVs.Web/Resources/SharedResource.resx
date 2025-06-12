@@ -171,4 +171,130 @@
   <data name="MobileNumber" xml:space="preserve">
     <value>Mobile Number</value>
   </data>
+  <data name="Gender" xml:space="preserve">
+    <value>Gender</value>
+  </data>
+  <data name="PlaceOfBirth" xml:space="preserve">
+    <value>Place Of Birth</value>
+  </data>
+  <data name="NationalNumber" xml:space="preserve">
+    <value>National Number</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="MaritalStatus" xml:space="preserve">
+    <value>Marital Status</value>
+  </data>
+  <data name="Nationality" xml:space="preserve">
+    <value>Nationality</value>
+  </data>
+  <data name="ApplyingFor" xml:space="preserve">
+    <value>Applying For</value>
+  </data>
+  <data name="JobApplicationSteps" xml:space="preserve">
+    <value>Job Application Steps</value>
+  </data>
+  <data name="ExpectedSalary" xml:space="preserve">
+    <value>Expected Salary</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="HighSchoolName" xml:space="preserve">
+    <value>High School Name</value>
+  </data>
+  <data name="HighSchoolGraduationYear" xml:space="preserve">
+    <value>High School Graduation Year</value>
+  </data>
+  <data name="AddUniversity" xml:space="preserve">
+    <value>Add University</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="AddCourse" xml:space="preserve">
+    <value>Add Course</value>
+  </data>
+  <data name="EnglishLevel" xml:space="preserve">
+    <value>English Level</value>
+  </data>
+  <data name="OtherLanguageLevel" xml:space="preserve">
+    <value>Other Language Level</value>
+  </data>
+  <data name="OtherLanguage" xml:space="preserve">
+    <value>Other Language</value>
+  </data>
+  <data name="ComputerSkillsLevel" xml:space="preserve">
+    <value>Computer Skills Level</value>
+  </data>
+  <data name="CurrentEmployerName" xml:space="preserve">
+    <value>Current Employer Name </value>
+  </data>
+  <data name="CurrentEmployerAddress" xml:space="preserve">
+    <value>Current Employer Address</value>
+  </data>
+  <data name="CurrentJobDescription" xml:space="preserve">
+    <value>Current Job Description</value>
+  </data>
+  <data name="CurrentSalary" xml:space="preserve">
+    <value>Current Salary</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="ReasonForLeaving" xml:space="preserve">
+    <value>Reason For Leaving </value>
+  </data>
+  <data name="ReadyToJoinFrom" xml:space="preserve">
+    <value>Ready To Join From</value>
+  </data>
+  <data name="Biographies" xml:space="preserve">
+    <value>Biographies</value>
+  </data>
+  <data name="CourseName" xml:space="preserve">
+    <value>Course Name</value>
+  </data>
+  <data name="CourseAddress" xml:space="preserve">
+    <value>Course Address </value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="EmployerName" xml:space="preserve">
+    <value>Employer Name</value>
+  </data>
+  <data name="JobDescription" xml:space="preserve">
+    <value>Job Description</value>
+  </data>
+  <data name="UniversityName" xml:space="preserve">
+    <value>University Name</value>
+  </data>
+  <data name="UniversityGraduationYear" xml:space="preserve">
+    <value>University Graduation Year</value>
+  </data>
+  <data name="SpecializationName" xml:space="preserve">
+    <value>Specialization Name</value>
+  </data>
+  <data name="Collage" xml:space="preserve">
+    <value>Collage</value>
+  </data>
+  <data name="WorkExperienceAttachment" xml:space="preserve">
+    <value>Work Experience Attachment</value>
+  </data>
+  <data name="AddExperience" xml:space="preserve">
+    <value>Add Experience</value>
+  </data>
+  <data name="AddAttachment" xml:space="preserve">
+    <value>Add Attachment</value>
+  </data>
+  <data name="CVAttachment" xml:space="preserve">
+    <value>CV Attachment</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
 </root>

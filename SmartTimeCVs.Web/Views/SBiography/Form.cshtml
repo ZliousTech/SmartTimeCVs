@@ -1,4 +1,6 @@
-﻿@model JobApplicationViewModel
+﻿@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@model JobApplicationViewModel
 @{
     ViewData["Title"] = "Biographies";
     ViewData["Path"] = "CVs / Biographies / " + (Model?.Id > 0 ? "Edit" : "Create");
@@ -18,7 +20,7 @@
 <div class="card shadow">
     <div class="card-header">
         <h2 class="text-center theme-main-color mb-5">
-            <b>Job Application Steps</b>
+            <b>@Localizer["JobApplicationSteps"]</b>
         </h2>
     </div>
     <div class="card-body">
@@ -59,7 +61,7 @@
 
                 <div class="row clearfix mb-3">
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">Full Name <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["FullName"] <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
                             <input type="text" class="form-control
                             @(ViewData.ModelState["FullName"] is null? "" :
@@ -69,7 +71,7 @@
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <h2 class="card-inside-title mb-1">Gender <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-1">@Localizer["Gender"] <span class="text-danger">*</span></h2>
                         <div class="">
                             <select class="form-control js-select2
                                 @(ViewData?.ModelState["GenderId"] is null ? "" :
@@ -83,7 +85,7 @@
 
                 <div class="row clearfix mb-3">
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">Email <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["Email"] <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
                             <input type="email" class="form-control
                             @(ViewData.ModelState["Email"] is null? "" :
@@ -94,7 +96,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <h2 class="card-inside-title mb-1">Nationality <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-1">@Localizer["Nationality"] <span class="text-danger">*</span></h2>
                         <div class="">
                             <select class="form-control js-select2
                                 @(ViewData?.ModelState["Nationality"] is null ? "" :
@@ -108,7 +110,7 @@
 
                 <div class="row clearfix mb-3">
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">Date Of Birth <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["DateOfBirth"] <span class="text-danger">*</span></h2>
                         <div class="input-group mb-0">
                             <input type="date" style="border-radius: 30px;" class="form-control
 					            @(ViewData?.ModelState["DateOfBirth"] is null? "" :
@@ -119,7 +121,7 @@
                         <span asp-validation-for="DateOfBirth" class="text-danger mb-5 mt-0"></span>
                     </div>
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">Place Of Birth <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["PlaceOfBirth"] <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
                             <input type="text" class="form-control
                             @(ViewData?.ModelState["PlaceOfBirth"] is null? "" :
@@ -132,7 +134,7 @@
 
                 <div class="row clearfix mb-3">
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">Mobile Number <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["MobileNumber"] <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
                             <input type="number" class="form-control
 							@(ViewData?.ModelState["MobileNumber"] is null? "" :
@@ -142,7 +144,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">National Number <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["NationalNumber"] <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
                             <input type="number" class="form-control
 							@(ViewData?.ModelState["NationalID"] is null? "" :
@@ -155,7 +157,7 @@
 
                 <div class="row clearfix mb-3">
                     <div class="col-md-6 mb-3">
-                        <h2 class="card-inside-title mb-2">Address <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["Address"] <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
                             <input class="form-control
 							@(ViewData?.ModelState["Address"] is null? "" :
@@ -172,7 +174,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <h2 class="card-inside-title mb-1">Marital Status  <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-1">@Localizer["MaritalStatus"]  <span class="text-danger">*</span></h2>
                         <div class="">
                             <select class="form-control js-select2
                                 @(ViewData?.ModelState["MaritalStatusId"] is null ? "" :
@@ -186,7 +188,7 @@
 
                 <div class="row clearfix mb-3">
                     <div class="col-md-6 mb-3">
-                        <h2 class="card-inside-title mb-1">Applying For <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-1">@Localizer["ApplyingFor"] <span class="text-danger">*</span></h2>
                         <div class="">
                             <select class="form-control js-select2
                                 @(ViewData?.ModelState["ApplyingFor"] is null ? "" :
@@ -198,7 +200,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">Expected Salary <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["ExpectedSalary"] <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
                             <input type="number" class="form-control
 							@(ViewData?.ModelState["ExpectedSalary"] is null? "" :
@@ -214,14 +216,14 @@
             <div class="form-step d-none" id="step-2">
                 <div class="row clearfix mb-3">
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">High School Name <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["HighSchoolName"] <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
                             <input asp-for="HighSchoolName" placeholder="Enter high school name" class="form-control @(ViewData?.ModelState["HighSchoolName"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")" />
                             <span asp-validation-for="HighSchoolName" class="text-danger mb-5"></span>
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <h2 class="card-inside-title mb-2">High School Graduation Year <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["HighSchoolGraduationYear"] <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
                             <input type="number" asp-for="HighSchoolGraduationYear" placeholder="Enter graduation year"
                                    class="form-control @(ViewData?.ModelState["HighSchoolGraduationYear"]?.Errors.Any() == true ?
@@ -247,7 +249,7 @@
 
                                     <div class="row clearfix mb-3">
                                         <div class="col-md-6">
-                                            <h2 class="card-inside-title mb-2">University Name <span class="text-danger">*</span></h2>
+                                            <h2 class="card-inside-title mb-2">@Localizer["UniversityName"] <span class="text-danger">*</span></h2>
                                             <div class="form-group form-float">
                                                 <input type="text" class="form-control"
                                                        name="Universities[@i].UniversityName"
@@ -298,7 +300,7 @@
                                     </svg>
                                 </div>
                                 <div class="col-md-9 px-1 align-self-center">
-                                    Add University
+                                    @Localizer["AddUniversity"]
                                 </div>
                             </div>
                         </button>
@@ -310,7 +312,7 @@
             <div class="form-step d-none" id="step-3">
                 <div class="row clearfix mb-3">
                     <div class="col-md-6 mb-3">
-                        <h2 class="card-inside-title mb-1">English Level <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-1">@Localizer["EnglishLevel"] <span class="text-danger">*</span></h2>
                         <select class="form-control js-select2 w-100
                             @(ViewData?.ModelState["EnglishLevelId"] is null ? "" :
                             ViewData.ModelState["EnglishLevelId"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")"
@@ -322,14 +324,14 @@
 
                 <div class="row clearfix mb-3">
                     <div class="col-md-6 mb-3">
-                        <h2 class="card-inside-title mb-1">Other Language</h2>
+                        <h2 class="card-inside-title mb-1">@Localizer["OtherLanguage"]</h2>
                         <input asp-for="OtherLanguage" placeholder="Enter other language"
                                class="form-control @(ViewData?.ModelState["OtherLanguage"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")" />
                         <span asp-validation-for="OtherLanguage" class="text-danger mb-5"></span>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <h2 class="card-inside-title mb-1">Other Language Level</h2>
+                        <h2 class="card-inside-title mb-1">@Localizer["OtherLanguageLevel"]</h2>
                         <select class="form-control js-select2
                             @(ViewData?.ModelState["OtherLanguageLevelId"] is null ? "" :
                             ViewData.ModelState["OtherLanguageLevelId"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")"
@@ -341,7 +343,7 @@
 
                 <div class="row clearfix mb-3">
                     <div class="col-md-6 mb-3">
-                        <h2 class="card-inside-title mb-1">Computer Skills Level <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-1">@Localizer["ComputerSkillsLevel"] <span class="text-danger">*</span></h2>
                         <select class="form-control js-select2
                                 @(ViewData?.ModelState["ComputerSkillsLevelId"] is null ? "" :
                                 ViewData.ModelState["ComputerSkillsLevelId"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")"
@@ -361,13 +363,13 @@
                                     <div class="row clearfix mb-3">
                                         <div class="col-md-6"></div>
                                         <div class="col-md-6">
-                                            <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeCourseBtn">Remove</button>
+                                            <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeCourseBtn">@Localizer["Remove"]</button>
                                         </div>
                                     </div>
 
                                     <div class="row clearfix mb-3">
                                         <div class="col-md-6">
-                                            <h2 class="card-inside-title mb-2">Course Name <span class="text-danger">*</span></h2>
+                                            <h2 class="card-inside-title mb-2">@Localizer["CourseName"] <span class="text-danger">*</span></h2>
                                             <div class="form-group form-float">
                                                 <input type="text" class="form-control"
                                                        name="Courses[@i].CourseName"
@@ -379,7 +381,7 @@
                                         </div>
 
                                         <div class="col-md-6">
-                                            <h2 class="card-inside-title mb-2">Course Address <span class="text-danger">*</span></h2>
+                                            <h2 class="card-inside-title mb-2">@Localizer["CourseAddress"] <span class="text-danger">*</span></h2>
                                             <div class="form-group form-float">
                                                 <input type="text" class="form-control"
                                                        name="Courses[@i].CourseAddress"
@@ -432,7 +434,7 @@
                                     </svg>
                                 </div>
                                 <div class="col-md-9 px-1 align-self-center">
-                                    Add Course
+                                    @Localizer["AddCourse"]
                                 </div>
                             </div>
                         </button>
@@ -444,7 +446,7 @@
             <div class="form-step d-none" id="step-4">
                 <div class="row clearfix mb-3">
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">Current Employer Name <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["CurrentEmployerName"] <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
                             <input type="text" class="form-control
                             @(ViewData?.ModelState["CurrentEmployerName"] is null? "" :
@@ -454,7 +456,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">Current Employer Address <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["CurrentEmployerAddress"] <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
                             <input type="text" class="form-control
                             @(ViewData?.ModelState["CurrentEmployerAddress"] is null? "" :
@@ -467,7 +469,7 @@
 
                 <div class="row clearfix mb-3">
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">Current Job Description <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["CurrentJobDescription"] <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
                             <input type="text" class="form-control
                             @(ViewData?.ModelState["CurrentJobDescription"] is null? "" :
@@ -477,7 +479,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">Current Salary</h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["CurrentSalary"]</h2>
                         <div class="form-group form-float">
                             <input type="number" class="form-control
                             @(ViewData?.ModelState["CurrentSalary"] is null? "" :
@@ -490,7 +492,7 @@
 
                 <div class="row clearfix mb-3">
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">From <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["From"] <span class="text-danger">*</span></h2>
                         <div class="input-group mb-0">
                             <span class="input-group-addon @(ViewData?.ModelState["CurrentFrom"] is null? "" :
                                 ViewData.ModelState["CurrentFrom"]?.Errors.Any() == true ? "form-control-icon-invalid" :"form-control-icon-valid")">
@@ -505,7 +507,7 @@
                         <span asp-validation-for="CurrentFrom" class="text-danger mb-5 mt-0"></span>
                     </div>
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">To <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["To"] <span class="text-danger">*</span></h2>
                         <div class="input-group mb-0">
                             <span class="input-group-addon @(ViewData?.ModelState["CurrentTo"] is null? "" :
                                 ViewData.ModelState["CurrentTo"]?.Errors.Any() == true ? "form-control-icon-invalid" :"form-control-icon-valid")">
@@ -523,7 +525,7 @@
 
                 <div class="row clearfix mb-3">
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">Reason For Leaving <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["ReasonForLeaving"] <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
                             <input type="text" class="form-control
                             @(ViewData?.ModelState["ReasonForLeavingCurrent"] is null? "" :
@@ -533,7 +535,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">Ready To Join From <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["ReadyToJoinFrom"] <span class="text-danger">*</span></h2>
                         <div class="input-group mb-0">
                             <span class="input-group-addon @(ViewData?.ModelState["ReadyToJoinFrom"] is null? "" :
                                 ViewData.ModelState["ReadyToJoinFrom"]?.Errors.Any() == true ? "form-control-icon-invalid" :"form-control-icon-valid")">
@@ -562,13 +564,13 @@
                                     <div class="row clearfix mb-3">
                                         <div class="col-md-6"></div>
                                         <div class="col-md-6">
-                                            <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeExperienceBtn">Remove</button>
+                                            <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeExperienceBtn">@Localizer["Remove"]</button>
                                         </div>
                                     </div>
 
                                     <div class="row clearfix mb-3">
                                         <div class="col-md-6">
-                                            <h2 class="card-inside-title mb-2">Employer Name <span class="text-danger">*</span></h2>
+                                            <h2 class="card-inside-title mb-2">@Localizer["EmployerName"] <span class="text-danger">*</span></h2>
                                             <div class="form-group form-float">
                                                 <input type="text" class="form-control"
                                                        name="WorkExperiences[@i].EmployerName"
@@ -582,7 +584,7 @@
 
                                     <div class="row clearfix mb-3">
                                         <div class="col-md-6">
-                                            <h2 class="card-inside-title mb-2">From <span class="text-danger">*</span></h2>
+                                            <h2 class="card-inside-title mb-2">@Localizer["From"] <span class="text-danger">*</span></h2>
                                             <div class="input-group mb-0">
                                                 <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
                                                 <input type="text" class="form-control datetimepicker"
@@ -595,7 +597,7 @@
                                         </div>
 
                                         <div class="col-md-6">
-                                            <h2 class="card-inside-title mb-2">To <span class="text-danger">*</span></h2>
+                                            <h2 class="card-inside-title mb-2">@Localizer["To"] <span class="text-danger">*</span></h2>
                                             <div class="input-group mb-0">
                                                 <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
                                                 <input type="text" class="form-control datetimepicker"
@@ -610,7 +612,7 @@
 
                                     <div class="row clearfix mb-3">
                                         <div class="col-md-6">
-                                            <h2 class="card-inside-title mb-2">Reason for Leaving <span class="text-danger">*</span></h2>
+                                            <h2 class="card-inside-title mb-2">@Localizer["ReasonForLeaving"] <span class="text-danger">*</span></h2>
                                             <div class="form-group form-float">
                                                 <input type="text" class="form-control"
                                                        name="WorkExperiences[@i].ReasonForLeaving"
@@ -624,7 +626,7 @@
 
                                     <div class="row clearfix mb-3">
                                         <div class="col-12 mb-3">
-                                            <h2 class="card-inside-title mb-2">Job Description</h2>
+                                            <h2 class="card-inside-title mb-2">@Localizer["JobDescription"]</h2>
                                             <div class="form-group form-float">
                                                 <textarea class="form-control no-resize"
                                                           name="WorkExperiences[@i].JobDescription"
@@ -667,7 +669,7 @@
                                             </div>
                                         }
                                         <div class="col-12 mb-3">
-                                            <h2 class="card-inside-title mb-2">Work Experience Attachment</h2>
+                                            <h2 class="card-inside-title mb-2">@Localizer["WorkExperienceAttachment"]</h2>
                                             <div class="custom-file-uploader"
                                                  style="border: 2px dashed #ccc; padding: 60px; text-align: center; border-radius: 20px; background: #eee !important;">
                                                 <input asp-for="@Model.WorkExperiences[i].AttachmentFile" type="file" class="form-control-file attachment-input" style="display: none;" id="workExperiencesAttachmentFile_@i" />
@@ -694,7 +696,7 @@
                                     </svg>
                                 </div>
                                 <div class="col-md-9 px-1 align-self-center">
-                                    Add Experience
+                                    @Localizer["AddExperience"]
                                 </div>
                             </div>
                         </button>
@@ -714,7 +716,7 @@
                                     <div class="row clearfix mb-3">
                                         <div class="col-md-6"></div>
                                         <div class="col-md-6">
-                                            <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeAttachmentBtn">Remove</button>
+                                            <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeAttachmentBtn">@Localizer["Remove"]</button>
                                         </div>
                                     </div>
 
@@ -788,7 +790,7 @@
                                     </svg>
                                 </div>
                                 <div class="col-md-9 px-1 align-self-center">
-                                    Add Attachment
+                                    @Localizer["AddAttachment"]
                                 </div>
                             </div>
                         </button>
@@ -801,7 +803,7 @@
                 <div class="row clearfix">
                     <div class="col-12">
                         <div class="form-group">
-                            <label asp-for="AttachmentFile" class="control-label">CV Attachment</label>
+                            <label asp-for="AttachmentFile" class="control-label">@Localizer["CVAttachment"]</label>
 
                             <!-- Preview section -->
                             @if (!string.IsNullOrEmpty(Model?.AttachmentUrl))
@@ -854,8 +856,8 @@
 
             <!-- Navigation Buttons -->
             <div class="d-flex justify-content-between mt-4">
-                <button type="button" class="btn btn-round btn-secondary" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
-                <button type="button" class="btn btn-round btn-primary" id="nextBtn" onclick="nextPrev(1)">Next</button>                
+                <button type="button" class="btn btn-round btn-secondary" id="prevBtn" onclick="nextPrev(-1)">@Localizer["Previous"]</button>
+                <button type="button" class="btn btn-round btn-primary" id="nextBtn" onclick="nextPrev(1)">@Localizer["Next"]</button>                
                 <button type="submit" class="btn btn-round btn-success float-end" id="submitBtn" data-index-url="/@ViewData?["ControllerName"]">
                     <div class="row">
                         <div class="col-5 px-2 js-correct-icon">
@@ -864,7 +866,7 @@
                             </svg>
                         </div>
                         <div class="col-7 px-1 js-button-text">
-                            <b>Save</b>
+                            <b>@Localizer["Save"]</b>
                         </div>
                     </div>
                 </button>
@@ -880,13 +882,13 @@
             <div class="col-md-6">
             </div>
             <div class="col-md-6">
-                <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeUniversityBtn">Remove</button>
+                <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeUniversityBtn">@Localizer["Remove"]</button>
             </div>
         </div>
 
         <div class="row clearfix mb-3">
             <div class="col-md-6">
-                <h2 class="card-inside-title mb-2">University Name <span class="text-danger">*</span></h2>
+                <h2 class="card-inside-title mb-2">@Localizer["UniversityName"] <span class="text-danger">*</span></h2>
                 <div class="form-group form-float">
                     <input type="text" class="form-control
                         @(ViewData?.ModelState[$"Universities[index].UniversityName"]?.Errors.Any() == true ? "form-control-invalid" :
@@ -899,7 +901,7 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <h2 class="card-inside-title mb-2">Collage / Specialization Name <span class="text-danger">*</span></h2>
+                <h2 class="card-inside-title mb-2">@Localizer["Collage"] / @Localizer["SpecializationName"] <span class="text-danger">*</span></h2>
                 <div class="form-group form-float">
                     <input type="text" class="form-control
                         @(ViewData.ModelState[$"Universities[index].Collage"]?.Errors.Any() == true ? "form-control-invalid" :
@@ -914,7 +916,7 @@
 
         <div class="row clearfix mb-3">
             <div class="col-md-6">
-                <h2 class="card-inside-title mb-2">University Graduation Year <span class="text-danger">*</span></h2>
+                <h2 class="card-inside-title mb-2">@Localizer["UniversityGraduationYear"] <span class="text-danger">*</span></h2>
                 <div class="form-group form-float">
                     <input type="number" class="form-control
                         @(ViewData.ModelState[$"Universities[index].UniversityGraduationYear"]?.Errors.Any() == true ? "form-control-invalid" :
@@ -936,13 +938,13 @@
             <div class="col-md-6">
             </div>
             <div class="col-md-6">
-                <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeCourseBtn">Remove</button>
+                <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeCourseBtn">@Localizer["Remove"]</button>
             </div>
         </div>
 
         <div class="row clearfix mb-3">
             <div class="col-md-6">
-                <h2 class="card-inside-title mb-2">Course Name <span class="text-danger">*</span></h2>
+                <h2 class="card-inside-title mb-2">@Localizer["CourseName"] <span class="text-danger">*</span></h2>
                 <div class="form-group form-float">
                     <input type="text" class="form-control
                         @(ViewData.ModelState[$"Courses[index].CourseName"]?.Errors.Any() == true ? "form-control-invalid" :
@@ -955,7 +957,7 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <h2 class="card-inside-title mb-2">Course Address <span class="text-danger">*</span></h2>
+                <h2 class="card-inside-title mb-2">@Localizer["CourseAddress"] <span class="text-danger">*</span></h2>
                 <div class="form-group form-float">
                     <input type="text" class="form-control
                         @(ViewData.ModelState[$"Courses[index].CourseAddress"]?.Errors.Any() == true ? "form-control-invalid" :
@@ -969,7 +971,7 @@
         </div>
         <div class="row clearfix mb-3">
             <div class="col-md-6">
-                <h2 class="card-inside-title mb-2">From <span class="text-danger">*</span></h2>
+                <h2 class="card-inside-title mb-2">@Localizer["From"] <span class="text-danger">*</span></h2>
                 <div class="input-group mb-0">
                     <span class="input-group-addon
                         @(ViewData.ModelState[$"Courses[index].From"]?.Errors.Any() == true ? "form-control-icon-invalid" :
@@ -986,7 +988,7 @@
                       data-valmsg-for="Courses[index].From"></span>
             </div>
             <div class="col-md-6">
-                <h2 class="card-inside-title mb-2">To <span class="text-danger">*</span></h2>
+                <h2 class="card-inside-title mb-2">@Localizer["To"] <span class="text-danger">*</span></h2>
                 <div class="input-group mb-0">
                     <span class="input-group-addon
                         @(ViewData.ModelState[$"Courses[index].To"]?.Errors.Any() == true ? "form-control-icon-invalid" :
@@ -1013,13 +1015,13 @@
             <div class="col-md-6">
             </div>
             <div class="col-md-6">
-                <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeExperienceBtn">Remove</button>
+                <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeExperienceBtn">@Localizer["Remove"]</button>
             </div>
         </div>
 
         <div class="row clearfix mb-3">
             <div class="col-md-6">
-                <h2 class="card-inside-title mb-2">Employer Name <span class="text-danger">*</span></h2>
+                <h2 class="card-inside-title mb-2">@Localizer["EmployerName"] <span class="text-danger">*</span></h2>
                 <div class="form-group form-float">
                     <input type="text" class="form-control
                         @(ViewData.ModelState[$"WorkExperiences[index].EmployerName"]?.Errors.Any() == true ? "form-control-invalid" :
@@ -1034,7 +1036,7 @@
 
         <div class="row clearfix mb-3">
             <div class="col-md-6">
-                <h2 class="card-inside-title mb-2">From <span class="text-danger">*</span></h2>
+                <h2 class="card-inside-title mb-2">@Localizer["From"] <span class="text-danger">*</span></h2>
                 <div class="input-group mb-0">
                     <span class="input-group-addon
                         @(ViewData.ModelState[$"WorkExperiences[index].From"]?.Errors.Any() == true ? "form-control-icon-invalid" :
@@ -1052,7 +1054,7 @@
             </div>
 
             <div class="col-md-6">
-                <h2 class="card-inside-title mb-2">To <span class="text-danger">*</span></h2>
+                <h2 class="card-inside-title mb-2">@Localizer["To"] <span class="text-danger">*</span></h2>
                 <div class="input-group mb-0">
                     <span class="input-group-addon
                         @(ViewData.ModelState[$"WorkExperiences[index].To"]?.Errors.Any() == true ? "form-control-icon-invalid" :
@@ -1072,7 +1074,7 @@
 
         <div class="row clearfix mb-3">
             <div class="col-md-6">
-                <h2 class="card-inside-title mb-2">Reason for Leaving <span class="text-danger">*</span></h2>
+                <h2 class="card-inside-title mb-2">@Localizer["ReasonForLeaving"] <span class="text-danger">*</span></h2>
                 <div class="form-group form-float">
                     <input type="text" class="form-control
                         @(ViewData.ModelState[$"WorkExperiences[index].ReasonForLeaving"]?.Errors.Any() == true ? "form-control-invalid" :
@@ -1087,7 +1089,7 @@
 
         <div class="row clearfix mb-3">
             <div class="col-12 mb-3">
-                <h2 class="card-inside-title mb-2">Job Description</h2>
+                <h2 class="card-inside-title mb-2">@Localizer["JobDescription"]</h2>
                 <div class="form-group form-float">
                     <textarea class="form-control no-resize"
                               name="WorkExperiences[index].JobDescription"
@@ -1100,7 +1102,7 @@
 
         <div class="row clearfix mb-3">
             <div class="col-12 mb-3">
-                <h2 class="card-inside-title mb-2">Work Experience Attachment</h2>
+                <h2 class="card-inside-title mb-2">@Localizer["WorkExperienceAttachment"]</h2>
                 <div class="custom-file-uploader"
                      style="border: 2px dashed #ccc; padding: 60px; text-align: center; border-radius: 20px; background: #eee !important;">
                     <input name="WorkExperiences[index].AttachmentFile" type="file" class="form-control-file attachment-input" style="display: none;" id="workExperiencesAttachmentFile_index" />
@@ -1123,7 +1125,7 @@
             <div class="col-md-6">
             </div>
             <div class="col-md-6">
-                <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeAttachmentBtn">Remove</button>
+                <button type="button" class="btn btn-danger btn-sm mb-3 float-end removeAttachmentBtn">@Localizer["Remove"]</button>
             </div>
         </div>
 
