@@ -96,6 +96,7 @@ namespace Common.Base
         {
             string? CompanyGuidID = "";
             string? UseHomePageText = "";
+            string? IsAllowBiographiesFeature = "False";
 
             try
             {
@@ -113,25 +114,26 @@ namespace Common.Base
                         {
                             CompanyGuidID = jsonData?.data.companyGuidID;
                             UseHomePageText = jsonData?.data.useHomePageText;
+                            IsAllowBiographiesFeature = jsonData?.data.IsAllowBiographiesFeature;
                         }
                         else
                         {
-                            return String.Concat(CompanyGuidID, "|", UseHomePageText);
+                            return String.Concat(CompanyGuidID, "|", UseHomePageText, "|", IsAllowBiographiesFeature);
                         }
                     }
                     else
                     {
-                        return String.Concat(CompanyGuidID, "|", UseHomePageText);
+                        return String.Concat(CompanyGuidID, "|", UseHomePageText, "|", IsAllowBiographiesFeature);
                     }
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                return String.Concat(CompanyGuidID, "|", UseHomePageText);
+                return String.Concat(CompanyGuidID, "|", UseHomePageText, "|", IsAllowBiographiesFeature);
             }
 
-            return String.Concat(CompanyGuidID, "|", UseHomePageText);
+            return String.Concat(CompanyGuidID, "|", UseHomePageText, "|", IsAllowBiographiesFeature);
         }
 
         private static string CalculateSentTime(string SentTime)
