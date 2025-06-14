@@ -25,6 +25,7 @@ namespace SmartTimeCVs.Web.Controllers
 
             bool IsCompanyRequest = true;
             bool UseHomePageText = false;
+            bool IsAllowBiographiesFeature = false;
 
             try
             {
@@ -38,13 +39,14 @@ namespace SmartTimeCVs.Web.Controllers
                     string[] CompanyGuidIDAndUseHomePageText = SysBase.CheckShortLink_SmartTimeCVs(bsslValue).Split('|');
                     CompanyGuidID = CompanyGuidIDAndUseHomePageText[0];
                     UseHomePageText =  bool.Parse(CompanyGuidIDAndUseHomePageText[1]);
+                    IsAllowBiographiesFeature = bool.Parse(CompanyGuidIDAndUseHomePageText[2]);
                     IsCompanyRequest = false;
                 }
                 /** EOF Check the short link **/
 
 
                 /** Start the action registration to register the company guid id **/
-                if (CompanyGuidID is null) return RedirectToAction("Logout");
+                if (CompanyGuidID is null || !IsAllowBiographiesFeature) return RedirectToAction("Logout");
 
                 if (SysBase.PtrCode(CompanyGuidID, PrtCode))
                 {
