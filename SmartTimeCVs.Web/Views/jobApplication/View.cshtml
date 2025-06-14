@@ -1,0 +1,27 @@
+@model JobApplicationViewModel
+
+<h2>Job Application Details</h2>
+
+<table class="table table-bordered">
+    <tr><th>Full Name</th><td>@Model.FullName</td></tr>
+    <tr><th>Job Type</th><td>@Model.ApplyingFor</td></tr>
+    <tr><th>Mobile Number</th><td>@Model.MobileNumber</td></tr>
+    <tr><th>Application Date</th><td>@Model.DateOfBirth?.ToString("dd-MMM-yyyy")</td></tr>
+    <tr><th>Status</th><td>@(Model.IsDeleted ? "Deleted" : "Available")</td></tr>
+    <tr><th>Attachment</th>
+        <td>
+            @if (!string.IsNullOrEmpty(Model.AttachmentUrl))
+            {
+                <a href="~/images/cvAttachments/@Model.AttachmentUrl" download>
+                    Download Attachment
+                </a>
+            }
+            else
+            {
+                <span>No file uploaded</span>
+            }
+        </td>
+    </tr>
+</table>
+
+<a asp-action="Index" class="btn btn-secondary">Back</a>
