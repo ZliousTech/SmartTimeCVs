@@ -20,8 +20,9 @@ namespace SmartTimeCVs.Web.Controllers
 
         public IActionResult Register([FromQuery] string CompanyGuidID, [FromQuery] string PrtCode)
         {
-            //https://localhost:7061/Account/Register/?bssl=sGGf3jxh
-            //https://localhost:7061/Account/Register/?bssl=PjVCjr4Q
+            //https://localhost:7061/Account/Register/?bssl=sGGf3jxh (Light House)
+            //https://localhost:7061/Account/Register/?bssl=PjVCjr4Q (Royal Eagle)
+            //https://localhost:7061/Account/Register/?bssl=31l37ziA (Nefertari)
 
             bool IsCompanyRequest = true;
             bool UseHomePageText = true;
