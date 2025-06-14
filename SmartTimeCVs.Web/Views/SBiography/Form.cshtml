@@ -492,7 +492,7 @@
 
                 <div class="row clearfix mb-3">
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">@Localizer["From"] <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["FromDate"] <span class="text-danger">*</span></h2>
                         <div class="input-group mb-0">
                             @* <span class="input-group-addon @(ViewData?.ModelState["CurrentFrom"] is null? "" :
                                 ViewData.ModelState["CurrentFrom"]?.Errors.Any() == true ? "form-control-icon-invalid" :"form-control-icon-valid")">
@@ -507,7 +507,7 @@
                         <span asp-validation-for="CurrentFrom" class="text-danger mb-5 mt-0"></span>
                     </div>
                     <div class="col-md-6">
-                        <h2 class="card-inside-title mb-2">@Localizer["To"] <span class="text-danger">*</span></h2>
+                        <h2 class="card-inside-title mb-2">@Localizer["ToDate"] <span class="text-danger">*</span></h2>
                         <div class="input-group mb-0">
                             @* <span class="input-group-addon @(ViewData?.ModelState["CurrentTo"] is null? "" :
                                 ViewData.ModelState["CurrentTo"]?.Errors.Any() == true ? "form-control-icon-invalid" :"form-control-icon-valid")">
@@ -537,10 +537,10 @@
                     <div class="col-md-6">
                         <h2 class="card-inside-title mb-2">@Localizer["ReadyToJoinFrom"] <span class="text-danger">*</span></h2>
                         <div class="input-group mb-0">
-                            <span class="input-group-addon @(ViewData?.ModelState["ReadyToJoinFrom"] is null? "" :
+                            @* <span class="input-group-addon @(ViewData?.ModelState["ReadyToJoinFrom"] is null? "" :
                                 ViewData.ModelState["ReadyToJoinFrom"]?.Errors.Any() == true ? "form-control-icon-invalid" :"form-control-icon-valid")">
                                 <i class="zmdi zmdi-calendar"></i>
-                            </span>
+                            </span> *@
                             <input type="text" class="form-control datetimepicker
 							@(ViewData?.ModelState["ReadyToJoinFrom"] is null? "" :
                             ViewData.ModelState["ReadyToJoinFrom"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
