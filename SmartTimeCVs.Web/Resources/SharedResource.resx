@@ -297,4 +297,16 @@
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
+  <data name="FromDate" xml:space="preserve">
+    <value>From Date</value>
+  </data>
+  <data name="ToDate" xml:space="preserve">
+    <value>To Date</value>
+  </data>
+  <data name="ApplicationDate" xml:space="preserve">
+    <value>Application Date</value>
+  </data>
+  <data name="JobType" xml:space="preserve">
+    <value>Job Type</value>
+  </data>
 </root>
