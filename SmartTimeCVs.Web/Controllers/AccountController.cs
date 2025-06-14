@@ -77,10 +77,11 @@ namespace SmartTimeCVs.Web.Controllers
                 return RedirectToAction("Logout");
             }
 
-            if(UseHomePageText)
-                return IsCompanyRequest ? RedirectToAction("Index", "Home") : RedirectToAction("Index", "Biography");
+            //JobApplication
+            if (UseHomePageText)
+                return IsCompanyRequest ? RedirectToAction("Index", "JobApplication") : RedirectToAction("Index", "Biography");
             else
-                return IsCompanyRequest ? RedirectToAction("Index", "Home") : RedirectToAction("Index", "SBiography");
+                return IsCompanyRequest ? RedirectToAction("Index", "JobApplication") : RedirectToAction("Create", "Biography");
         }
     }
 }
