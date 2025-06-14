@@ -114,7 +114,7 @@ namespace Common.Base
                         {
                             CompanyGuidID = jsonData?.data.companyGuidID;
                             UseHomePageText = jsonData?.data.useHomePageText;
-                            IsAllowBiographiesFeature = jsonData?.data.IsAllowBiographiesFeature;
+                            IsAllowBiographiesFeature = jsonData?.data.isAllowBiographiesFeature;
                         }
                         else
                         {

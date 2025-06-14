@@ -20,12 +20,12 @@ namespace SmartTimeCVs.Web.Controllers
 
         public IActionResult Register([FromQuery] string CompanyGuidID, [FromQuery] string PrtCode)
         {
-            //https://localhost:7061/Account/Register/?bssl=304q66q4
+            //https://localhost:7061/Account/Register/?bssl=sGGf3jxh
             //https://localhost:7061/Account/Register/?bssl=PjVCjr4Q
 
             bool IsCompanyRequest = true;
-            bool UseHomePageText = false;
-            bool IsAllowBiographiesFeature = false;
+            bool UseHomePageText = true;
+            bool IsAllowBiographiesFeature = true;
 
             try
             {
@@ -43,7 +43,6 @@ namespace SmartTimeCVs.Web.Controllers
                     IsCompanyRequest = false;
                 }
                 /** EOF Check the short link **/
-
 
                 /** Start the action registration to register the company guid id **/
                 if (CompanyGuidID is null || !IsAllowBiographiesFeature) return RedirectToAction("Logout");
