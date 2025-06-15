@@ -109,6 +109,9 @@
         [MaxLength(100)]
         public string? ApplyingFor { get; set; }
 
+        [MaxLength(100)]
+        public string? JobTitle { get; set; }
+
         [MaxLength(500)]
         public string? AdminFeedback { get; set; }
 

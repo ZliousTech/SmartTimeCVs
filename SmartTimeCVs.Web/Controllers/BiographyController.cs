@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Localization;
 using SmartTimeCVs.Web.Core.Dtos;
 using SmartTimeCVs.Web.Core.Enums;
+using Common;
+using Common.Base;
 
 namespace SmartTimeCVs.Web.Controllers
 {
@@ -466,6 +468,20 @@ namespace SmartTimeCVs.Web.Controllers
             return Json(isAllowed);
         }
 
+        [HttpGet]
+        public IActionResult GetJobTitlesByCategory(string categoryGuidID)
+        {
+            var currentCulture = Thread.CurrentThread.CurrentUICulture.Name;
+            var titles = SysBase.GetJobTitles(categoryGuidID);
+            var list = titles.Select(title => new
+            {
+                value = title.JobTitleGuidID!.ToString(),
+                text = currentCulture.Contains("en") ? title.JobTitleNameEn! : title.JobTitleNameNative!
+            });
+
+            return Json(list);
+        }
+
         #region Private Area.
 
         private void HandleSidebarsViewAndReturnToController(bool isFromJobApplicationView)
@@ -488,6 +504,7 @@ namespace SmartTimeCVs.Web.Controllers
             ViewBag.MaritalStatusList = InitEnumList<MaritalStatusTypeEnum>();
             ViewBag.NationalityList = InitNationalityList();
             ViewBag.ApplyingForList = InitApplyingForList();
+            //ViewBag.JobTitleList = InitJobTitlesList();
 
             var levels = InitEnumList<LevelsEnum>();
             ViewBag.EnglishLevelList = levels;
@@ -725,19 +742,36 @@ namespace SmartTimeCVs.Web.Controllers
 
         private List<SelectListItem> InitApplyingForList()
         {
-            return new List<SelectListItem>
+            var currentCulture = Thread.CurrentThread.CurrentUICulture.Name;
+            string CompanyGuidID = GlobalVariablesService.CompanyId;
+
+            var categories = SysBase.GetJobCategories(CompanyGuidID);
+            var list = new List<SelectListItem>();
+
+            foreach (var cat in categories)
             {
-                new SelectListItem { Value = "Teacher", Text = "Teacher" },
-                new SelectListItem { Value = "Assistant Teacher", Text = "Assistant Teacher" },
-                new SelectListItem { Value = "School Counselor", Text = "School Counselor" },
-                new SelectListItem { Value = "Admin Assistant", Text = "Administrative Assistant" },
-                new SelectListItem { Value = "Janitor", Text = "Janitor" },
-                new SelectListItem { Value = "Security", Text = "Security Guard" },
-                new SelectListItem { Value = "Principal", Text = "Principal" },
-                new SelectListItem { Value = "Vice Principal", Text = "Vice Principal" },
-                new SelectListItem { Value = "Librarian", Text = "Librarian" },
-                new SelectListItem { Value = "IT Support", Text = "IT Support" }
-            };
+                list.Add(new SelectListItem
+                {
+                    Value = cat.JobCategoryGuidID!.ToString(),
+                    Text = currentCulture.Contains("en") ? cat.JobCategoryNameEn! : cat.JobCategoryNameNative!
+                });
+            }
+
+            return list;
+
+            //return new List<SelectListItem>
+            //{
+            //    new SelectListItem { Value = "Teacher", Text = "Teacher" },
+            //    new SelectListItem { Value = "Assistant Teacher", Text = "Assistant Teacher" },
+            //    new SelectListItem { Value = "School Counselor", Text = "School Counselor" },
+            //    new SelectListItem { Value = "Admin Assistant", Text = "Administrative Assistant" },
+            //    new SelectListItem { Value = "Janitor", Text = "Janitor" },
+            //    new SelectListItem { Value = "Security", Text = "Security Guard" },
+            //    new SelectListItem { Value = "Principal", Text = "Principal" },
+            //    new SelectListItem { Value = "Vice Principal", Text = "Vice Principal" },
+            //    new SelectListItem { Value = "Librarian", Text = "Librarian" },
+            //    new SelectListItem { Value = "IT Support", Text = "IT Support" }
+            //};
         }
 
         private async Task<string> ProcessFileAsync(IFormFile file, string folderName, string fieldName, bool isAttachemnt = false)
@@ -775,3 +809,28 @@ namespace SmartTimeCVs.Web.Controllers
         #endregion
     }
 }
+
+
+#region For testing
+/* SOF Job Categories and titles */
+//List<JobCategories> jobCategories = [];
+//jobCategories = SysBase.GetJobCategories("88aa34452c5141e8b7b68443cad9b7e7");
+
+//foreach (JobCategories jobCategory in jobCategories)
+//{
+//    string BJCGuidID = jobCategory.JobCategoryGuidID!;
+//    string BJCNameEn = jobCategory.JobCategoryNameEn!;
+//    string BJCNameNative = jobCategory.JobCategoryNameNative!;
+//}
+
+//List<JobTitles> jobTitles = [];
+//jobTitles = SysBase.GetJobTitles("be2a8f9cd0444391aa4ba6ec32c87446");
+
+//foreach (JobTitles jobTitle in jobTitles)
+//{
+//    string BJTGuidID = jobTitle.JobTitleGuidID!;
+//    string BJTNameEn = jobTitle.JobTitleNameEn!;
+//    string BJTNameNative = jobTitle.JobTitleNameNative!;
+//}
+/* EOF Job Categories and titles */
+#endregion

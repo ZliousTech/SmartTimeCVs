@@ -34,6 +34,9 @@
                 <input type="hidden" asp-for="Id" />
             }
 
+            <input type="hidden" id="ApplyingForText" name="ApplyingFor" />
+            <input type="hidden" id="JobTitleText" name="JobTitle" />
+
             <!-- Step 1: Basic Info -->
             <div class="form-step" id="step-1">
                 <div class="row clearfix mb-3">
@@ -162,13 +165,6 @@
                             ViewData.ModelState["Address"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")" asp-for="Address">
                             <span asp-validation-for="Address" class="text-danger mb-5"></span>
                         </div>
-
-                        @* <h2 class="card-inside-title mb-2">Address <span class="text-danger">*</span></h2>
-                        <div class="form-group form-float">
-                            <input type="text" id="address-input" class="form-control @(ViewData?.ModelState["Address"] is null? "" : ViewData.ModelState["Address"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")" asp-for="Address" readonly>
-                            <span asp-validation-for="Address" class="text-danger mb-5"></span>
-                        </div>
-                        <div id="map" style="height: 300px; width: 100%;"></div> *@
                     </div>
 
                     <div class="col-md-6 mb-3">
@@ -185,16 +181,22 @@
                 </div>
 
                 <div class="row clearfix mb-3">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-3 mb-3">
                         <h2 class="card-inside-title mb-1">Applying For <span class="text-danger">*</span></h2>
                         <div class="">
-                            <select class="form-control js-select2
-                                @(ViewData?.ModelState["ApplyingFor"] is null ? "" :
-                                ViewData.ModelState["ApplyingFor"]?.Errors.Any() == true ? "form-control-invalid" : "form-control-valid")"
-                                    asp-for="ApplyingFor" asp-items="ViewBag.ApplyingForList">
-                            </select>
+                            <select class="form-control js-select2" asp-for="ApplyingFor" asp-items="ViewBag.ApplyingForList"></select>
                         </div>
                         <span asp-validation-for="ApplyingFor" class="text-danger mb-5"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <h2 class="card-inside-title mb-1">Job Title <span class="text-danger">*</span></h2>
+                        <div class="">
+                            <select class="form-control js-select2" id="JobTitle" name="JobTitle">
+                                <option disabled selected>Loading...</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="JobTitle" class="text-danger mb-5"></span>
                     </div>
 
                     <div class="col-md-6">
@@ -1305,7 +1307,6 @@
             $.validator.unobtrusive.parse(context); // re-parse validation for new inputs
         }
 
-
         function showStep(n) {
             const steps = document.getElementsByClassName("form-step");
 
@@ -1330,18 +1331,40 @@
 
         function validateCurrentStep(stepDiv) {
             let isValid = true;
+
             $(stepDiv).find("input, select, textarea").each(function () {
                 if (!$(this).valid()) {
                     isValid = false;
                 }
             });
 
-            if (currentStep === 0 && !validateImageInput()) {
-                isValid = false;
+            if (currentStep === 0) {
+                const applyingForHasOptions = $('#ApplyingFor option').length > 0;
+                const jobTitleSelect = $('#JobTitle');
+                const jobTitleHasOptions = jobTitleSelect.find('option').length > 0;
+                const jobTitleValue = jobTitleSelect.val();
+
+                if (applyingForHasOptions && (!jobTitleHasOptions || !jobTitleValue || jobTitleValue === '')) {
+                    isValid = false;
+                    jobTitleSelect.addClass('is-invalid');
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'warning!',
+                        text: 'Please select at least one job title.'
+                    });
+                } else {
+                    jobTitleSelect.removeClass('is-invalid');
+                }
+
+                if (!validateImageInput()) {
+                    isValid = false;
+                }
             }
 
             return isValid;
         }
+
 
         // function initMap() {
         //     const defaultLatLng = { lat: 30.0444, lng: 31.2357 }; // Default to Cairo
@@ -1406,8 +1429,62 @@
         // window.onload = initMap;
 
     </script>
-}
 
+    <script>
+        $(document).ready(function () {
+            $('#form').on('submit', function () {
+                var selectedJobCategoryText = $('#ApplyingFor option:selected').text();
+                $('#ApplyingForText').val(selectedJobCategoryText);
+
+                var selectedJobTitleText = $('#JobTitle option:selected').text();
+                $('#JobTitleText').val(selectedJobTitleText);
+            });
+
+            function loadJobTitles(applyingForId) {
+                if (!applyingForId) return;
+
+                $.ajax({
+                    url: '/Biography/GetJobTitlesByCategory',
+                    type: 'GET',
+                    data: { categoryGuidID: applyingForId },
+                    success: function (data) {
+                        var jobTitleSelect = $('#JobTitle');
+                        jobTitleSelect.empty();
+
+                        if (data && data.length > 0) {
+                            $.each(data, function (i, item) {
+                                jobTitleSelect.append($('<option>', {
+                                    value: item.value,
+                                    //value: item.text,
+                                    text: item.text
+                                }));
+                            });
+                        } else {
+                            jobTitleSelect.append('<option disabled selected>No job titles</option>');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Error loading job titles.'
+                        });
+                    }
+                });
+            }
+
+            $('#ApplyingFor').on('change', function () {
+                var selectedCategoryId = $(this).val();
+                loadJobTitles(selectedCategoryId);
+            });
+
+            var initialCategoryId = $('#ApplyingFor option:selected').val();
+            if (initialCategoryId) {
+                loadJobTitles(initialCategoryId);
+            }
+        });
+    </script>
+}
 
 @section Plugins {
     <partial name="_CustomValidationsJS" />

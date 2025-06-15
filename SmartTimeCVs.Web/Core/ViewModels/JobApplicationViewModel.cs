@@ -126,6 +126,9 @@ public class JobApplicationViewModel : BaseModel
     [MaxLength(100, ErrorMessage = Errors.MaxLength), Display(Name = "Applying For")]
     public string? ApplyingFor { get; set; }
 
+    [MaxLength(100, ErrorMessage = Errors.MaxLength), Display(Name = "Job Title")]
+    public string? JobTitle { get; set; }
+
     [MaxLength(500, ErrorMessage = Errors.MaxLength), Display(Name = "Admin Feedback")]
     public string? AdminFeedback { get; set; }
 

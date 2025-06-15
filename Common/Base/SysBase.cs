@@ -100,31 +100,29 @@ namespace Common.Base
 
             try
             {
-                using (var client = new HttpClient())
+                using var client = new HttpClient();
+                string SmartTimeAPIUri = "https://smarttimeapi.zlioustech.com";
+                client.BaseAddress = new Uri($"{SmartTimeAPIUri}/api/Company/");
+                var endpoint = $"CheckShortLinkSTCV/{bsslValue}";
+                var response = client.GetAsync(endpoint).Result;
+                if (response != null && response.IsSuccessStatusCode)
                 {
-                    string SmartTimeAPIUri = "https://smarttimeapi.zlioustech.com";
-                    client.BaseAddress = new Uri($"{SmartTimeAPIUri}/api/Company/");
-                    var endpoint = $"CheckShortLinkSTCV/{bsslValue}";
-                    var response = client.GetAsync(endpoint).Result;
-                    if (response != null && response.IsSuccessStatusCode)
+                    string jsonDataString = response.Content.ReadAsStringAsync().Result;
+                    dynamic jsonData = JsonConvert.DeserializeObject(jsonDataString);
+                    if (jsonData != null && jsonData?.status == "True")
                     {
-                        string jsonDataString = response.Content.ReadAsStringAsync().Result;
-                        dynamic jsonData = JsonConvert.DeserializeObject(jsonDataString);
-                        if (jsonData != null && jsonData?.status == "True")
-                        {
-                            CompanyGuidID = jsonData?.data.companyGuidID;
-                            UseHomePageText = jsonData?.data.useHomePageText;
-                            IsAllowBiographiesFeature = jsonData?.data.isAllowBiographiesFeature;
-                        }
-                        else
-                        {
-                            return String.Concat(CompanyGuidID, "|", UseHomePageText, "|", IsAllowBiographiesFeature);
-                        }
+                        CompanyGuidID = jsonData?.data.companyGuidID;
+                        UseHomePageText = jsonData?.data.useHomePageText;
+                        IsAllowBiographiesFeature = jsonData?.data.isAllowBiographiesFeature;
                     }
                     else
                     {
                         return String.Concat(CompanyGuidID, "|", UseHomePageText, "|", IsAllowBiographiesFeature);
                     }
+                }
+                else
+                {
+                    return String.Concat(CompanyGuidID, "|", UseHomePageText, "|", IsAllowBiographiesFeature);
                 }
             }
             catch (Exception ex)
@@ -134,6 +132,80 @@ namespace Common.Base
             }
 
             return String.Concat(CompanyGuidID, "|", UseHomePageText, "|", IsAllowBiographiesFeature);
+        }
+
+        public static List<JobCategories> GetJobCategories(string CompanyGuidID)
+        {
+            List<JobCategories> jobCategories = [];
+
+            try
+            {
+                using var client = new HttpClient();
+                string SmartTimeAPIUri = "https://smarttimeapi.zlioustech.com";
+                client.BaseAddress = new Uri($"{SmartTimeAPIUri}/api/Company/");
+                var endpoint = $"GetBiographyJobCategories/{CompanyGuidID}";
+                var response = client.GetAsync(endpoint).Result;
+                if (response != null && response.IsSuccessStatusCode)
+                {
+                    string jsonDataString = response.Content.ReadAsStringAsync().Result;
+                    dynamic jsonData = JsonConvert.DeserializeObject(jsonDataString);
+                    if (jsonData?.status == "True")
+                    {
+                        foreach (var jobCategory in jsonData?.data ?? new List<dynamic>())
+                        {
+                            jobCategories.Add(new JobCategories
+                            {
+                                JobCategoryGuidID = jobCategory.jobCategoryGuidID,
+                                JobCategoryNameEn = jobCategory.jobCategoryNameEn,
+                                JobCategoryNameNative = jobCategory.jobCategoryNameNative
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return jobCategories;
+        }
+
+        public static List<JobTitles> GetJobTitles(string JobCategoryGuidID)
+        {
+            List<JobTitles> jobTitles = [];
+
+            try
+            {
+                using var client = new HttpClient();
+                string SmartTimeAPIUri = "https://smarttimeapi.zlioustech.com";
+                client.BaseAddress = new Uri($"{SmartTimeAPIUri}/api/Company/");
+                var endpoint = $"GetBiographyJobTitles/{JobCategoryGuidID}";
+                var response = client.GetAsync(endpoint).Result;
+                if (response != null && response.IsSuccessStatusCode)
+                {
+                    string jsonDataString = response.Content.ReadAsStringAsync().Result;
+                    dynamic jsonData = JsonConvert.DeserializeObject(jsonDataString);
+                    if (jsonData?.status == "True")
+                    {
+                        foreach (var jobTitle in jsonData?.data ?? new List<dynamic>())
+                        {
+                            jobTitles.Add(new JobTitles
+                            {
+                                JobTitleGuidID = jobTitle.jobTitleGuidID,
+                                JobTitleNameEn = jobTitle.jobTitleNameEn,
+                                JobTitleNameNative = jobTitle.jobTitleNameNative
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return jobTitles;
         }
 
         private static string CalculateSentTime(string SentTime)
