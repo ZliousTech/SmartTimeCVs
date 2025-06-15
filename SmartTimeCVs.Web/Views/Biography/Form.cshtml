@@ -227,7 +227,8 @@
                         <div class="form-group form-float">
                             <input type="number" asp-for="HighSchoolGraduationYear" placeholder="Enter graduation year"
                                    class="form-control @(ViewData?.ModelState["HighSchoolGraduationYear"]?.Errors.Any() == true ?
-                                   "form-control-invalid" : "form-control-valid")" value="@DateTime.Now.AddYears(-4).Year" />
+                                   "form-control-invalid" : "form-control-valid")"
+                                   />
                             <span asp-validation-for="HighSchoolGraduationYear" class="text-danger mb-5"></span>
                         </div>
                     </div>
