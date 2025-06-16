@@ -309,4 +309,34 @@
   <data name="JobTitle" xml:space="preserve">
     <value>مسمى وظيفي</value>
   </data>
+  <data name="WorkExperience" xml:space="preserve">
+    <value>خبرة في العمل</value>
+  </data>
+  <data name="PersonalInformation" xml:space="preserve">
+    <value>معلومات شخصية</value>
+  </data>
+  <data name="JobApplicationOverview" xml:space="preserve">
+    <value>طلب الوظيفة</value>
+  </data>
+  <data name="Skills" xml:space="preserve">
+    <value>مهارات</value>
+  </data>
+  <data name="PositionDetails" xml:space="preserve">
+    <value>تفاصيل الوظيفة</value>
+  </data>
+  <data name="Education" xml:space="preserve">
+    <value>التعليم</value>
+  </data>
+  <data name="ScreeningComplete" xml:space="preserve">
+    <value>الفحص مكتمل</value>
+  </data>
+  <data name="UploadedCV" xml:space="preserve">
+    <value>السيرة الذاتية المرفوعة</value>
+  </data>
+  <data name="male" xml:space="preserve">
+    <value>ذكر</value>
+  </data>
+  <data name="female" xml:space="preserve">
+    <value>أنثى</value>
+  </data>
 </root>

@@ -1,32 +1,153 @@
 @model JobApplicationViewModel
+@using System.Globalization
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
 
 @{
-    ViewData["HideSidebars"] = true;
+    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    ViewData["Title"] = Localizer["Job Application Details"];
 }
+@{
+    var genderDisplay = Model.GenderId == 1 ? @Localizer["Male"]
+                      : Model.GenderId == 2 ? @Localizer["Female"]
+                      : Localizer["NotSpecified"];
+}
+<div class="container @(isRtl ? "rtl" : "ltr") mt-5">
+    <div class="card-view">
+        <div class="row align-items-center mb-4">
+            <div class="col-md-8">
+                <h2 class="mb-0 text-success">@Localizer["JobApplicationOverview"]</h2>
+            </div>
+            <div class="col-md-4 text-end">
+                <img src="~/images/profileImages/@(Model.ImageUrl ?? "ProfileImagePlaceholder.jpg")" alt="Profile Picture" class="profile-img" />
+            </div>
+        </div>
 
+        <div class="section-title">@Localizer["PersonalInformation"]</div>
+        <div class="row mb-3">
+            <div class="col-md-6"><div class="info-label">@Localizer["FullName"]</div><div class="info-value">@Model.FullName</div></div>
+            <div class="col-md-6"><div class="info-label">@Localizer["Gender"]</div><div class="info-value">@genderDisplay</div></div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6"><div class="info-label">@Localizer["DateOfBirth"]</div><div class="info-value">@Model.DateOfBirth?.ToString("yyyy-MM-dd")</div></div>
+            <div class="col-md-6"><div class="info-label">@Localizer["PlaceOfBirth"]</div><div class="info-value">@Model.PlaceOfBirth</div></div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6"><div class="info-label">@Localizer["Nationality"]</div><div class="info-value">@Model.Nationality</div></div>
+            <div class="col-md-6"><div class="info-label">@Localizer["NationalNumber"]</div><div class="info-value">@Model.NationalID</div></div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6"><div class="info-label">@Localizer["MobileNumber"]</div><div class="info-value">@Model.MobileNumber</div></div>
+            <div class="col-md-6"><div class="info-label">@Localizer["Address"]</div><div class="info-value">@Model.Address</div></div>
+        </div>
 
-<h2>Job Application Details</h2>
-
-<table class="table table-bordered">
-    <tr><th>Full Name</th><td>@Model.FullName</td></tr>
-    <tr><th>Job Type</th><td>@Model.ApplyingFor</td></tr>
-    <tr><th>Mobile Number</th><td>@Model.MobileNumber</td></tr>
-    <tr><th>Application Date</th><td>@Model.DateOfBirth?.ToString("dd-MMM-yyyy")</td></tr>
-    <tr><th>Status</th><td>@(Model.IsDeleted ? "Deleted" : "Available")</td></tr>
-    <tr><th>Attachment</th>
-        <td>
+        <div class="section-title">@Localizer["PositionDetails"]</div>
+        <div class="row mb-3">
+            <div class="col-md-6"><div class="info-label">@Localizer["ApplyingFor"]</div><div class="info-value">@Model.ApplyingFor</div></div>
+            <div class="col-md-6"><div class="info-label">@Localizer["ExpectedSalary"]</div><div class="info-value">@Model.ExpectedSalary</div></div>
+        </div>
+        <div class="info-label mt-3">@Localizer["UploadedCV"]</div>
+        <div class="info-value mb-4">
             @if (!string.IsNullOrEmpty(Model.AttachmentUrl))
             {
-                <a href="~/images/cvAttachments/@Model.AttachmentUrl" download>
-                    Download Attachment
-                </a>
+                <a href="~/images/cvAttachments/@Model.AttachmentUrl" download>@Model.AttachmentUrl</a>
             }
             else
             {
-                <span>No file uploaded</span>
+                @Localizer["NoFileUploaded"]
             }
-        </td>
-    </tr>
-</table>
+        </div>
 
-<a asp-action="Index" class="btn btn-secondary">Back</a>
+        <div class="section-title">@Localizer["WorkExperience"]</div>
+        <div class="mb-2"><div class="info-label">@Localizer["EmployerName"]</div><div class="info-value">@Model.CurrentEmployerName</div></div>
+        <div class="mb-2"><div class="info-label">@Localizer["JobDescription"]</div><div class="info-value">@Model.CurrentJobDescription</div></div>
+        <div class="row mb-2">
+            <div class="col-md-4"><div class="info-label">@Localizer["From"]</div><div class="info-value">@Model.CurrentFrom?.ToString("yyyy-MM-dd")</div></div>
+            <div class="col-md-4"><div class="info-label">@Localizer["To"]</div><div class="info-value">@Model.CurrentTo?.ToString("yyyy-MM-dd")</div></div>
+            <div class="col-md-4"><div class="info-label">@Localizer["ReadyToJoinFrom"]</div><div class="info-value">@Model.ReadyToJoinFrom?.ToString("yyyy-MM-dd")</div></div>
+        </div>
+        <div class="mb-4"><div class="info-label">@Localizer["ReasonForLeaving"]</div><div class="info-value">@Model.ReasonForLeavingCurrent</div></div>
+
+        <div class="section-title">@Localizer["Education"]</div>
+        <div class="row mb-3">
+            <div class="col-md-6"><div class="info-label">@Localizer["HighSchoolName"]</div><div class="info-value">@Model.HighSchoolName</div></div>
+            <div class="col-md-6"><div class="info-label">@Localizer["HighSchoolGraduationYear"]</div><div class="info-value">@Model.HighSchoolGraduationYear</div></div>
+        </div>
+
+        @foreach (var uni in Model.Universities)
+        {
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="info-label">@Localizer["University"]</div>
+                    <div class="info-value">@uni.UniversityName</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-label">@Localizer["UniversityGraduationYear"]</div>
+                    <div class="info-value">@uni.UniversityGraduationYear</div>
+                </div>
+            </div>
+        }
+
+        @* <div class="mb-4"><div class="info-label">@Localizer["Specialization"]</div><div class="info-value">@Model.Specialization</div></div> *@
+
+        <div class="section-title">@Localizer["Skills"]</div>
+        <div class="row mb-3">
+            <div class="col-md-4"><div class="info-label">@Localizer["EnglishLevel"]</div><div class="info-value">@Model.EnglishLevel</div></div>
+            <div class="col-md-4"><div class="info-label">@Localizer["OtherLanguage"]</div><div class="info-value">@Model.OtherLanguage</div></div>
+            <div class="col-md-4"><div class="info-label">@Localizer["OtherLanguageLevel"]</div><div class="info-value">@Model.OtherLanguageLevel</div></div>
+        </div>
+        <div class="mb-4"><div class="info-label">@Localizer["ComputerSkills"]</div><div class="info-value">@Model.ComputerSkillsLevelId</div></div>
+
+        <hr class="my-4" />
+        <div class="text-center">
+            <button type="button" class="btn btn-success px-5 py-2">
+                @Localizer["ScreeningComplete"]
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-view {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        padding: 30px;
+        margin-top: 40px;
+    }
+
+    .section-title {
+        border-left: 5px solid #198754;
+        padding-left: 10px;
+        font-weight: bold;
+        font-size: 1.3rem;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        color: #198754;
+    }
+
+    .rtl .section-title {
+        border-left: none;
+        border-right: 5px solid #198754;
+        padding-left: 0;
+        padding-right: 10px;
+    }
+
+    .info-label {
+        font-weight: 500;
+        color: #6c757d;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .profile-img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #ddd;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+</style>
