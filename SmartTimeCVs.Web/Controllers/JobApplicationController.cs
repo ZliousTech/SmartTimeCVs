@@ -2,7 +2,7 @@
 
 namespace SmartTimeCVs.Web.Controllers
 {
-    //[Authorize]
+    [Authorize]
 
     public class JobApplicationController : Controller
     {
