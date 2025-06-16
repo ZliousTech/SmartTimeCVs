@@ -306,7 +306,7 @@
   <data name="ApplicationDate" xml:space="preserve">
     <value>تاريخ  التقديم</value>
   </data>
-  <data name="JobType" xml:space="preserve">
-    <value>نوع الوظيفه</value>
+  <data name="JobTitle" xml:space="preserve">
+    <value>مسمى وظيفي</value>
   </data>
 </root>

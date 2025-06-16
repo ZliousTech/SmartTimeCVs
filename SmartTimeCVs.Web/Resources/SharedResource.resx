@@ -306,7 +306,7 @@
   <data name="ApplicationDate" xml:space="preserve">
     <value>Application Date</value>
   </data>
-  <data name="JobType" xml:space="preserve">
-    <value>Job Type</value>
+  <data name="JobTitle" xml:space="preserve">
+    <value>Job Title</value>
   </data>
 </root>
