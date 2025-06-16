@@ -38,13 +38,34 @@
         <div class="row mb-3">
             <div class="col-md-6"><div class="info-label">@Localizer["MobileNumber"]</div><div class="info-value">@Model.MobileNumber</div></div>
             <div class="col-md-6"><div class="info-label">@Localizer["Address"]</div><div class="info-value">@Model.Address</div></div>
+
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6"><div class="info-label">@Localizer["MaritalStatus"]</div><div class="info-value">@Model.MaritalStatusId</div></div>
+            <div class="col-md-6"><div class="info-label">@Localizer["Email"]</div><div class="info-value">@Model.Email</div></div>
+
         </div>
 
         <div class="section-title">@Localizer["PositionDetails"]</div>
         <div class="row mb-3">
-            <div class="col-md-6"><div class="info-label">@Localizer["ApplyingFor"]</div><div class="info-value">@Model.ApplyingFor</div></div>
-            <div class="col-md-6"><div class="info-label">@Localizer["ExpectedSalary"]</div><div class="info-value">@Model.ExpectedSalary</div></div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["JobTitle"]</div>
+                <div class="info-value">@Model.JobTitle</div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["ApplyingFor"]</div>
+                <div class="info-value">@Model.ApplyingFor</div>
+            </div>
         </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["ExpectedSalary"]</div>
+                <div class="info-value">@Model.ExpectedSalary</div>
+            </div>
+        </div>
+
         <div class="info-label mt-3">@Localizer["UploadedCV"]</div>
         <div class="info-value mb-4">
             @if (!string.IsNullOrEmpty(Model.AttachmentUrl))
@@ -57,15 +78,52 @@
             }
         </div>
 
+
         <div class="section-title">@Localizer["WorkExperience"]</div>
-        <div class="mb-2"><div class="info-label">@Localizer["EmployerName"]</div><div class="info-value">@Model.CurrentEmployerName</div></div>
-        <div class="mb-2"><div class="info-label">@Localizer["JobDescription"]</div><div class="info-value">@Model.CurrentJobDescription</div></div>
+
         <div class="row mb-2">
-            <div class="col-md-4"><div class="info-label">@Localizer["From"]</div><div class="info-value">@Model.CurrentFrom?.ToString("yyyy-MM-dd")</div></div>
-            <div class="col-md-4"><div class="info-label">@Localizer["To"]</div><div class="info-value">@Model.CurrentTo?.ToString("yyyy-MM-dd")</div></div>
-            <div class="col-md-4"><div class="info-label">@Localizer["ReadyToJoinFrom"]</div><div class="info-value">@Model.ReadyToJoinFrom?.ToString("yyyy-MM-dd")</div></div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["EmployerName"]</div>
+                <div class="info-value">@Model.CurrentEmployerName</div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["CurrentEmployerAddress"]</div>
+                <div class="info-value">@Model.CurrentEmployerAddress</div>
+            </div>
         </div>
-        <div class="mb-4"><div class="info-label">@Localizer["ReasonForLeaving"]</div><div class="info-value">@Model.ReasonForLeavingCurrent</div></div>
+
+        <div class="mb-2">
+            <div class="info-label">@Localizer["JobDescription"]</div>
+            <div class="info-value">@Model.CurrentJobDescription</div>
+        </div>
+
+
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["CurrentSalary"]</div>
+                <div class="info-value">@Model.CurrentSalary?.ToString("C")</div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["ReasonForLeaving"]</div>
+                <div class="info-value">@Model.ReasonForLeavingCurrent</div>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-4">
+                <div class="info-label">@Localizer["From"]</div>
+                <div class="info-value">@Model.CurrentFrom?.ToString("yyyy-MM-dd")</div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-label">@Localizer["To"]</div>
+                <div class="info-value">@Model.CurrentTo?.ToString("yyyy-MM-dd")</div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-label">@Localizer["ReadyToJoinFrom"]</div>
+                <div class="info-value">@Model.ReadyToJoinFrom?.ToString("yyyy-MM-dd")</div>
+            </div>
+
+        </div>
 
         <div class="section-title">@Localizer["Education"]</div>
         <div class="row mb-3">
@@ -95,14 +153,19 @@
             <div class="col-md-4"><div class="info-label">@Localizer["OtherLanguage"]</div><div class="info-value">@Model.OtherLanguage</div></div>
             <div class="col-md-4"><div class="info-label">@Localizer["OtherLanguageLevel"]</div><div class="info-value">@Model.OtherLanguageLevel</div></div>
         </div>
-        <div class="mb-4"><div class="info-label">@Localizer["ComputerSkills"]</div><div class="info-value">@Model.ComputerSkillsLevelId</div></div>
+        <div class="mb-4"><div class="info-label">@Localizer["ComputerSkillsLevel"]</div><div class="info-value">@Model.ComputerSkillsLevelId</div></div>
 
         <hr class="my-4" />
-        <div class="text-center">
+        <div class="d-flex justify-content-center gap-3">
             <button type="button" class="btn btn-success px-5 py-2">
                 @Localizer["ScreeningComplete"]
             </button>
+
+            <button type="button" class="btn btn-danger px-5 py-2">
+                @Localizer["Exclude"]
+            </button>
         </div>
+
     </div>
 </div>
 
