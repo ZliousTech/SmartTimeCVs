@@ -327,8 +327,8 @@
   <data name="Education" xml:space="preserve">
     <value>Education</value>
   </data>
-  <data name="ScreeningComplete" xml:space="preserve">
-    <value>Screening Complete</value>
+  <data name="Screening" xml:space="preserve">
+    <value>Screening</value>
   </data>
   <data name="UploadedCV" xml:space="preserve">
     <value>Uploaded CV</value>
@@ -341,5 +341,29 @@
   </data>
   <data name="Exclude" xml:space="preserve">
     <value>Exclude</value>
+  </data>
+  <data name="Single" xml:space="preserve">
+    <value>Single</value>
+  </data>
+  <data name="Divorced" xml:space="preserve">
+    <value>Divorced</value>
+  </data>
+  <data name="Married" xml:space="preserve">
+    <value>Married</value>
+  </data>
+  <data name="Separated" xml:space="preserve">
+    <value>Separated</value>
+  </data>
+  <data name="Widowed" xml:space="preserve">
+    <value>Widowed</value>
+  </data>
+  <data name="Fluent" xml:space="preserve">
+    <value>Fluent</value>
+  </data>
+  <data name="Good" xml:space="preserve">
+    <value>Good</value>
+  </data>
+  <data name="Fair" xml:space="preserve">
+    <value>Fair</value>
   </data>
 </root>

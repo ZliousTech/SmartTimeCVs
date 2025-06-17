@@ -327,8 +327,8 @@
   <data name="Education" xml:space="preserve">
     <value>التعليم</value>
   </data>
-  <data name="ScreeningComplete" xml:space="preserve">
-    <value>الفحص مكتمل</value>
+  <data name="Screening" xml:space="preserve">
+    <value>الفحص</value>
   </data>
   <data name="UploadedCV" xml:space="preserve">
     <value>السيرة الذاتية المرفوعة</value>
@@ -341,5 +341,29 @@
   </data>
   <data name="Exclude" xml:space="preserve">
     <value>استبعاد</value>
+  </data>
+  <data name="Single" xml:space="preserve">
+    <value>اعزب</value>
+  </data>
+  <data name="Divorced" xml:space="preserve">
+    <value>مطلق</value>
+  </data>
+  <data name="Married" xml:space="preserve">
+    <value>متزوج</value>
+  </data>
+  <data name="Separated" xml:space="preserve">
+    <value>منفصل</value>
+  </data>
+  <data name="Widowed" xml:space="preserve">
+    <value>أرمل</value>
+  </data>
+  <data name="Fluent" xml:space="preserve">
+    <value>طلِق</value>
+  </data>
+  <data name="Good" xml:space="preserve">
+    <value>جيد</value>
+  </data>
+  <data name="Fair" xml:space="preserve">
+    <value>عدل</value>
   </data>
 </root>
