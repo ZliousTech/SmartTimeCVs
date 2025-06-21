@@ -11,6 +11,18 @@
                       : Model.GenderId == 2 ? @Localizer["Female"]
                       : Localizer["NotSpecified"];
 }
+@{
+    var maritalStatusDisplay = Model.MaritalStatusId == 1 ? @Localizer["Single"]
+                      : Model.MaritalStatusId == 2 ? @Localizer["Married"]
+                      : Model.MaritalStatusId == 3 ? @Localizer["Divorced"]
+                      : Model.MaritalStatusId == 4 ? @Localizer["Widowed"]
+                      : Localizer["Separated"];
+}
+@{
+    var levelTypeDisplay = Model.ComputerSkillsLevelId == 1 ? @Localizer["Fluent"]
+                      : Model.ComputerSkillsLevelId == 2 ? @Localizer["Good"]
+                      : @Localizer["Fair"];
+}
 <div class="container @(isRtl ? "rtl" : "ltr") mt-5">
     <div class="card-view">
         <div class="row align-items-center mb-4">
@@ -41,7 +53,7 @@
 
         </div>
         <div class="row mb-3">
-            <div class="col-md-6"><div class="info-label">@Localizer["MaritalStatus"]</div><div class="info-value">@Model.MaritalStatusId</div></div>
+            <div class="col-md-6"><div class="info-label">@Localizer["MaritalStatus"]</div><div class="info-value">@maritalStatusDisplay</div></div>
             <div class="col-md-6"><div class="info-label">@Localizer["Email"]</div><div class="info-value">@Model.Email</div></div>
 
         </div>
@@ -153,17 +165,19 @@
             <div class="col-md-4"><div class="info-label">@Localizer["OtherLanguage"]</div><div class="info-value">@Model.OtherLanguage</div></div>
             <div class="col-md-4"><div class="info-label">@Localizer["OtherLanguageLevel"]</div><div class="info-value">@Model.OtherLanguageLevel</div></div>
         </div>
-        <div class="mb-4"><div class="info-label">@Localizer["ComputerSkillsLevel"]</div><div class="info-value">@Model.ComputerSkillsLevelId</div></div>
+        <div class="mb-4"><div class="info-label">@Localizer["ComputerSkillsLevel"]</div><div class="info-value">@levelTypeDisplay</div></div>
 
-        <hr class="my-4" />
-        <div class="d-flex justify-content-center gap-3">
-            <button type="button" class="btn btn-success px-5 py-2">
-                @Localizer["ScreeningComplete"]
-            </button>
-
-            <button type="button" class="btn btn-danger px-5 py-2">
-                @Localizer["Exclude"]
-            </button>
+        <div class="row justify-content-center">
+            <div class="col-auto">
+                <button type="button" class="btn btn-success px-5 py-2">
+                    @Localizer["Screening"]
+                </button>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-danger px-5 py-2">
+                    @Localizer["Exclude"]
+                </button>
+            </div>
         </div>
 
     </div>
