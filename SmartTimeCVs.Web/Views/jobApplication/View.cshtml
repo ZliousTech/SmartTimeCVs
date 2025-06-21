@@ -8,21 +8,39 @@
     ViewData["HideSidebars"] = true;
 }
 @{
-    var genderDisplay = Model.GenderId == 1 ? @Localizer["Male"]
-                      : Model.GenderId == 2 ? @Localizer["Female"]
-                      : Localizer["NotSpecified"];
+    var genderDisplay = string.Empty;
+
+    if (Model != null)
+    {
+        genderDisplay = Model.GenderId == 1 ? Localizer["Male"]
+        : Model.GenderId == 2 ? Localizer["Female"]
+        : Localizer["NotSpecified"];
+    }
 }
 @{
-    var maritalStatusDisplay = Model.MaritalStatusId == 1 ? @Localizer["Single"]
-                      : Model.MaritalStatusId == 2 ? @Localizer["Married"]
-                      : Model.MaritalStatusId == 3 ? @Localizer["Divorced"]
-                      : Model.MaritalStatusId == 4 ? @Localizer["Widowed"]
-                      : Localizer["Separated"];
+    var maritalStatusDisplay = string.Empty;
+
+    if (Model != null)
+    {
+        maritalStatusDisplay = Model.MaritalStatusId == 1 ? Localizer["Single"]
+        : Model.MaritalStatusId == 2 ? Localizer["Married"]
+        : Model.MaritalStatusId == 3 ? Localizer["Divorced"]
+        : Model.MaritalStatusId == 4 ? Localizer["Widowed"]
+        : Localizer["Separated"];
+
+    }
 }
+
 @{
-    var levelTypeDisplay = Model.ComputerSkillsLevelId == 1 ? @Localizer["Fluent"]
-                      : Model.ComputerSkillsLevelId == 2 ? @Localizer["Good"]
-                      : @Localizer["Fair"];
+    var levelTypeDisplay = string.Empty;
+
+    if (Model != null)
+    {
+
+        levelTypeDisplay = Model.ComputerSkillsLevelId == 1 ? Localizer["Fluent"]
+        : Model.ComputerSkillsLevelId == 2 ? Localizer["Good"]
+        : Localizer["Fair"];
+    }
 }
 <div class="container @(isRtl ? "rtl" : "ltr") mt-5">
     <div class="card-view">
@@ -31,31 +49,62 @@
                 <h2 class="mb-0 text-success">@Localizer["JobApplicationOverview"]</h2>
             </div>
             <div class="col-md-4 text-end">
-                <img src="~/images/profileImages/@(Model.ImageUrl ?? "ProfileImagePlaceholder.jpg")" alt="Profile Picture" class="profile-img" />
+                <img src="~/images/profileImages/@(Model.ImageUrl ?? "ProfileImagePlaceholder.jpg")"
+                    alt="Profile Picture" class="profile-img" />
             </div>
         </div>
 
         <div class="section-title">@Localizer["PersonalInformation"]</div>
         <div class="row mb-3">
-            <div class="col-md-6"><div class="info-label">@Localizer["FullName"]</div><div class="info-value">@Model.FullName</div></div>
-            <div class="col-md-6"><div class="info-label">@Localizer["Gender"]</div><div class="info-value">@genderDisplay</div></div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["FullName"]</div>
+                <div class="info-value">@Model.FullName</div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["Gender"]</div>
+                <div class="info-value">@genderDisplay</div>
+            </div>
         </div>
         <div class="row mb-3">
-            <div class="col-md-6"><div class="info-label">@Localizer["DateOfBirth"]</div><div class="info-value">@Model.DateOfBirth?.ToString("yyyy-MM-dd")</div></div>
-            <div class="col-md-6"><div class="info-label">@Localizer["PlaceOfBirth"]</div><div class="info-value">@Model.PlaceOfBirth</div></div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["DateOfBirth"]</div>
+                <div class="info-value">@Model.DateOfBirth?.ToString("yyyy-MM-dd")</div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["PlaceOfBirth"]</div>
+                <div class="info-value">@Model.PlaceOfBirth</div>
+            </div>
         </div>
         <div class="row mb-3">
-            <div class="col-md-6"><div class="info-label">@Localizer["Nationality"]</div><div class="info-value">@Model.Nationality</div></div>
-            <div class="col-md-6"><div class="info-label">@Localizer["NationalNumber"]</div><div class="info-value">@Model.NationalID</div></div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["Nationality"]</div>
+                <div class="info-value">@Model.Nationality</div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["NationalNumber"]</div>
+                <div class="info-value">@Model.NationalID</div>
+            </div>
         </div>
         <div class="row mb-3">
-            <div class="col-md-6"><div class="info-label">@Localizer["MobileNumber"]</div><div class="info-value">@Model.MobileNumber</div></div>
-            <div class="col-md-6"><div class="info-label">@Localizer["Address"]</div><div class="info-value">@Model.Address</div></div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["MobileNumber"]</div>
+                <div class="info-value">@Model.MobileNumber</div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["Address"]</div>
+                <div class="info-value">@Model.Address</div>
+            </div>
 
         </div>
         <div class="row mb-3">
-            <div class="col-md-6"><div class="info-label">@Localizer["MaritalStatus"]</div><div class="info-value">@maritalStatusDisplay</div></div>
-            <div class="col-md-6"><div class="info-label">@Localizer["Email"]</div><div class="info-value">@Model.Email</div></div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["MaritalStatus"]</div>
+                <div class="info-value">@maritalStatusDisplay</div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["Email"]</div>
+                <div class="info-value">@Model.Email</div>
+            </div>
 
         </div>
 
@@ -140,20 +189,30 @@
 
         <div class="section-title">@Localizer["Education"]</div>
         <div class="row mb-3">
-            <div class="col-md-6"><div class="info-label">@Localizer["HighSchoolName"]</div><div class="info-value">@Model.HighSchoolName</div></div>
-            <div class="col-md-6"><div class="info-label">@Localizer["HighSchoolGraduationYear"]</div><div class="info-value">@Model.HighSchoolGraduationYear</div></div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["HighSchoolName"]</div>
+                <div class="info-value">@Model.HighSchoolName</div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-label">@Localizer["HighSchoolGraduationYear"]</div>
+                <div class="info-value">@Model.HighSchoolGraduationYear</div>
+            </div>
         </div>
 
         @foreach (var uni in Model.Universities)
         {
             <div class="row mb-3">
-                <div class="col-md-6">
-                    <div class="info-label">@Localizer["University"]</div>
+                <div class="col-md-4">
+                    <div class="info-label">@Localizer["UniversityName"]</div>
                     <div class="info-value">@uni.UniversityName</div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="info-label">@Localizer["UniversityGraduationYear"]</div>
                     <div class="info-value">@uni.UniversityGraduationYear</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-label">@Localizer["College"]</div>
+                    <div class="info-value">@uni.Collage</div>
                 </div>
             </div>
         }
@@ -162,11 +221,23 @@
 
         <div class="section-title">@Localizer["Skills"]</div>
         <div class="row mb-3">
-            <div class="col-md-4"><div class="info-label">@Localizer["EnglishLevel"]</div><div class="info-value">@Model.EnglishLevel</div></div>
-            <div class="col-md-4"><div class="info-label">@Localizer["OtherLanguage"]</div><div class="info-value">@Model.OtherLanguage</div></div>
-            <div class="col-md-4"><div class="info-label">@Localizer["OtherLanguageLevel"]</div><div class="info-value">@Model.OtherLanguageLevel</div></div>
+            <div class="col-md-4">
+                <div class="info-label">@Localizer["EnglishLevel"]</div>
+                <div class="info-value">@Model.EnglishLevel</div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-label">@Localizer["OtherLanguage"]</div>
+                <div class="info-value">@Model.OtherLanguage</div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-label">@Localizer["OtherLanguageLevel"]</div>
+                <div class="info-value">@Model.OtherLanguageLevel</div>
+            </div>
         </div>
-        <div class="mb-4"><div class="info-label">@Localizer["ComputerSkillsLevel"]</div><div class="info-value">@levelTypeDisplay</div></div>
+        <div class="mb-4">
+            <div class="info-label">@Localizer["ComputerSkillsLevel"]</div>
+            <div class="info-value">@levelTypeDisplay</div>
+        </div>
 
         <div class="row justify-content-center">
             <div class="col-auto">
@@ -188,7 +259,7 @@
     .card-view {
         background: #fff;
         border-radius: 12px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
         padding: 30px;
         margin-top: 40px;
     }
@@ -226,6 +297,6 @@
         border-radius: 50%;
         object-fit: cover;
         border: 3px solid #ddd;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 </style>

@@ -2,7 +2,7 @@
 
 namespace SmartTimeCVs.Web.Controllers
 {
-    [Authorize]
+    // [Authorize]
 
     public class JobApplicationController : Controller
     {
@@ -17,15 +17,15 @@ namespace SmartTimeCVs.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            string CompanyGuidID;
-            string IsCompanyRequest = "";
-            if (HttpContext.User.Identity!.IsAuthenticated)
-            {
-                CompanyGuidID = HttpContext.User.Claims.First(c => c.Type == "CompanyGuidID").Value.ToString();
-                IsCompanyRequest = HttpContext.User.Claims.First(c => c.Type == "IsCompanyRequest").Value.ToString();
-            }
-            else return RedirectToAction("Logout", "Account");
-            if (IsCompanyRequest == "False") return RedirectToAction("Logout", "Account");
+            // string CompanyGuidID;
+            // string IsCompanyRequest = "";
+            // if (HttpContext.User.Identity!.IsAuthenticated)
+            // {
+            //     CompanyGuidID = HttpContext.User.Claims.First(c => c.Type == "CompanyGuidID").Value.ToString();
+            //     IsCompanyRequest = HttpContext.User.Claims.First(c => c.Type == "IsCompanyRequest").Value.ToString();
+            // }
+            // else return RedirectToAction("Logout", "Account");
+            // if (IsCompanyRequest == "False") return RedirectToAction("Logout", "Account");
 
             try
             {
@@ -51,7 +51,21 @@ namespace SmartTimeCVs.Web.Controllers
             {
                 var job = _context.JobApplication.FirstOrDefault(x => x.Id == id);
 
+                var uni = _context.University.Where(x => x.JobApplicationId == job.Id).ToList();
+
                 var viewModel = _mapper.Map<JobApplicationViewModel>(job);
+
+                var uniList = uni.Select(x => new UniversityViewModel
+                    {
+                        Id = x.Id,
+                        JobApplicationId = x.JobApplicationId,
+                        UniversityGraduationYear = x.UniversityGraduationYear,
+                        UniversityName = x.UniversityName,
+                        Collage = x.Collage,
+                    })
+                    .ToList();
+
+                viewModel.Universities = uniList;
 
                 return View(viewModel);
             }
