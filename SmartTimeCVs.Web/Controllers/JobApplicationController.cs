@@ -53,6 +53,8 @@ namespace SmartTimeCVs.Web.Controllers
 
                 var uni = _context.University.Where(x => x.JobApplicationId == job.Id).ToList();
 
+                var course = _context.Course.Where(x => x.JobApplicationId == job.Id).ToList();
+
                 var viewModel = _mapper.Map<JobApplicationViewModel>(job);
 
                 var uniList = uni.Select(x => new UniversityViewModel
@@ -65,7 +67,20 @@ namespace SmartTimeCVs.Web.Controllers
                     })
                     .ToList();
 
+                var courseList = course
+                    .Select(x => new CourseViewModel
+                    {
+                        Id = x.Id,
+                        JobApplicationId = x.JobApplicationId,
+                        CourseName = x.CourseName,
+                        CourseAddress = x.CourseAddress,
+                        From = x.From,
+                        To = x.To,
+                    })
+                    .ToList();
+
                 viewModel.Universities = uniList;
+                viewModel.Courses = courseList;
 
                 return View(viewModel);
             }

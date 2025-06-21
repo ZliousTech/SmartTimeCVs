@@ -238,6 +238,27 @@
             <div class="info-label">@Localizer["ComputerSkillsLevel"]</div>
             <div class="info-value">@levelTypeDisplay</div>
         </div>
+        @foreach (var course in Model.Courses)
+        {
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="info-label">@Localizer["CourseName"]</div>
+                    <div class="info-value">@course.CourseName</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="info-label">@Localizer["CourseAddress"]</div>
+                    <div class="info-value">@course.CourseAddress</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="info-label">@Localizer["From"]</div>
+                    <div class="info-value">@course.From</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="info-label">@Localizer["To"]</div>
+                    <div class="info-value">@course.To</div>
+                </div>
+            </div>
+        }
 
         <div class="row justify-content-center">
             <div class="col-auto">
