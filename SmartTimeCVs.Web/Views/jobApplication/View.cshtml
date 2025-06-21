@@ -5,6 +5,7 @@
 @{
     var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
     ViewData["Title"] = Localizer["Job Application Details"];
+    ViewData["HideSidebars"] = true;
 }
 @{
     var genderDisplay = Model.GenderId == 1 ? @Localizer["Male"]
