@@ -199,7 +199,7 @@
             </div>
         </div>
 
-        @foreach (var uni in Model.Universities)
+        @* @foreach (var uni in Model.Universities)
         {
             <div class="row mb-3">
                 <div class="col-md-4">
@@ -215,7 +215,31 @@
                     <div class="info-value">@uni.Collage</div>
                 </div>
             </div>
+        } *@
+        @if (Model.Universities?.Any() == true)
+        {
+            <div class="section-title">@Localizer["Universities"]</div>
+            <table class="table table-bordered table-striped mb-4">
+                <thead class="table-success">
+                    <tr>
+                        <th>@Localizer["UniversityName"]</th>
+                        <th>@Localizer["UniversityGraduationYear"]</th>
+                        <th>@Localizer["College"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var uni in Model.Universities)
+                    {
+                        <tr>
+                            <td>@uni.UniversityName</td>
+                            <td>@uni.UniversityGraduationYear</td>
+                            <td>@uni.Collage</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         }
+
 
         @* <div class="mb-4"><div class="info-label">@Localizer["Specialization"]</div><div class="info-value">@Model.Specialization</div></div> *@
 
@@ -238,7 +262,7 @@
             <div class="info-label">@Localizer["ComputerSkillsLevel"]</div>
             <div class="info-value">@levelTypeDisplay</div>
         </div>
-        @foreach (var course in Model.Courses)
+        @* @foreach (var course in Model.Courses)
         {
             <div class="row mb-4">
                 <div class="col-md-3">
@@ -258,6 +282,31 @@
                     <div class="info-value">@course.To</div>
                 </div>
             </div>
+        } *@
+        @if (Model.Courses?.Any() == true)
+        {
+            <div class="section-title">@Localizer["Courses"]</div>
+            <table class="table table-bordered table-striped mb-4">
+                <thead class="table-success">
+                    <tr>
+                        <th>@Localizer["CourseName"]</th>
+                        <th>@Localizer["CourseAddress"]</th>
+                        <th>@Localizer["From"]</th>
+                        <th>@Localizer["To"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var course in Model.Courses)
+                    {
+                        <tr>
+                            <td>@course.CourseName</td>
+                            <td>@course.CourseAddress</td>
+                            <td>@course.From?.ToString("yyyy-MM-dd")</td>
+                            <td>@course.To?.ToString("yyyy-MM-dd")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         }
 
         <div class="row justify-content-center">
