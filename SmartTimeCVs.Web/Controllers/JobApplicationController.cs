@@ -90,6 +90,49 @@ namespace SmartTimeCVs.Web.Controllers
             }
         }
 
+        public IActionResult ShortList(int id)
+        {
+            try
+            {
+                var job = _context.JobApplication.FirstOrDefault(x => x.Id == id);
+                var uni = _context.University.Where(x => x.JobApplicationId == job.Id).ToList();
+                var course = _context.Course.Where(x => x.JobApplicationId == job.Id).ToList();
+
+                var viewModel = _mapper.Map<JobApplicationViewModel>(job);
+
+                var uniList = uni.Select(x => new UniversityViewModel
+                    {
+                        Id = x.Id,
+                        JobApplicationId = x.JobApplicationId,
+                        UniversityGraduationYear = x.UniversityGraduationYear,
+                        UniversityName = x.UniversityName,
+                        Collage = x.Collage,
+                    })
+                    .ToList();
+
+                var courseList = course
+                    .Select(x => new CourseViewModel
+                    {
+                        Id = x.Id,
+                        JobApplicationId = x.JobApplicationId,
+                        CourseName = x.CourseName,
+                        CourseAddress = x.CourseAddress,
+                        From = x.From,
+                        To = x.To,
+                    })
+                    .ToList();
+
+                viewModel.Universities = uniList;
+                viewModel.Courses = courseList;
+
+                return View("ShortListView", viewModel);
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new ErrorViewModel { Exception = ex.Message });
+            }
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleStatus(int id)
