@@ -1,0 +1,132 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgery
+@model IEnumerable<JobApplicationViewModel>
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+	ViewData["HideSidebars"] = true;
+	ViewData["Title"] = @Localizer["JobApplications"];
+	ViewData["ControllerName"] = "JobApplication";
+	ViewData["Path"] = $"{@Localizer["JobApplications"]} / {@Localizer["Index"]}";
+	ViewData["Icon"] = "description";
+}
+
+@section Styles {
+	<link rel="stylesheet" href="~/theme/assets/css/plugins/datatables.bootstrap4.min.css" />
+	<link rel="stylesheet" href="~/lib/animate.css/animate.min.css" />
+}
+
+<div class="card shadow-sm">
+	<div class="card-header">
+		<div class="row justify-content-center">
+			<div class="col-6">@*<i class="material-icons breadcrumb theme-main-color align-self-center">@ViewData["Icon"]</i>*@
+			</div>
+			<div class="col-6">
+				@* <a asp-controller="Biography" asp-action="Create" asp-route-isFromJobApplicationView="true" class="btn btn-round btn-info font-bold waves-effect float-end">
+					<div class="row">
+						<div class="col-md-5 px-2 align-self-center">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+								<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+							</svg>
+						</div>
+						<div class="col-md-7 px-1 align-self-center">
+							@Localizer["Add"]
+						</div>
+					</div>
+				</a> *@
+			</div>
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="body table-responsive">
+			<table class="table js-datatables" data-document-title="JobApplications">
+				<thead>
+					<tr class="cyan">
+						<th class="js-no-export js-exclude-search d-none">Id</th>
+						<th class="js-no-export js-exclude-search">@Localizer["Image"]</th>
+						<th>@Localizer["FullName"]</th>
+						<th class="js-status-header">@Localizer["Status"]</th>
+						<th>@Localizer["ApplicationDate"]</th>
+						<th>@Localizer["Mobile"]</th>
+						<th>@Localizer["JobTitle"]</th>
+						<th class="js-no-export">@Localizer["Attachment"]</th>
+						<th class="js-no-export">@Localizer["View"]</th>
+						@* <th class="js-no-export">@Localizer["Actions"]</th> *@
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var jobApp in Model)
+					{
+						<tr>
+							<td class="d-none">@jobApp.Id</td>
+							<td class="text-center" scope="row"><img class="rounded-circle" src="~/images/profileImages/@(jobApp.ImageUrl is null? "ProfileImagePlaceholder.jpg" : jobApp.ImageUrl)" width="40" height="40" alt="Application image"></td>
+							<td scope="row">
+								<span class="list-name">@jobApp.FullName</span>
+								<br />
+								<span class="text-muted">@(jobApp.ApplyingFor ?? string.Empty)</span>
+							</td>
+							<td class="js-td-status"><span class="badge badge-@(jobApp.IsDeleted? "danger" : "success") js-status">@(jobApp.IsDeleted ? "Deleted" : "Available")</span></td>
+							<td>@jobApp.DateOfBirth?.ToDateOfBirth()</td>
+							<td>@jobApp.MobileNumber</td>
+							@* <td><span class="list-name">@jobApp.Email</span></td> *@
+							<td><span class="text-muted">@(jobApp.ApplyingFor ?? string.Empty)</span></td>
+							<td class="text-center">
+								@if (!string.IsNullOrEmpty(jobApp.AttachmentUrl))
+								{
+									<a class="btn btn-sm btn-round btn-primary"
+									   href="~/images/cvAttachments/@jobApp.AttachmentUrl"
+									   target="_blank"
+									   download>
+										<div class="row">
+											<i class="col-md-12 material-icons">file_download</i>
+										</div>
+									</a>
+								}
+								else
+								{
+									<span class="text-muted">No file uploaded</span>
+								}
+							</td>
+							@* <td>
+								<ul>
+									<li class="dropdown">
+										<a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+											<i class="material-icons" style=" color: #17a2b8">arrow_drop_down_circle</i>
+										</a>
+										<ul class="dropdown-menu dropdown-menu-right custom-dropdown-menu js-table-actions">
+											@if (!jobApp.IsDeleted)
+											{
+												<li>
+													<a asp-controller="Biography" asp-action="Edit"
+													   asp-route-id="@jobApp.Id" asp-route-isFromJobApplicationView="true">
+														Edit
+													</a>
+												</li>
+											}
+											<li class="js-delete-retrieve" data-id="@jobApp.Id" data-url="/JobApplication/ToggleStatus/@jobApp.Id" data-name="Job Application"><a class="js-toggle" href="javascript:;">@(jobApp.IsDeleted ? "Retrive" : "Delete")</a></li>
+										</ul>
+									</li>
+								</ul>
+							</td> *@
+                           
+                            @* <td>
+                                <a asp-controller="JobApplication"
+                                   asp-action="ShortList"
+                                   asp-route-id="@jobApp.Id"
+                                   class="btn btn-sm btn-info">
+                                    @Localizer["View"]
+                                </a>
+                            </td> *@
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<input type="hidden" name="__RequestVerificationToken" value="@antiforgery.GetAndStoreTokens(Context).RequestToken" />
+
+@section Plugins {
+	<partial name="_DataTablesJS" />
+}

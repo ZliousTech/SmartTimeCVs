@@ -100,7 +100,8 @@
 
         #region Previous Work Experience.
 
-        public ICollection<WorkExperience> WorkExperience { get; set; } = new List<WorkExperience>();
+        public ICollection<WorkExperience> WorkExperience { get; set; } =
+            new List<WorkExperience>();
 
         #endregion Previous Work Experience.
 
@@ -114,13 +115,17 @@
 
         [MaxLength(500)]
         public string? AdminFeedback { get; set; }
+        public bool IsShortListed { get; set; }
+        public bool IsExcluded { get; set; }
+        public bool IsHolding { get; set; }
 
         #endregion Application Information.
 
         #region Attachments.
         public string? AttachmentUrl { get; set; }
 
-        public ICollection<AttachmentFile> AttachmentFiles { get; set; } = new List<AttachmentFile>();
+        public ICollection<AttachmentFile> AttachmentFiles { get; set; } =
+            new List<AttachmentFile>();
 
         #endregion Attachments.
 

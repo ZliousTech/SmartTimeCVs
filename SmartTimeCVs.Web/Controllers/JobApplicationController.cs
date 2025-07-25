@@ -15,7 +15,7 @@ namespace SmartTimeCVs.Web.Controllers
             _mapper = mapper;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(bool shortlistedOnly = false)
         {
             //string CompanyGuidID;
             //string IsCompanyRequest = "";
@@ -32,6 +32,100 @@ namespace SmartTimeCVs.Web.Controllers
                 var jobApplications = await _context
                     .JobApplication.Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
                     .OrderByDescending(p => p.Id)
+                    .Where(p => !p.IsShortListed && !p.IsExcluded && !p.IsHolding)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                var viewModel = _mapper.Map<List<JobApplicationViewModel>>(jobApplications);
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new ErrorViewModel { Exception = ex.Message });
+            }
+        }
+
+        public async Task<IActionResult> ShortListedIndex()
+        {
+            //string CompanyGuidID;
+            //string IsCompanyRequest = "";
+            //if (HttpContext.User.Identity!.IsAuthenticated)
+            //{
+            //    CompanyGuidID = HttpContext.User.Claims.First(c => c.Type == "CompanyGuidID").Value.ToString();
+            //    IsCompanyRequest = HttpContext.User.Claims.First(c => c.Type == "IsCompanyRequest").Value.ToString();
+            //}
+            //else return RedirectToAction("Logout", "Account");
+            //if (IsCompanyRequest == "False") return RedirectToAction("Logout", "Account");
+
+            try
+            {
+                var jobApplications = await _context
+                    .JobApplication.Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
+                    .OrderByDescending(p => p.Id)
+                    .Where(p => p.IsShortListed == true)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                var viewModel = _mapper.Map<List<JobApplicationViewModel>>(jobApplications);
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new ErrorViewModel { Exception = ex.Message });
+            }
+        }
+
+        public async Task<IActionResult> ExcludedIndex()
+        {
+            //string CompanyGuidID;
+            //string IsCompanyRequest = "";
+            //if (HttpContext.User.Identity!.IsAuthenticated)
+            //{
+            //    CompanyGuidID = HttpContext.User.Claims.First(c => c.Type == "CompanyGuidID").Value.ToString();
+            //    IsCompanyRequest = HttpContext.User.Claims.First(c => c.Type == "IsCompanyRequest").Value.ToString();
+            //}
+            //else return RedirectToAction("Logout", "Account");
+            //if (IsCompanyRequest == "False") return RedirectToAction("Logout", "Account");
+
+            try
+            {
+                var jobApplications = await _context
+                    .JobApplication.Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
+                    .OrderByDescending(p => p.Id)
+                    .Where(p => p.IsExcluded == true)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                var viewModel = _mapper.Map<List<JobApplicationViewModel>>(jobApplications);
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new ErrorViewModel { Exception = ex.Message });
+            }
+        }
+
+        public async Task<IActionResult> HoldingIndex()
+        {
+            //string CompanyGuidID;
+            //string IsCompanyRequest = "";
+            //if (HttpContext.User.Identity!.IsAuthenticated)
+            //{
+            //    CompanyGuidID = HttpContext.User.Claims.First(c => c.Type == "CompanyGuidID").Value.ToString();
+            //    IsCompanyRequest = HttpContext.User.Claims.First(c => c.Type == "IsCompanyRequest").Value.ToString();
+            //}
+            //else return RedirectToAction("Logout", "Account");
+            //if (IsCompanyRequest == "False") return RedirectToAction("Logout", "Account");
+
+            try
+            {
+                var jobApplications = await _context
+                    .JobApplication.Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
+                    .OrderByDescending(p => p.Id)
+                    .Where(p => p.IsHolding == true)
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -57,7 +151,7 @@ namespace SmartTimeCVs.Web.Controllers
 
                 var viewModel = _mapper.Map<JobApplicationViewModel>(job);
 
-                var uniList = uni.Select(x => new UniversityViewModel
+                viewModel.Universities = uni.Select(x => new UniversityViewModel
                     {
                         Id = x.Id,
                         JobApplicationId = x.JobApplicationId,
@@ -67,7 +161,7 @@ namespace SmartTimeCVs.Web.Controllers
                     })
                     .ToList();
 
-                var courseList = course
+                viewModel.Courses = course
                     .Select(x => new CourseViewModel
                     {
                         Id = x.Id,
@@ -78,9 +172,6 @@ namespace SmartTimeCVs.Web.Controllers
                         To = x.To,
                     })
                     .ToList();
-
-                viewModel.Universities = uniList;
-                viewModel.Courses = courseList;
 
                 return View(viewModel);
             }
@@ -100,7 +191,7 @@ namespace SmartTimeCVs.Web.Controllers
 
                 var viewModel = _mapper.Map<JobApplicationViewModel>(job);
 
-                var uniList = uni.Select(x => new UniversityViewModel
+                viewModel.Universities = uni.Select(x => new UniversityViewModel
                     {
                         Id = x.Id,
                         JobApplicationId = x.JobApplicationId,
@@ -110,7 +201,7 @@ namespace SmartTimeCVs.Web.Controllers
                     })
                     .ToList();
 
-                var courseList = course
+                viewModel.Courses = course
                     .Select(x => new CourseViewModel
                     {
                         Id = x.Id,
@@ -122,15 +213,54 @@ namespace SmartTimeCVs.Web.Controllers
                     })
                     .ToList();
 
-                viewModel.Universities = uniList;
-                viewModel.Courses = courseList;
-
                 return View("ShortListView", viewModel);
             }
             catch (Exception ex)
             {
                 return View("Error", new ErrorViewModel { Exception = ex.Message });
             }
+        }
+
+        public IActionResult CreateShortlist(int id)
+        {
+            var job = _context.JobApplication.FirstOrDefault(x => x.Id == id);
+
+            if (job == null)
+                return NotFound();
+
+            job.IsShortListed = true;
+            _context.SaveChanges();
+
+            // Redirect back to grid with a filter
+            return RedirectToAction("ShortListedIndex");
+        }
+
+        public IActionResult CreateExclude(int id)
+        {
+            var job = _context.JobApplication.FirstOrDefault(x => x.Id == id);
+
+            if (job == null)
+                return NotFound();
+
+            job.IsExcluded = true;
+            _context.SaveChanges();
+
+            // Redirect back to grid with a filter
+            return RedirectToAction("ExcludedIndex");
+        }
+
+        public IActionResult CreateHolding(int id)
+        {
+            var job = _context.JobApplication.FirstOrDefault(x => x.Id == id);
+
+            if (job == null)
+                return NotFound();
+
+            job.IsHolding = true;
+            _context.SaveChanges();
+
+            // Redirect back to grid with a filter
+            return RedirectToAction("HoldingIndex");
         }
 
         [HttpPost]

@@ -315,20 +315,26 @@
                     @Localizer["Back"]
                 </button>
             </div> *@
-            <div class="col-auto">
-                <button type="button" class="btn btn-success px-5 py-2">
-                    @Localizer["Accept / Arrange Meeting"]
-                </button>
-            </div>
-            <div class="col-auto">
-                <button type="button" class="btn btn-danger px-5 py-2">
-                    @Localizer["Exclude"]
-                </button>
-            </div>
+            @* <div class="col-auto"></div>
+            <a class="btn btn-outline-secondary px-5 py-2"
+                href="@Url.Action("Index", "JobApplication", new { shortlistedOnly = TempData["ShortlistedOnly"] })">
+                @Localizer["Back"]
+            </a>
+        </div> *@
+        <div class="col-auto">
+            <button type="button" class="btn btn-success px-5 py-2">
+                @Localizer["Accept / Arrange Meeting"]
+            </button>
         </div>
-
-
+        <div class="col-auto">
+            <button type="button" class="btn btn-danger px-5 py-2">
+                @Localizer["Exclude"]
+            </button>
+        </div>
     </div>
+
+
+</div>
 </div>
 
 </div>

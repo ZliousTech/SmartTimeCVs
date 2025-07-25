@@ -26,6 +26,10 @@ namespace SmartTimeCVs.Web.Data
             builder.Entity<Course>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Entity<WorkExperience>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Entity<AttachmentFile>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
+            builder.Entity<JobApplication>().Property(p => p.IsShortListed);
+            builder.Entity<JobApplication>().Property(p => p.IsExcluded);
+            builder.Entity<JobApplication>().Property(p => p.IsHolding);
+            
 
             builder.Entity<JobApplication>()
                 .HasOne(j => j.EnglishLevel)
