@@ -7,6 +7,8 @@ namespace SmartTimeCVs.Web.Controllers
 {
     public class AccountController : Controller
     {
+        public string actionReq = "";
+
         public IActionResult Login()
         {
             return Redirect("https://smarttime.zlioustech.com/web/login");
@@ -20,7 +22,7 @@ namespace SmartTimeCVs.Web.Controllers
 
         public IActionResult Register([FromQuery] string CompanyGuidID, [FromQuery] string PrtCode)
         {
-            //https://localhost:7061/Account/Register/?bssl=sGGf3jxh (Light House)
+            //https://localhost:7061/Account/Register/?bssl=5yFU111c (Light House)
             //https://localhost:7061/Account/Register/?bssl=PjVCjr4Q (Royal Eagle)
             //https://localhost:7061/Account/Register/?bssl=31l37ziA (Nefertari)
 
@@ -34,6 +36,7 @@ namespace SmartTimeCVs.Web.Controllers
                 var request = HttpContext.Request;
                 var fullUrl = $"{request.Scheme}://{request.Host}{request.Path}{request.QueryString}";
                 string? bsslValue = HttpContext.Request.Query["bssl"];
+                actionReq = HttpContext.Request.Query["arq"]!;
 
                 if (!String.IsNullOrWhiteSpace(bsslValue))
                 {
@@ -77,11 +80,25 @@ namespace SmartTimeCVs.Web.Controllers
                 return RedirectToAction("Logout");
             }
 
-            //JobApplication
-            if (UseHomePageText)
-                return IsCompanyRequest ? RedirectToAction("Index", "JobApplication") : RedirectToAction("Index", "Biography");
-            else
-                return IsCompanyRequest ? RedirectToAction("Index", "JobApplication") : RedirectToAction("Create", "Biography");
+            //Go to requested action 
+            switch (actionReq)
+            {
+                case "shortedlist":
+                    return RedirectToAction("ShortListedIndex", "JobApplication");
+
+                case "exludedlist":
+                    return RedirectToAction("ExcludedIndex", "JobApplication");
+
+                case "holdedlist":
+                    return RedirectToAction("HoldingIndex", "JobApplication");
+                default:
+                    if (UseHomePageText)
+                        return IsCompanyRequest ? RedirectToAction("Index", "JobApplication") : RedirectToAction("Index", "Biography");
+                    else
+                        return IsCompanyRequest ? RedirectToAction("Index", "JobApplication") : RedirectToAction("Create", "Biography");
+            }
+
+
         }
     }
 }
