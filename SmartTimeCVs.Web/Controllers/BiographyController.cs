@@ -7,7 +7,7 @@ using Common.Base;
 
 namespace SmartTimeCVs.Web.Controllers
 {
-    [Authorize]
+    //[Authorize]
 
     public class BiographyController : Controller
     {
