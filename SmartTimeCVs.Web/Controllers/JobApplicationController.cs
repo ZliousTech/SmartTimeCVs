@@ -229,6 +229,9 @@ namespace SmartTimeCVs.Web.Controllers
                 return NotFound();
 
             job.IsShortListed = true;
+            job.IsExcluded = false;
+            job.IsHolding = false;
+            _context.Update(job);
             _context.SaveChanges();
 
             // Redirect back to grid with a filter
@@ -243,6 +246,9 @@ namespace SmartTimeCVs.Web.Controllers
                 return NotFound();
 
             job.IsExcluded = true;
+            job.IsShortListed = false;
+            job.IsHolding = false;
+            _context.Update(job);
             _context.SaveChanges();
 
             // Redirect back to grid with a filter
@@ -257,6 +263,9 @@ namespace SmartTimeCVs.Web.Controllers
                 return NotFound();
 
             job.IsHolding = true;
+            job.IsShortListed = false;
+            job.IsExcluded = false;
+            _context.Update(job);
             _context.SaveChanges();
 
             // Redirect back to grid with a filter

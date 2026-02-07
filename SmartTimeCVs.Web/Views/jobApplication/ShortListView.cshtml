@@ -310,26 +310,18 @@
         }
 
         <div class="row justify-content-center">
-            @* <div class="col-auto">
-                <button type="button" class="btn btn-outline-secondary px-5 py-2" onclick="window.history.back()">
-                    @Localizer["Back"]
+            <div class="col-auto">
+                <button type="button" class="btn btn-success px-5 py-2" id="btnArrangeMeeting" data-job-id="@Model.Id">
+                    @Localizer["Accept / Arrange Meeting"]
                 </button>
-            </div> *@
-            @* <div class="col-auto"></div>
-            <a class="btn btn-outline-secondary px-5 py-2"
-                href="@Url.Action("Index", "JobApplication", new { shortlistedOnly = TempData["ShortlistedOnly"] })">
-                @Localizer["Back"]
-            </a>
-        </div> *@
-        <div class="col-auto">
-            <button type="button" class="btn btn-success px-5 py-2">
-                @Localizer["Accept / Arrange Meeting"]
-            </button>
-        </div>
-        <div class="col-auto">
-            <button type="button" class="btn btn-danger px-5 py-2">
-                @Localizer["Exclude"]
-            </button>
+            </div>
+            <div class="col-auto">
+                <a href="@Url.Action("CreateExclude", "JobApplication", new { id = Model.Id })" 
+                   class="btn btn-danger px-5 py-2"
+                   onclick="return confirm('@Localizer["Are you sure you want to exclude this candidate?"]');">
+                    @Localizer["Exclude"]
+                </a>
+            </div>
         </div>
     </div>
 
@@ -338,6 +330,15 @@
 </div>
 
 </div>
+</div>
+
+<!-- Schedule Interview Modal -->
+<div class="modal fade" id="scheduleInterviewModal" tabindex="-1" role="dialog" aria-labelledby="scheduleInterviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id="modalContent">
+            <!-- Content will be loaded dynamically -->
+        </div>
+    </div>
 </div>
 
 <style>
@@ -384,4 +385,140 @@
         border: 3px solid #ddd;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
+    
+    /* Modal enhancements */
+    .modal-header.bg-success {
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
+    
+    .form-check-input:checked {
+        background-color: #198754;
+        border-color: #198754;
+    }
+
+    /* Force modal above everything else */
+    .modal {
+        z-index: 100050 !important;
+    }
+    .modal-backdrop {
+        z-index: 100040 !important;
+    }
 </style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Handle "Accept / Arrange Meeting" button click
+            $('#btnArrangeMeeting').on('click', function() {
+                var jobId = $(this).data('job-id');
+                loadScheduleModal(jobId);
+            });
+            
+            // Load the schedule modal via AJAX
+            function loadScheduleModal(jobApplicationId) {
+                $.ajax({
+                    url: '@Url.Action("GetScheduleModal", "Interview")',
+                    type: 'GET',
+                    data: { jobApplicationId: jobApplicationId },
+                    beforeSend: function() {
+                        $('#modalContent').html('<div class="modal-body text-center py-5"><div class="spinner-border text-success" role="status"></div><p class="mt-2">Loading...</p></div>');
+                        $('#scheduleInterviewModal').modal('show');
+                    },
+                    success: function(response) {
+                        $('#modalContent').html(response);
+                        bindSaveButton();
+                    },
+                    error: function(xhr, status, error) {
+                        $('#modalContent').html('<div class="modal-body text-center py-5 text-danger"><i class="material-icons" style="font-size: 48px;">error</i><p>@Localizer["Failed to load the form. Please try again."]</p></div>');
+                    }
+                });
+            }
+            
+            // Bind save button click event
+            function bindSaveButton() {
+                $('#btnSaveSchedule').off('click').on('click', function() {
+                    saveSchedule();
+                });
+            }
+            
+            // Save the schedule via AJAX
+            function saveSchedule() {
+                var form = $('#scheduleInterviewForm');
+                
+                // Validate required fields
+                if (!form[0].checkValidity()) {
+                    form[0].reportValidity();
+                    return;
+                }
+                
+                // Collect form data
+                var formData = {
+                    JobApplicationId: parseInt($('input[name="JobApplicationId"]').val()),
+                    InterviewDate: $('#InterviewDate').val(),
+                    InterviewTime: $('#InterviewTime').val() + ':00',
+                    InterviewLocation: $('#InterviewLocation').val(),
+                    TestDate: $('#TestDate').val() || null,
+                    TestTime: $('#TestTime').val() ? $('#TestTime').val() + ':00' : null,
+                    TestLocation: $('#TestLocation').val(),
+                    NotificationType: parseInt($('input[name="NotificationType"]:checked').val()),
+                    Notes: $('#Notes').val()
+                };
+                
+                // Disable button and show loading
+                var btn = $('#btnSaveSchedule');
+                var originalText = btn.html();
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status"></span>@Localizer["Saving..."]');
+                
+                // Send AJAX request
+                $.ajax({
+                    url: '@Url.Action("ScheduleInterview", "Interview")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Show success message
+                            Swal.fire({
+                                icon: 'success',
+                                title: '@Localizer["Success!"]',
+                                text: response.message,
+                                confirmButtonColor: '#198754',
+                                confirmButtonText: '@Localizer["View Schedules"]'
+                            }).then(function() {
+                                // Redirect to interview schedules page
+                                window.location.href = response.redirectUrl;
+                            });
+                            
+                            $('#scheduleInterviewModal').modal('hide');
+                        } else {
+                            // Show error message
+                            Swal.fire({
+                                icon: 'error',
+                                title: '@Localizer["Error"]',
+                                text: response.message,
+                                confirmButtonColor: '#dc3545'
+                            });
+                            btn.prop('disabled', false).html(originalText);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '@Localizer["Error"]',
+                            text: '@Localizer["An unexpected error occurred. Please try again."]',
+                            confirmButtonColor: '#dc3545'
+                        });
+                        btn.prop('disabled', false).html(originalText);
+                    }
+                });
+            }
+            
+            // Move modal to body to avoid z-index/stacking context issues
+            $('#scheduleInterviewModal').appendTo("body");
+        });
+    </script>
+}
+

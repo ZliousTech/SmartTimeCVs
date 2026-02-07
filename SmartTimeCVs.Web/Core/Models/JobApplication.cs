@@ -129,6 +129,21 @@
 
         #endregion Attachments.
 
+        #region Interview Scheduling.
+
+        /// <summary>
+        /// Current status of the candidate in the hiring process
+        /// </summary>
+        public CandidateStatus? CandidateStatus { get; set; }
+
+        /// <summary>
+        /// Collection of scheduled interviews and tests
+        /// </summary>
+        public ICollection<InterviewSchedule> InterviewSchedules { get; set; } =
+            new List<InterviewSchedule>();
+
+        #endregion Interview Scheduling.
+
         public string? CompanyId { get; set; }
     }
 }

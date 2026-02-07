@@ -1,0 +1,107 @@
+@model ScheduleInterviewViewModel
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+<div class="modal-header border-0 pb-0">
+    <h5 class="modal-title font-weight-bold text-primary">
+        @Localizer["Edit Appointments"]
+    </h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div class="modal-body pt-2">
+    <form id="editScheduleForm">
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <input type="hidden" name="JobApplicationId" value="@Model.JobApplicationId" />
+        
+        <!-- Interview Details -->
+        <div class="form-group mb-4">
+            <label class="font-weight-bold text-dark mb-2">@Localizer["Interview Date"] <span class="text-danger">*</span></label>
+            <div class="input-group">
+                <input type="date" class="form-control rounded-lg" id="EditInterviewDate" name="InterviewDate" 
+                       value="@(Model.InterviewDate?.ToString("yyyy-MM-dd"))" required 
+                       style="border-radius: 8px; border-color: #e2e5ec; height: 45px;" />
+            </div>
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="font-weight-bold text-dark mb-2">@Localizer["Interview Time"] <span class="text-danger">*</span></label>
+            <div class="input-group">
+                <input type="time" class="form-control rounded-lg" id="EditInterviewTime" name="InterviewTime" 
+                       value="@(Model.InterviewTime?.ToString(@"hh\:mm"))" required 
+                       style="border-radius: 8px; border-color: #e2e5ec; height: 45px;" />
+            </div>
+        </div>
+        
+         <div class="form-group mb-4">
+            <label class="font-weight-bold text-dark mb-2">@Localizer["Location / Meeting Link"]</label>
+            <input type="text" class="form-control" id="EditInterviewLocation" name="InterviewLocation" 
+                   value="@Model.InterviewLocation"
+                   placeholder="@Localizer["Office address or video call link"]"
+                   style="border-radius: 8px; border-color: #e2e5ec; height: 45px;" />
+        </div>
+
+        <!-- Test Details -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group mb-4">
+                    <label class="font-weight-bold text-dark mb-2">@Localizer["Test Date"]</label>
+                    <input type="date" class="form-control" id="EditTestDate" name="TestDate" 
+                           value="@(Model.TestDate?.ToString("yyyy-MM-dd"))"
+                           style="border-radius: 8px; border-color: #e2e5ec; height: 45px;" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group mb-4">
+                    <label class="font-weight-bold text-dark mb-2">@Localizer["Test Time"]</label>
+                    <input type="time" class="form-control" id="EditTestTime" name="TestTime" 
+                           value="@(Model.TestTime?.ToString(@"hh\:mm"))"
+                           style="border-radius: 8px; border-color: #e2e5ec; height: 45px;" />
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notification -->
+        <div class="form-group mb-3">
+             <label class="font-weight-bold text-dark mb-2 d-block">@Localizer["Notify Candidate Via"]</label>
+             <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                <label class="btn btn-outline-primary @(Model.NotificationType == NotificationType.Email ? "active" : "")" style="border-radius: 8px 0 0 8px;">
+                    <input type="radio" name="NotificationType" id="editNotifyEmail" value="1" @(Model.NotificationType == NotificationType.Email ? "checked" : "")> @Localizer["Email"]
+                </label>
+                <label class="btn btn-outline-primary @(Model.NotificationType == NotificationType.SMS ? "active" : "")">
+                    <input type="radio" name="NotificationType" id="editNotifySms" value="2" @(Model.NotificationType == NotificationType.SMS ? "checked" : "")> @Localizer["SMS"]
+                </label>
+                <label class="btn btn-outline-primary @(Model.NotificationType == NotificationType.Both ? "active" : "")" style="border-radius: 0 8px 8px 0;">
+                    <input type="radio" name="NotificationType" id="editNotifyBoth" value="3" @(Model.NotificationType == NotificationType.Both ? "checked" : "")> @Localizer["Both"]
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <textarea class="form-control" id="EditNotes" name="Notes" rows="2" 
+                      placeholder="@Localizer["Additional Notes..."]"
+                      style="border-radius: 8px; border-color: #e2e5ec; resize: none;">@Model.Notes</textarea>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer border-0 pt-0">
+    <button type="button" class="btn btn-primary btn-block w-100 font-weight-bold" id="btnUpdateSchedule" 
+            style="border-radius: 8px; padding: 12px; font-size: 16px; background-color: #0d6efd; border-color: #0d6efd;">
+        @Localizer["Save Modifications"]
+    </button>
+</div>
+
+<style>
+    /* Custom styles for this modal to match the design */
+    #scheduleInterviewModal .modal-content {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    #scheduleInterviewModal .form-control:focus {
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+        border-color: #0d6efd;
+    }
+</style>

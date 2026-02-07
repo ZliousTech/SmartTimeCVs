@@ -1,0 +1,111 @@
+@model ScheduleInterviewViewModel
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+<div class="modal-header border-0 pb-0">
+    <h5 class="modal-title font-weight-bold text-primary">
+        @Localizer["Schedule Interview"]
+    </h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div class="modal-body pt-2">
+    <form id="scheduleInterviewForm">
+        <input type="hidden" name="JobApplicationId" value="@Model.JobApplicationId" />
+        
+        <!-- Minimal Candidate Info -->
+         <p class="text-muted mb-4 small">
+            @Localizer["Scheduling for:"] <strong>@Model.CandidateName</strong>
+        </p>
+
+        <!-- Interview Details -->
+        <div class="form-group mb-4">
+            <label class="font-weight-bold text-dark mb-2">@Localizer["Interview Date"] <span class="text-danger">*</span></label>
+            <div class="input-group">
+                <input type="date" class="form-control rounded-lg" id="InterviewDate" name="InterviewDate" 
+                       value="@(Model.InterviewDate?.ToString("yyyy-MM-dd"))" required 
+                       style="border-radius: 8px; border-color: #e2e5ec; height: 45px;" />
+                <div class="input-group-append" style="position: absolute; right: 15px; top: 10px; pointer-events: none; z-index: 10;">
+                    <!-- Calendar icon handled by browser input[type=date] usually, but adding visual cue if needed -->
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="font-weight-bold text-dark mb-2">@Localizer["Interview Time"] <span class="text-danger">*</span></label>
+            <div class="input-group">
+                <input type="time" class="form-control rounded-lg" id="InterviewTime" name="InterviewTime" 
+                       value="@(Model.InterviewTime?.ToString(@"hh\:mm"))" required 
+                       style="border-radius: 8px; border-color: #e2e5ec; height: 45px;" />
+            </div>
+        </div>
+        
+         <div class="form-group mb-4">
+            <label class="font-weight-bold text-dark mb-2">@Localizer["Location / Meeting Link"] <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="InterviewLocation" name="InterviewLocation" 
+                   placeholder="@Localizer["Office address or video call link"]" required
+                   style="border-radius: 8px; border-color: #e2e5ec; height: 45px;" />
+        </div>
+
+        <!-- Test Details -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group mb-4">
+                    <label class="font-weight-bold text-dark mb-2">@Localizer["Test Date"] <span class="text-muted font-weight-normal small">(@Localizer["Optional"])</span></label>
+                    <input type="date" class="form-control" id="TestDate" name="TestDate" 
+                           style="border-radius: 8px; border-color: #e2e5ec; height: 45px;" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group mb-4">
+                    <label class="font-weight-bold text-dark mb-2">@Localizer["Test Time"] <span class="text-muted font-weight-normal small">(@Localizer["Optional"])</span></label>
+                    <input type="time" class="form-control" id="TestTime" name="TestTime" 
+                           style="border-radius: 8px; border-color: #e2e5ec; height: 45px;" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification -->
+        <div class="form-group mb-3">
+             <label class="font-weight-bold text-dark mb-2 d-block">@Localizer["Notification"]</label>
+             <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                <label class="btn btn-outline-primary active" style="border-radius: 8px 0 0 8px;">
+                    <input type="radio" name="NotificationType" id="notifyEmail" value="1" checked> @Localizer["Email"]
+                </label>
+                <label class="btn btn-outline-primary">
+                    <input type="radio" name="NotificationType" id="notifySms" value="2"> @Localizer["SMS"]
+                </label>
+                <label class="btn btn-outline-primary" style="border-radius: 0 8px 8px 0;">
+                    <input type="radio" name="NotificationType" id="notifyBoth" value="3"> @Localizer["Both"]
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <textarea class="form-control" id="Notes" name="Notes" rows="2" 
+                      placeholder="@Localizer["Additional Notes..."]"
+                      style="border-radius: 8px; border-color: #e2e5ec; resize: none;"></textarea>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer border-0 pt-0">
+    <button type="button" class="btn btn-primary btn-block w-100 font-weight-bold" id="btnSaveSchedule" 
+            style="border-radius: 8px; padding: 12px; font-size: 16px; background-color: #0d6efd; border-color: #0d6efd;">
+        @Localizer["Save Schedule"]
+    </button>
+</div>
+
+<style>
+    /* Custom styles for this modal to match the design */
+    #scheduleInterviewModal .modal-content {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    #scheduleInterviewModal .form-control:focus {
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+        border-color: #0d6efd;
+    }
+</style>

@@ -10,6 +10,7 @@ namespace SmartTimeCVs.Web.Data
         }
 
         public DbSet<JobApplication> JobApplication { get; set; }
+        public DbSet<InterviewSchedule> InterviewSchedule { get; set; }
         public DbSet<University> University { get; set; }
         public DbSet<Course> Course { get; set; }
         public DbSet<WorkExperience> WorkExperience { get; set; }

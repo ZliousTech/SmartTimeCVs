@@ -3,10 +3,13 @@ global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.Rendering;
 global using Microsoft.EntityFrameworkCore;
 global using SmartTimeCVs.Web.Core.Consts;
+global using SmartTimeCVs.Web.Core.Enums;
 global using SmartTimeCVs.Web.Core.Models;
 global using SmartTimeCVs.Web.Core.Models.Base;
+global using SmartTimeCVs.Web.Core.Services;
 global using SmartTimeCVs.Web.Core.ViewModels;
 global using SmartTimeCVs.Web.Data;
 global using SmartTimeCVs.Web.Extensions;
 global using SmartTimeCVs.Web.Helpers;
 global using System.ComponentModel.DataAnnotations;
+
