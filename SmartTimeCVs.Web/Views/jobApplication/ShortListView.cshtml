@@ -44,6 +44,13 @@
 }
 <div class="container @(isRtl ? "rtl" : "ltr") mt-5">
     <div class="card-view">
+        <div class="row mb-3">
+            <div class="col-12 text-end">
+                <button class="btn btn-secondary btn-sm" onclick="window.history.back()">
+                    <i class="material-icons align-middle" style="font-size: 16px;">arrow_back</i> @Localizer["Back"]
+                </button>
+            </div>
+        </div>
         <div class="row align-items-center mb-4">
             <div class="col-md-8">
                 <h2 class="mb-0 text-success">@Localizer["JobApplicationOverview"]</h2>

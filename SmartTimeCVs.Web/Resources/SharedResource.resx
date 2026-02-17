@@ -366,4 +366,118 @@
   <data name="Fair" xml:space="preserve">
     <value>Fair</value>
   </data>
+  <data name="InterviewDate" xml:space="preserve">
+    <value>Interview Date</value>
+  </data>
+  <data name="InterviewTime" xml:space="preserve">
+    <value>Interview Time</value>
+  </data>
+  <data name="TestDate" xml:space="preserve">
+    <value>Test Date</value>
+  </data>
+  <data name="TestTime" xml:space="preserve">
+    <value>Test Time</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="ShortListed" xml:space="preserve">
+    <value>ShortListed</value>
+  </data>
+  <data name="Excluded" xml:space="preserve">
+    <value>Excluded</value>
+  </data>
+  <data name="Holding" xml:space="preserve">
+    <value>Holding</value>
+  </data>
+  <data name="InterviewSchedules" xml:space="preserve">
+    <value>Interview &amp; Schedules</value>
+  </data>
+  <data name="TestSchedules" xml:space="preserve">
+    <value>Test &amp; Schedules</value>
+  </data>
+  <data name="InterviewResults" xml:space="preserve">
+    <value>Interview Results</value>
+  </data>
+  <data name="TestResults" xml:space="preserve">
+    <value>Test Results</value>
+  </data>
+  <data name="AddResult" xml:space="preserve">
+    <value>Add Result</value>
+  </data>
+  <data name="AddInterviewResult" xml:space="preserve">
+    <value>Add Interview Result</value>
+  </data>
+  <data name="AddTestResult" xml:space="preserve">
+    <value>Add Test Result</value>
+  </data>
+  <data name="Result" xml:space="preserve">
+    <value>Result</value>
+  </data>
+  <data name="Accepted" xml:space="preserve">
+    <value>Pass</value>
+  </data>
+  <data name="Rejected" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="Re-interview" xml:space="preserve">
+    <value>Re-interview</value>
+  </data>
+  <data name="DidNotAttend" xml:space="preserve">
+    <value>Did not attend</value>
+  </data>
+  <data name="Pass" xml:space="preserve">
+    <value>Pass</value>
+  </data>
+  <data name="Fail" xml:space="preserve">
+    <value>Fail</value>
+  </data>
+  <data name="Re-test" xml:space="preserve">
+    <value>Re-test</value>
+  </data>
+  <data name="DidNotAttendTest" xml:space="preserve">
+    <value>Did not attend the test</value>
+  </data>
+  <data name="AddNote" xml:space="preserve">
+    <value>Add a note...</value>
+  </data>
+  <data name="PleaseSelectResult" xml:space="preserve">
+    <value>Please select a result first</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="InterviewAndTestSchedules" xml:space="preserve">
+    <value>Interview &amp; Test Schedules</value>
+  </data>
+  <data name="Schedules" xml:space="preserve">
+    <value>Schedules</value>
+  </data>
+  <data name="TodayInterviews" xml:space="preserve">
+    <value>Today's Interviews</value>
+  </data>
+  <data name="PastInterviews" xml:space="preserve">
+    <value>Past Interviews Pending Result</value>
+  </data>
+  <data name="TodayTests" xml:space="preserve">
+    <value>Today's Tests</value>
+  </data>
+  <data name="PastTests" xml:space="preserve">
+    <value>Past Tests Pending Result</value>
+  </data>
+  <data name="NoTest" xml:space="preserve">
+    <value>No Test</value>
+  </data>
+  <data name="InterviewResult" xml:space="preserve">
+    <value>Interview Result</value>
+  </data>
+  <data name="TestResult" xml:space="preserve">
+    <value>Test Result</value>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="JobOffer" xml:space="preserve">
+    <value>Job Offer</value>
+  </data>
 </root>

@@ -1,4 +1,6 @@
-﻿<aside id="leftsidebar" class="sidebar">
+﻿@using SmartTimeCVs.Web
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+<aside id="leftsidebar" class="sidebar">
 	<div class="menu">
 		<ul class="list">
 			<li>
@@ -24,7 +26,7 @@
 					<i class="material-icons">dashboard</i><span>Dashboard</span>
 				</a>
 			</li>
-			<li active-when="JobApplication">
+			<li active-when="JobApplication, JobApplication-ShortListed, JobApplication-Excluded, JobApplication-Holding">
 				<a href="javascript:void(0);" class="menu-toggle">
 					<i class="material-icons">description</i><span>CVs</span>
 				</a>
@@ -32,12 +34,35 @@
 					<li active-when="JobApplication">
 						<a asp-controller="JobApplication" asp-action="Index">Job Application</a>
 					</li>
+					<li active-when="JobApplication-ShortListed">
+						<a asp-controller="JobApplication" asp-action="ShortListedIndex">ShortListed</a>
+					</li>
+					<li active-when="JobApplication-Excluded">
+						<a asp-controller="JobApplication" asp-action="ExcludedIndex">Excluded</a>
+					</li>
+					<li active-when="JobApplication-Holding">
+						<a asp-controller="JobApplication" asp-action="HoldingIndex">Holding</a>
+					</li>
 				</ul>
 			</li>
-			<li active-when="Interview">
-				<a asp-controller="Interview" asp-action="Index">
-					<i class="material-icons">event</i><span>Interview Schedules</span>
+			<li active-when="Interview, Interview-Result, Interview-TestResult, Interview-FinalResult">
+				<a href="javascript:void(0);" class="menu-toggle">
+					<i class="material-icons">event</i><span>@Localizer["Schedules"]</span>
 				</a>
+				<ul class="ml-menu">
+					<li active-when="Interview">
+						<a asp-controller="Interview" asp-action="Index">@Localizer["InterviewAndTestSchedules"]</a>
+					</li>
+					<li active-when="Interview-Result">
+						<a asp-controller="Interview" asp-action="InterviewResults">@Localizer["InterviewResults"]</a>
+					</li>
+					<li active-when="Interview-TestResult">
+						<a asp-controller="Interview" asp-action="TestResults">@Localizer["TestResults"]</a>
+					</li>
+					<li active-when="Interview-FinalResult">
+						<a asp-controller="Interview" asp-action="FinalResults">@Localizer["FinalResults"]</a>
+					</li>
+				</ul>
 			</li>
 		</ul>
 	</div>

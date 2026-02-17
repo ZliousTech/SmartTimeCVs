@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartTimeCVs.Web.Data;
 
@@ -11,9 +12,11 @@ using SmartTimeCVs.Web.Data;
 namespace SmartTimeCVs.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260211193450_AddInterviewAndTestResults")]
+    partial class AddInterviewAndTestResults
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -427,7 +430,7 @@ namespace SmartTimeCVs.Web.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("CompanyId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ComputerSkillsLevelId")
                         .HasColumnType("int");
@@ -505,9 +508,6 @@ namespace SmartTimeCVs.Web.Migrations
                     b.Property<bool>("IsShortListed")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("JobOfferId")
-                        .HasColumnType("int");
-
                     b.Property<string>("JobTitle")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -556,91 +556,24 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("ComputerSkillsLevelId");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.HasIndex("EnglishLevelId");
+
+                    b.HasIndex("FullName")
+                        .IsUnique();
 
                     b.HasIndex("GenderId");
 
                     b.HasIndex("MaritalStatusId");
 
-                    b.HasIndex("OtherLanguageLevelId");
-
-                    b.HasIndex("Email", "CompanyId")
-                        .IsUnique()
-                        .HasFilter("[CompanyId] IS NOT NULL");
-
-                    b.HasIndex("FullName", "CompanyId")
-                        .IsUnique()
-                        .HasFilter("[CompanyId] IS NOT NULL");
-
-                    b.HasIndex("NationalID", "CompanyId")
-                        .IsUnique()
-                        .HasFilter("[CompanyId] IS NOT NULL");
-
-                    b.ToTable("JobApplication");
-                });
-
-            modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.JobOffer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Allowances")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Benefits")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Department")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("JobApplicationId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("LastUpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ManagerName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("OfferedSalary")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("ProbationPeriod")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("RespondedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("SentOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("WorkingHours")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("JobApplicationId")
+                    b.HasIndex("NationalID")
                         .IsUnique();
 
-                    b.ToTable("JobOffer");
+                    b.HasIndex("OtherLanguageLevelId");
+
+                    b.ToTable("JobApplication");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.LevelType", b =>
@@ -894,17 +827,6 @@ namespace SmartTimeCVs.Web.Migrations
                     b.Navigation("OtherLanguageLevel");
                 });
 
-            modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.JobOffer", b =>
-                {
-                    b.HasOne("SmartTimeCVs.Web.Core.Models.JobApplication", "JobApplication")
-                        .WithOne("JobOffer")
-                        .HasForeignKey("SmartTimeCVs.Web.Core.Models.JobOffer", "JobApplicationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("JobApplication");
-                });
-
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.University", b =>
                 {
                     b.HasOne("SmartTimeCVs.Web.Core.Models.JobApplication", "JobApplication")
@@ -935,8 +857,6 @@ namespace SmartTimeCVs.Web.Migrations
                     b.Navigation("Course");
 
                     b.Navigation("InterviewSchedules");
-
-                    b.Navigation("JobOffer");
 
                     b.Navigation("Univesity");
 

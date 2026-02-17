@@ -1,0 +1,156 @@
+@model SmartTimeCVs.Web.Core.ViewModels.JobOfferViewModel
+@using SmartTimeCVs.Web.Core.Enums
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+<div class="modal-header">
+    <h5 class="modal-title" id="jobOfferModalLabel">@Localizer["Job Offer"] - @Model.CandidateName</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form id="jobOfferForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="JobApplicationId" />
+
+        <!-- Candidate Info (Read Only) -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>@Localizer["Candidate Name"]</label>
+                    <input type="text" class="form-control" value="@Model.CandidateName" readonly />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>@Localizer["Job Title"]</label>
+                    <input type="text" class="form-control" value="@Model.JobTitle" readonly />
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <!-- Offer Details -->
+        <h6 class="mb-3">@Localizer["Offer Details"]</h6>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="OfferedSalary" class="control-label">@Localizer["Basic Salary"] <span class="text-danger">*</span></label>
+                    <input asp-for="OfferedSalary" class="form-control" type="number" step="0.01" required />
+                    <span asp-validation-for="OfferedSalary" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Allowances" class="control-label">@Localizer["Allowances"]</label>
+                    <input asp-for="Allowances" class="form-control" placeholder="e.g. Housing, Transport" />
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="StartDate" class="control-label">@Localizer["Start Date"] <span class="text-danger">*</span></label>
+                    <input asp-for="StartDate" class="form-control" type="date" required />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+            </div>
+             <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="ProbationPeriod" class="control-label">@Localizer["Probation Period"]</label>
+                    <input asp-for="ProbationPeriod" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+         <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="WorkingHours" class="control-label">@Localizer["Working Hours"]</label>
+                    <input asp-for="WorkingHours" class="form-control" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Benefits" class="control-label">@Localizer["Benefits"]</label>
+                    <textarea asp-for="Benefits" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+        </div>
+
+         <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="ManagerName" class="control-label">@Localizer["Reporting To"]</label>
+                    <input asp-for="ManagerName" class="form-control" />
+                </div>
+            </div>
+             <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Department" class="control-label">@Localizer["Department"]</label>
+                    <input asp-for="Department" class="form-control" />
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label asp-for="Notes" class="control-label">@Localizer["Internal Notes"]</label>
+            <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+        </div>
+
+        <div class="form-group mb-3">
+             <label class="font-weight-bold text-dark mb-2 d-block">@Localizer["Notification"]</label>
+             <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                <label class="btn btn-outline-primary active" style="border-radius: 8px 0 0 8px;">
+                    <input type="radio" name="NotificationType" id="notifyEmail" value="1" checked> @Localizer["Email"]
+                </label>
+                <label class="btn btn-outline-primary">
+                    <input type="radio" name="NotificationType" id="notifySms" value="2"> @Localizer["SMS"]
+                </label>
+                <label class="btn btn-outline-primary" style="border-radius: 0 8px 8px 0;">
+                    <input type="radio" name="NotificationType" id="notifyBoth" value="3"> @Localizer["Both"]
+                </label>
+            </div>
+        </div>
+
+        @if(Model.Status != JobOfferStatus.Draft && Model.SentOn.HasValue)
+        {
+             <div class="alert alert-info">
+                 @Localizer["Offer Sent On"]: @Model.SentOn.Value.ToString("g") <br/>
+                 @Localizer["Current Status"]: <strong>@Model.StatusString</strong>
+             </div>
+        }
+
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Close"]</button>
+    
+    @if(Model.Status == JobOfferStatus.Draft)
+    {
+         <button type="button" class="btn btn-primary" onclick="saveOffer()">@Localizer["Save Draft"]</button>
+         @if(Model.Id.HasValue && Model.Id.Value > 0)
+         {
+             <button type="button" class="btn btn-success" onclick="sendOffer(@Model.Id)">@Localizer["Send Offer"]</button>
+         }
+    }
+    else
+    {
+         <button type="button" class="btn btn-primary" onclick="saveOffer()">@Localizer["Update Offer"]</button>
+         <button type="button" class="btn btn-warning" onclick="sendOffer(@Model.Id)">@Localizer["Resend Offer"]</button>
+         
+         <div class="dropdown d-inline-block ml-2">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                @Localizer["Change Status"]
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item text-success" href="#" onclick="respondToOffer(@Model.Id, true)">@Localizer["Mark as Accepted"]</a>
+                <a class="dropdown-item text-danger" href="#" onclick="respondToOffer(@Model.Id, false)">@Localizer["Mark as Rejected"]</a>
+            </div>
+        </div>
+    }
+</div>

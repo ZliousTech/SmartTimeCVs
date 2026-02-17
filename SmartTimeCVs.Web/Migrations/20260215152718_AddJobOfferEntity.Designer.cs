@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartTimeCVs.Web.Data;
 
@@ -11,9 +12,11 @@ using SmartTimeCVs.Web.Data;
 namespace SmartTimeCVs.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260215152718_AddJobOfferEntity")]
+    partial class AddJobOfferEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -427,7 +430,7 @@ namespace SmartTimeCVs.Web.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("CompanyId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ComputerSkillsLevelId")
                         .HasColumnType("int");
@@ -556,25 +559,22 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.HasIndex("ComputerSkillsLevelId");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.HasIndex("EnglishLevelId");
+
+                    b.HasIndex("FullName")
+                        .IsUnique();
 
                     b.HasIndex("GenderId");
 
                     b.HasIndex("MaritalStatusId");
 
+                    b.HasIndex("NationalID")
+                        .IsUnique();
+
                     b.HasIndex("OtherLanguageLevelId");
-
-                    b.HasIndex("Email", "CompanyId")
-                        .IsUnique()
-                        .HasFilter("[CompanyId] IS NOT NULL");
-
-                    b.HasIndex("FullName", "CompanyId")
-                        .IsUnique()
-                        .HasFilter("[CompanyId] IS NOT NULL");
-
-                    b.HasIndex("NationalID", "CompanyId")
-                        .IsUnique()
-                        .HasFilter("[CompanyId] IS NOT NULL");
 
                     b.ToTable("JobApplication");
                 });

@@ -45,6 +45,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ISmsService, SmsService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IInterviewSchedulingService, InterviewSchedulingService>();
+builder.Services.AddScoped<IJobOfferService, JobOfferService>();
 
 var app = builder.Build();
 
@@ -68,6 +69,10 @@ app.UseStaticFiles();
 
 app.UseRequestLocalization();
 
+var localizationOptions = app.Services.CreateScope().ServiceProvider.GetService<IOptions<RequestLocalizationOptions>>()?.Value;
+if (localizationOptions != null)
+    app.UseRequestLocalization(localizationOptions);
+
 app.UseRouting();
 
 app.UseAuthentication();
@@ -82,8 +87,6 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
-
-
 
 //adding multi-language support (Methods)
 static void AddingMultiLanguageSupportServices(WebApplicationBuilder? builder)
@@ -103,12 +106,7 @@ static void AddingMultiLanguageSupportServices(WebApplicationBuilder? builder)
     });
 }
 
-var localizationOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>()?.Value;
-if (localizationOptions != null)
-    app.UseRequestLocalization(localizationOptions);
-
-
 static void AddingMultiLanguageSupport(WebApplication? app)
 {
-    app?.UseRequestLocalization();
+    //app?.UseRequestLocalization(); // Removed redundant call as we configure it explicitly above
 }

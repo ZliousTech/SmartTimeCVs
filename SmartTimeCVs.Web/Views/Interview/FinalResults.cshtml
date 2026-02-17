@@ -1,0 +1,487 @@
+@model List<InterviewScheduleListViewModel>
+@using System.Globalization
+@using SmartTimeCVs.Web.Core.Enums
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    // We can use localized strings or hardcoded for now if resource keys don't exist yet, 
+    // but better to use what we have or fallbacks.
+    ViewData["Title"] = "Final Results"; 
+    ViewData["Path"] = "Final Results";
+    ViewData["Icon"] = "assignment_turned_in";
+    ViewData["ControllerName"] = "Interview-FinalResult";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Theme/assets/css/plugins/dataTables.bootstrap4.min.css" />
+    <style>
+        .result-badge {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            display: inline-block;
+            text-align: center;
+            min-width: 80px;
+        }
+        .bg-success-custom { background-color: #28a745; }
+        .bg-danger-custom { background-color: #dc3545; }
+        .bg-warning-custom { background-color: #ffc107; color: #333; }
+        .bg-info-custom { background-color: #17a2b8; }
+        .bg-secondary-custom { background-color: #6c757d; }
+        .bg-notest-custom { background-color: #546e7a; } /* Blue Grey */
+        
+        /* Filter Styles */
+        .filter-icon {
+            cursor: pointer;
+            margin-left: 8px;
+            color: #ccc;
+            font-size: 14px;
+            vertical-align: middle;
+            transition: color 0.2s;
+        }
+        .filter-icon:hover, .filter-icon.active {
+            color: #333;
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .filter-container {
+            position: relative;
+            display: inline-block;
+        }
+        .filter-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0; /* Align to right */
+            z-index: 1050;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,.15);
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,.175);
+            border-radius: 0.25rem;
+            display: none;
+            min-width: 160px;
+            padding: 0.5rem 0;
+            text-align: left;
+            margin-top: 5px;
+        }
+        .filter-dropdown-menu.show {
+            display: block;
+        }
+        .filter-item {
+            display: block;
+            width: 100%;
+            padding: 0.25rem 1.5rem;
+            clear: both;
+            font-weight: 400;
+            color: #212529;
+            text-align: inherit;
+            white-space: nowrap;
+            background-color: transparent;
+            border: 0;
+            cursor: pointer;
+        }
+        .filter-item:hover {
+            color: #16181b;
+            background-color: #f8f9fa;
+        }
+        .filter-item.active {
+            color: #fff;
+            background-color: #17a2b8;
+        }
+    </style>
+}
+
+<div class="row clearfix">
+    <div class="col-lg-12">
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+                <div class="body table-responsive">
+                    <table class="table table-hover js-datatables" id="finalResultsTable" data-document-title="FinalResults" data-order='[[5, "desc"]]'>
+                        <thead>
+                            <tr class="cyan">
+                                <th class="js-no-export js-exclude-search">@Localizer["Image"]</th>
+                                <th>@Localizer["FullName"]</th>
+                                <th>@Localizer["JobTitle"]</th>
+                                <th>@Localizer["InterviewDate"]</th>
+                                <th>@Localizer["InterviewResult"]</th>
+                                <th>@Localizer["TestResult"]</th>
+                                <th>@Localizer["JobOffer"]</th>
+                                <th>@Localizer["Notes"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                @foreach (var schedule in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <img src="~/images/profileImages/@(schedule.CandidateImageUrl ?? "ProfileImagePlaceholder.jpg")"
+                                                 class="rounded-circle" width="40" height="40" />
+                                        </td>
+                                        <td><strong>@schedule.CandidateName</strong></td>
+                                        <td>@schedule.JobTitle</td>
+                                        
+                                        <!-- Interview Date -->
+                                        <td>@schedule.InterviewDate.ToString("yyyy-MM-dd")</td>
+                                        
+                                        <!-- Interview Result -->
+                                        <td>
+                                            @if (schedule.InterviewResult.HasValue)
+                                            {
+                                                switch (schedule.InterviewResult.Value)
+                                                {
+                                                    case InterviewResult.Accepted:
+                                                        <span class="result-badge bg-success-custom">@Localizer["Accepted"]</span>
+                                                        break;
+                                                    case InterviewResult.Rejected:
+                                                        <span class="result-badge bg-danger-custom">@Localizer["Rejected"]</span>
+                                                        break;
+                                                    case InterviewResult.ReInterview:
+                                                        <span class="result-badge bg-warning-custom">@Localizer["Re-interview"]</span>
+                                                        break;
+                                                    case InterviewResult.DidNotAttend:
+                                                        <span class="result-badge bg-secondary-custom">@Localizer["DidNotAttend"]</span>
+                                                        break;
+                                                    default:
+                                                        <span>@schedule.InterviewResult</span>
+                                                        break;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="result-badge bg-info-custom">@Localizer["Pending"]</span>
+                                            }
+                                        </td>
+                                        
+                                        <!-- Test Result -->
+                                        <td>
+                                            @if (schedule.TestDate.HasValue)
+                                            {
+                                                if (schedule.TestResult.HasValue)
+                                                {
+                                                    switch (schedule.TestResult.Value)
+                                                    {
+                                                        case TestResult.Pass:
+                                                            <span class="result-badge bg-success-custom">@Localizer["Pass"]</span>
+                                                            break;
+                                                        case TestResult.Fail:
+                                                            <span class="result-badge bg-danger-custom">@Localizer["Fail"]</span>
+                                                            break;
+                                                        case TestResult.ReTest:
+                                                            <span class="result-badge bg-warning-custom">@Localizer["Re-test"]</span>
+                                                            break;
+                                                         case TestResult.DidNotAttend:
+                                                            <span class="result-badge bg-secondary-custom">@Localizer["DidNotAttendTest"]</span>
+                                                            break;
+                                                        default:
+                                                            <span>@schedule.TestResult</span>
+                                                            break;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span class="result-badge bg-info-custom">@Localizer["Pending"]</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <!-- No Test Scheduled -->
+                                                <span class="result-badge bg-notest-custom">@Localizer["NoTest"]</span>
+                                            }
+                                        </td>
+
+                                        <!-- Job Offer -->
+                                        <td>
+                                            @if (schedule.InterviewResult == InterviewResult.Accepted && (schedule.TestResult == TestResult.Pass || !schedule.TestDate.HasValue))
+                                            {
+                                                @if (schedule.HasOffer)
+                                                {
+                                                     var btnClass = "btn-primary";
+                                                     var btnText = Localizer["Manage Offer"];
+                                                     
+                                                     if (schedule.OfferStatus == SmartTimeCVs.Web.Core.Enums.JobOfferStatus.Sent)
+                                                     {
+                                                         btnClass = "btn-success";
+                                                         btnText = Localizer["Offer Sent"];
+                                                     }
+                                                     else if (schedule.OfferStatus == SmartTimeCVs.Web.Core.Enums.JobOfferStatus.Accepted)
+                                                     {
+                                                         btnClass = "btn-info";
+                                                         btnText = Localizer["Offer Accepted"];
+                                                     }
+                                                      else if (schedule.OfferStatus == SmartTimeCVs.Web.Core.Enums.JobOfferStatus.Rejected)
+                                                     {
+                                                         btnClass = "btn-danger";
+                                                         btnText = Localizer["Offer Rejected"];
+                                                     }
+
+                                                    <button class="btn btn-sm @btnClass" onclick="openJobOfferModal(@schedule.JobApplicationId)">
+                                                        @btnText
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-sm btn-primary" onclick="openJobOfferModal(@schedule.JobApplicationId)">
+                                                        @Localizer["Manage Offer"]
+                                                    </button>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        
+                                        <!-- Notes (Combined) -->
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(schedule.InterviewResultNote))
+                                            {
+                                                <div><small><strong>Interview:</strong> @schedule.InterviewResultNote</small></div>
+                                            }
+                                            @if (!string.IsNullOrEmpty(schedule.TestResultNote))
+                                            {
+                                                <div><small><strong>Test:</strong> @schedule.TestResultNote</small></div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Job Offer Modal Container -->
+<div class="modal fade" id="jobOfferModal" role="dialog" aria-labelledby="jobOfferModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id="jobOfferModalContent">
+            <!-- Content loaded via AJAX -->
+        </div>
+    </div>
+</div>
+
+@section Plugins {
+    <partial name="_DataTablesJS" />
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Move modal to body to avoid z-index/stacking context issues (Fix for freeze)
+            $('#jobOfferModal').appendTo("body");
+
+            // Wait for DataTable to initialize
+            var checkTable = setInterval(function() {
+                if ($.fn.DataTable.isDataTable('#finalResultsTable')) {
+                    clearInterval(checkTable);
+                    initColumnFilters();
+                }
+            }, 100);
+
+            function initColumnFilters() {
+                var table = $('#finalResultsTable').DataTable();
+                
+                // Columns to filter: Interview Result (4) and Test Result (5)
+                // Note: Index might vary if columns are reordered or hidden. Safer to use header text or index if fixed.
+                // Based on view: Image(0), Name(1), Job(2), Date(3), IntResult(4), TestResult(5), Notes(6)
+                
+                var columns = [4, 5];
+
+                columns.forEach(function(colIndex) {
+                    var column = table.column(colIndex);
+                    var header = $(column.header());
+                    var title = header.text();
+
+                    // Get unique values from the column, stripping HTML tags
+                    var distinctValues = [];
+                    column.data().unique().sort().each(function (d, j) {
+                        // Create a temp element to strip HTML and get text
+                        var val = $.trim($('<div>').html(d).text());
+                        if (val && val !== '-' && !distinctValues.includes(val)) {
+                            distinctValues.push(val);
+                        }
+                    });
+
+                    // Build dropdown HTML
+                    var dropdownHtml = `
+                        <div class="filter-container">
+                            <i class="zmdi zmdi-filter-list filter-icon" style="font-size: 18px;" title="Filter ${title}"></i>
+                            <div class="filter-dropdown-menu">
+                                <button class="filter-item active" data-val="">@Localizer["All"]</button>
+                                ${distinctValues.map(v => `<button class="filter-item" data-val="${v}">${v}</button>`).join('')}
+                            </div>
+                        </div>
+                    `;
+
+                    // Modify header content safely
+                    // We wrap existing text in a span to keep sort click (table handles it) functioning, 
+                    // but we need to stop propagation on filter click.
+                    // DataTables click listener is on 'th'.
+                    
+                    // Append filter to header
+                    // Check if filter already exists to avoid duplication on re-init
+                    if (header.find('.filter-container').length === 0) {
+                        header.append(dropdownHtml);
+                    }
+                });
+
+                // Toggle dropdown
+                $(document).on('click', '.filter-icon', function(e) {
+                    e.stopPropagation(); // Stop sorting
+                    var container = $(this).closest('.filter-container');
+                    var menu = container.find('.filter-dropdown-menu');
+                    
+                    // Close other menus
+                    $('.filter-dropdown-menu').not(menu).removeClass('show');
+                    
+                    menu.toggleClass('show');
+                });
+
+                // Handle filter selection
+                $(document).on('click', '.filter-item', function(e) {
+                    e.stopPropagation(); // Stop sorting
+                    var btn = $(this);
+                    var val = btn.data('val');
+                    var container = btn.closest('.filter-container');
+                    var th = container.closest('th');
+                    var colIndex = table.column(th).index();
+
+                    // Update visual state
+                    container.find('.filter-item').removeClass('active');
+                    btn.addClass('active');
+                    
+                    // Highlight icon if filtered
+                    if (val) {
+                        container.find('.filter-icon').addClass('active');
+                    } else {
+                        container.find('.filter-icon').removeClass('active');
+                    }
+
+                    // Apply search
+                    // Use regex false, smart false for exact match? 
+                    // Actually, the cell content is HTML "<span>Pending</span>". 
+                    // Searching for "Pending" works with default smart search.
+                    table.column(colIndex).search(val ? val : '', true, false).draw();
+                    
+                    // Close menu
+                    container.find('.filter-dropdown-menu').removeClass('show');
+                });
+
+                // Close dropdown when clicking outside
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('.filter-container').length) {
+                        $('.filter-dropdown-menu').removeClass('show');
+                    }
+                });
+            }
+        });
+
+        // Job Offer Functions
+        function openJobOfferModal(jobApplicationId) {
+            $.get('@Url.Action("GetOfferModal", "JobOffer")', { jobApplicationId: jobApplicationId }, function(data) {
+                $('#jobOfferModalContent').html(data);
+                $('#jobOfferModal').modal('show');
+            }).fail(function() {
+                alert('Error loading job offer details.');
+            });
+        }
+
+        function saveOffer() {
+            var form = $('#jobOfferForm');
+            if (form.valid && !form.valid()) return;
+
+            // Serialize form to object to handle complexity if needed, or just standard serialization
+            // Since we are sending JSON to [FromBody], we need to construct the object
+            // Use a helper or simple object construction
+            
+            var formData = {};
+            form.serializeArray().forEach(function(item) {
+                formData[item.name] = item.value;
+            });
+            
+            // Fix data types
+            if (!formData.Id || formData.Id === "") {
+                delete formData.Id; // Or set to null: formData.Id = null;
+            } else {
+                formData.Id = parseInt(formData.Id);
+            }
+
+            formData.JobApplicationId = parseInt(formData.JobApplicationId);
+            formData.OfferedSalary = parseFloat(formData.OfferedSalary);
+
+            if (formData.NotificationType) {
+                formData.NotificationType = parseInt(formData.NotificationType);
+            }
+
+            // Handle enums or other specific fields if necessary
+            // For Date, string format yyyy-MM-dd is usually fine for ASP.NET Core binding
+            
+            $.ajax({
+                url: '@Url.Action("SaveOffer", "JobOffer")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    if (response.success) {
+                        // alert(response.message);
+                        // Reload modal to show "Send" button or update state
+                        openJobOfferModal(formData.JobApplicationId);
+                        
+                        // Optionally refresh table if we want to show status there
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('Error saving offer.');
+                }
+            });
+        }
+
+        function sendOffer(offerId) {
+            if (!confirm('@Localizer["Are you sure you want to send this offer?"]')) return;
+
+            var notificationType = $('input[name="NotificationType"]:checked').val();
+
+            $.post('@Url.Action("SendOffer", "JobOffer")', { id: offerId, notificationType: notificationType }, function(response) {
+                if (response.success) {
+                    alert(response.message);
+                     $('#jobOfferModal').modal('hide');
+                     // Refresh page/table?
+                     location.reload(); // Reload to show updated status if needed
+                } else {
+                    alert(response.message);
+                }
+            }).fail(function() {
+                alert('Error sending offer.');
+            });
+        }
+
+        function respondToOffer(offerId, accepted) {
+            var actionText = accepted ? '@Localizer["accept"]' : '@Localizer["reject"]';
+            if (!confirm('@Localizer["Are you sure you want to"] ' + actionText + ' @Localizer["this offer?"]')) return;
+
+            $.post('@Url.Action("RespondToOffer", "JobOffer")', { id: offerId, accepted: accepted }, function(response) {
+                if (response.success) {
+                    alert(response.message);
+                     $('#jobOfferModal').modal('hide');
+                     location.reload(); 
+                } else {
+                    alert(response.message);
+                }
+            }).fail(function() {
+                alert('Error updating offer status.');
+            });
+        }
+    </script>
+}

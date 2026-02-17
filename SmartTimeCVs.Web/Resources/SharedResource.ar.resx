@@ -366,4 +366,238 @@
   <data name="Fair" xml:space="preserve">
     <value>عدل</value>
   </data>
+  <data name="InterviewDate" xml:space="preserve">
+    <value>تاريخ المقابلة</value>
+  </data>
+  <data name="InterviewTime" xml:space="preserve">
+    <value>وقت المقابلة</value>
+  </data>
+  <data name="TestDate" xml:space="preserve">
+    <value>تاريخ الاختبار</value>
+  </data>
+  <data name="TestTime" xml:space="preserve">
+    <value>وقت الاختبار</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>تعديل</value>
+  </data>
+  <data name="ShortListed" xml:space="preserve">
+    <value>المرشحين</value>
+  </data>
+  <data name="Excluded" xml:space="preserve">
+    <value>المستبعدين</value>
+  </data>
+  <data name="Holding" xml:space="preserve">
+    <value>المعلّقين</value>
+  </data>
+  <data name="InterviewSchedules" xml:space="preserve">
+    <value>المقابلات والجداول</value>
+  </data>
+  <data name="TestSchedules" xml:space="preserve">
+    <value>الاختبارات والجداول</value>
+  </data>
+  <data name="InterviewResults" xml:space="preserve">
+    <value>نتائج المقابلات</value>
+  </data>
+  <data name="TestResults" xml:space="preserve">
+    <value>نتائج الاختبارات</value>
+  </data>
+  <data name="AddResult" xml:space="preserve">
+    <value>إضافة نتيجة</value>
+  </data>
+  <data name="AddInterviewResult" xml:space="preserve">
+    <value>إضافة نتيجة المقابلة</value>
+  </data>
+  <data name="AddTestResult" xml:space="preserve">
+    <value>إضافة نتيجة الاختبار</value>
+  </data>
+  <data name="Result" xml:space="preserve">
+    <value>النتيجة</value>
+  </data>
+  <data name="Accepted" xml:space="preserve">
+    <value>ناجح</value>
+  </data>
+  <data name="Rejected" xml:space="preserve">
+    <value>مرفوض</value>
+  </data>
+  <data name="Re-interview" xml:space="preserve">
+    <value>إعادة مقابلة</value>
+  </data>
+  <data name="DidNotAttend" xml:space="preserve">
+    <value>لم يحضر</value>
+  </data>
+  <data name="Pass" xml:space="preserve">
+    <value>ناجح</value>
+  </data>
+  <data name="Fail" xml:space="preserve">
+    <value>راسب</value>
+  </data>
+  <data name="Re-test" xml:space="preserve">
+    <value>إعادة اختبار</value>
+  </data>
+  <data name="DidNotAttendTest" xml:space="preserve">
+    <value>لم يحضر الاختبار</value>
+  </data>
+  <data name="AddNote" xml:space="preserve">
+    <value>أضف ملاحظة...</value>
+  </data>
+  <data name="PleaseSelectResult" xml:space="preserve">
+    <value>يرجى اختيار نتيجة أولاً</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>رجوع</value>
+  </data>
+  <data name="InterviewAndTestSchedules" xml:space="preserve">
+    <value>المقابلات والاختبارات</value>
+  </data>
+  <data name="Schedules" xml:space="preserve">
+    <value>الجداول</value>
+  </data>
+  <data name="TodayInterviews" xml:space="preserve">
+    <value>مقابلات اليوم</value>
+  </data>
+  <data name="PastInterviews" xml:space="preserve">
+    <value>مقابلات سابقة بانتظار نتيجة</value>
+  </data>
+  <data name="TodayTests" xml:space="preserve">
+    <value>اختبارات اليوم</value>
+  </data>
+  <data name="PastTests" xml:space="preserve">
+    <value>اختبارات سابقة بانتظار نتيجة</value>
+  </data>
+  <data name="NoTest" xml:space="preserve">
+    <value>لا يوجد اختبار</value>
+  </data>
+  <data name="View" xml:space="preserve">
+    <value>عرض</value>
+  </data>
+  <data name="Saving..." xml:space="preserve">
+    <value>جاري الحفظ...</value>
+  </data>
+  <data name="Success!" xml:space="preserve">
+    <value>تم بنجاح!</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>خطأ</value>
+  </data>
+  <data name="Failed to load schedule details." xml:space="preserve">
+    <value>فشل تحميل تفاصيل الجدول.</value>
+  </data>
+  <data name="An unexpected error occurred." xml:space="preserve">
+    <value>حدث خطأ غير متوقع.</value>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>ملاحظات</value>
+  </data>
+  <data name="TestResult" xml:space="preserve">
+    <value>نتيجة الاختبار</value>
+  </data>
+  <data name="InterviewResult" xml:space="preserve">
+    <value>نتيجة المقابلة</value>
+  </data>
+  <data name="JobOffer" xml:space="preserve">
+    <value>عرض العمل</value>
+  </data>
+  <data name="Job Offer" xml:space="preserve">
+    <value>عرض العمل</value>
+  </data>
+  <data name="Manage Offer" xml:space="preserve">
+    <value>إدارة العرض</value>
+  </data>
+  <data name="Offer Sent" xml:space="preserve">
+    <value>تم إرسال العرض</value>
+  </data>
+  <data name="Offer Accepted" xml:space="preserve">
+    <value>تم قبول العرض</value>
+  </data>
+  <data name="Offer Rejected" xml:space="preserve">
+    <value>تم رفض العرض</value>
+  </data>
+  <data name="Change Status" xml:space="preserve">
+    <value>تغيير الحالة</value>
+  </data>
+  <data name="Mark as Accepted" xml:space="preserve">
+    <value>تحديد كمقبول</value>
+  </data>
+  <data name="Mark as Rejected" xml:space="preserve">
+    <value>تحديد كمرفوض</value>
+  </data>
+  <data name="Offer Details" xml:space="preserve">
+    <value>تفاصيل العرض</value>
+  </data>
+  <data name="Basic Salary" xml:space="preserve">
+    <value>الراتب الأساسي</value>
+  </data>
+  <data name="Allowances" xml:space="preserve">
+    <value>البدلات</value>
+  </data>
+  <data name="Start Date" xml:space="preserve">
+    <value>تاريخ البدء</value>
+  </data>
+  <data name="Probation Period" xml:space="preserve">
+    <value>فترة التجربة</value>
+  </data>
+  <data name="Working Hours" xml:space="preserve">
+    <value>ساعات العمل</value>
+  </data>
+  <data name="Benefits" xml:space="preserve">
+    <value>المزايا</value>
+  </data>
+  <data name="Reporting To" xml:space="preserve">
+    <value>المدير المباشر</value>
+  </data>
+  <data name="Department" xml:space="preserve">
+    <value>القسم</value>
+  </data>
+  <data name="Internal Notes" xml:space="preserve">
+    <value>ملاحظات داخلية</value>
+  </data>
+  <data name="Notification" xml:space="preserve">
+    <value>إشعار</value>
+  </data>
+  <data name="SMS" xml:space="preserve">
+    <value>رسالة نصية</value>
+  </data>
+  <data name="Both" xml:space="preserve">
+    <value>كلاهما</value>
+  </data>
+  <data name="Offer Sent On" xml:space="preserve">
+    <value>تم الإرسال في</value>
+  </data>
+  <data name="Current Status" xml:space="preserve">
+    <value>الحالة الحالية</value>
+  </data>
+  <data name="Save Draft" xml:space="preserve">
+    <value>حفظ مسودة</value>
+  </data>
+  <data name="Send Offer" xml:space="preserve">
+    <value>إرسال العرض</value>
+  </data>
+  <data name="Update Offer" xml:space="preserve">
+    <value>تحديث العرض</value>
+  </data>
+  <data name="Resend Offer" xml:space="preserve">
+    <value>إعادة إرسال العرض</value>
+  </data>
+  <data name="Candidate Name" xml:space="preserve">
+      <value>اسم المرشح</value>
+  </data>
+   <data name="Close" xml:space="preserve">
+      <value>إغلاق</value>
+  </data>
+  <data name="Are you sure you want to send this offer?" xml:space="preserve">
+      <value>هل أنت متأكد أنك تريد إرسال هذا العرض؟</value>
+  </data>
+  <data name="Are you sure you want to" xml:space="preserve">
+      <value>هل أنت متأكد أنك تريد</value>
+  </data>
+  <data name="accept" xml:space="preserve">
+      <value>قبول</value>
+  </data>
+  <data name="reject" xml:space="preserve">
+      <value>رفض</value>
+  </data>
+  <data name="this offer?" xml:space="preserve">
+      <value>هذا العرض؟</value>
+  </data>
 </root>

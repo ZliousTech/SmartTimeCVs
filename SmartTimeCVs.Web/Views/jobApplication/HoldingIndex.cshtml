@@ -4,10 +4,9 @@
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
 
 @{
-	ViewData["HideSidebars"] = true;
-	ViewData["Title"] = @Localizer["JobApplications"];
-	ViewData["ControllerName"] = "JobApplication";
-	ViewData["Path"] = $"{@Localizer["JobApplications"]} / {@Localizer["Index"]}";
+	ViewData["Title"] = @Localizer["Holding"];
+	ViewData["ControllerName"] = "JobApplication-Holding";
+	ViewData["Path"] = @Localizer["Holding"];
 	ViewData["Icon"] = "description";
 }
 
@@ -108,14 +107,14 @@
 									</li>
 								</ul>
 							</td> *@
-                            @* <td>
+                            <td>
                                 <a asp-controller="JobApplication"
                                    asp-action="ShortList"
                                    asp-route-id="@jobApp.Id"
                                    class="btn btn-sm btn-info">
                                     @Localizer["View"]
                                 </a>
-                            </td> *@
+                            </td>
 						</tr>
 					}
 				</tbody>

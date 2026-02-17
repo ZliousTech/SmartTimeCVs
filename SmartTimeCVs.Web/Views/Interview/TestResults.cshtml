@@ -1,0 +1,336 @@
+@model SmartTimeCVs.Web.Core.ViewModels.ResultsViewModel
+@removeTagHelper Microsoft.AspNetCore.Mvc.TagHelpers.OptionTagHelper, Microsoft.AspNetCore.Mvc.TagHelpers
+@using System.Globalization
+@using SmartTimeCVs.Web.Core.Enums
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    ViewData["Title"] = Localizer["TestResults"];
+    ViewData["Path"] = Localizer["TestResults"];
+    ViewData["Icon"] = "grading";
+    ViewData["ControllerName"] = "Interview-TestResult";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Theme/assets/css/plugins/dataTables.bootstrap4.min.css" />
+    <style>
+        /* Force native select to show and look clean */
+        .result-select {
+            display: block !important;
+            width: 100%;
+            height: auto !important;
+            padding: 6px 10px;
+            border: 1px solid #ddd !important;
+            border-radius: 4px !important;
+            background-color: #fff !important;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            outline: none;
+            box-shadow: none !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            appearance: auto !important; /* Force native appearance */
+            -webkit-appearance: auto !important;
+        }
+        
+        /* Hide any plugin generated elements that might be adjacent */
+        .result-select + .nice-select,
+        .result-select + .select2,
+        .result-select + .bootstrap-select,
+        .result-select ~ .nice-select,
+        .result-select ~ .select2-container,
+        .result-select ~ .btn-group {
+            display: none !important;
+        }
+
+        .note-input {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+            font-size: 13px;
+            outline: none;
+            width: 100%;
+            min-width: 120px;
+        }
+
+        .btn-save-result {
+            background: #17a2b8;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-save-result:hover { background: #138496; }
+    </style>
+}
+
+<div class="row clearfix">
+    <div class="col-lg-12">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <strong>@Localizer["TodayTests"]</strong>
+            </div>
+            <div class="card-body">
+                <div class="body table-responsive">
+                    <table class="table table-hover" id="todayTestResultsTable" data-document-title="@Localizer["TestResults"]" data-order='[[5, "desc"]]'>
+                        <thead>
+                            <tr class="cyan">
+                                <th class="js-no-export js-exclude-search">@Localizer["Image"]</th>
+                                <th>@Localizer["FullName"]</th>
+                                <th>@Localizer["ApplicationDate"]</th>
+                                <th>@Localizer["MobileNumber"]</th>
+                                <th>@Localizer["JobTitle"]</th>
+                                <th>@Localizer["TestDate"]</th>
+                                <th>@Localizer["TestTime"]</th>
+                                <th style="min-width: 160px;" class="js-no-export">@Localizer["Result"]</th>
+                                <th class="js-no-export">@Localizer["Notes"]</th>
+                                <th class="js-no-export"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.TodayRequests.Any())
+                            {
+                                @foreach (var schedule in Model.TodayRequests)
+                                {
+                                    var currentVal = schedule.TestResult.HasValue ? ((int)schedule.TestResult.Value).ToString() : "";
+                                    <tr>
+                                        <td>
+                                            <img src="~/images/profileImages/@(schedule.CandidateImageUrl ?? "ProfileImagePlaceholder.jpg")"
+                                                 class="rounded-circle" width="40" height="40" />
+                                        </td>
+                                        <td><strong>@schedule.CandidateName</strong></td>
+                                        <td>@schedule.ApplicationDate.ToString("yyyy-MM-dd")</td>
+                                        <td dir="ltr">@schedule.CandidatePhone</td>
+                                        <td>@schedule.JobTitle</td>
+                                        <td>@(schedule.TestDate.HasValue ? schedule.TestDate.Value.ToString("yyyy-MM-dd") : "-")</td>
+                                        <td>@(schedule.TestTime.HasValue ? schedule.TestTime.Value.ToString(@"hh\:mm") : "-")</td>
+                                        <td>
+                                            <select class="result-select browser-default no-autoinit" data-schedule-id="@schedule.Id">
+                                                <option value="">-- @Localizer["Result"] --</option>
+                                                <option value="1" @(currentVal == "1" ? "selected" : "")>@Localizer["Pass"]</option>
+                                                <option value="2" @(currentVal == "2" ? "selected" : "")>@Localizer["Fail"]</option>
+                                                <option value="3" @(currentVal == "3" ? "selected" : "")>@Localizer["Re-test"]</option>
+                                                <option value="4" @(currentVal == "4" ? "selected" : "")>@Localizer["DidNotAttendTest"]</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="note-input" data-note-for="@schedule.Id"
+                                                   value="@(schedule.TestResultNote ?? "")"
+                                                   placeholder="@Localizer["AddNote"]" />
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn-save-result" onclick="saveResult(@schedule.Id)">
+                                                @Localizer["Save"]
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <strong>@Localizer["PastTests"]</strong>
+            </div>
+            <div class="card-body">
+                <div class="body table-responsive">
+                    <table class="table table-hover" id="pastTestResultsTable" data-document-title="@Localizer["TestResults"]" data-order='[[5, "desc"]]'>
+                        <thead>
+                            <tr class="cyan">
+                                <th class="js-no-export js-exclude-search">@Localizer["Image"]</th>
+                                <th>@Localizer["FullName"]</th>
+                                <th>@Localizer["ApplicationDate"]</th>
+                                <th>@Localizer["MobileNumber"]</th>
+                                <th>@Localizer["JobTitle"]</th>
+                                <th>@Localizer["TestDate"]</th>
+                                <th>@Localizer["TestTime"]</th>
+                                <th style="min-width: 160px;" class="js-no-export">@Localizer["Result"]</th>
+                                <th class="js-no-export">@Localizer["Notes"]</th>
+                                <th class="js-no-export"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.PastRequests.Any())
+                            {
+                                @foreach (var schedule in Model.PastRequests)
+                                {
+                                    var currentVal = schedule.TestResult.HasValue ? ((int)schedule.TestResult.Value).ToString() : "";
+                                    <tr>
+                                        <td>
+                                            <img src="~/images/profileImages/@(schedule.CandidateImageUrl ?? "ProfileImagePlaceholder.jpg")"
+                                                 class="rounded-circle" width="40" height="40" />
+                                        </td>
+                                        <td><strong>@schedule.CandidateName</strong></td>
+                                        <td>@schedule.ApplicationDate.ToString("yyyy-MM-dd")</td>
+                                        <td dir="ltr">@schedule.CandidatePhone</td>
+                                        <td>@schedule.JobTitle</td>
+                                        <td>@(schedule.TestDate.HasValue ? schedule.TestDate.Value.ToString("yyyy-MM-dd") : "-")</td>
+                                        <td>@(schedule.TestTime.HasValue ? schedule.TestTime.Value.ToString(@"hh\:mm") : "-")</td>
+                                        <td>
+                                            <select class="result-select browser-default no-autoinit" data-schedule-id="@schedule.Id">
+                                                <option value="">-- @Localizer["Result"] --</option>
+                                                <option value="1" @(currentVal == "1" ? "selected" : "")>@Localizer["Pass"]</option>
+                                                <option value="2" @(currentVal == "2" ? "selected" : "")>@Localizer["Fail"]</option>
+                                                <option value="3" @(currentVal == "3" ? "selected" : "")>@Localizer["Re-test"]</option>
+                                                <option value="4" @(currentVal == "4" ? "selected" : "")>@Localizer["DidNotAttendTest"]</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="note-input" data-note-for="@schedule.Id"
+                                                   value="@(schedule.TestResultNote ?? "")"
+                                                   placeholder="@Localizer["AddNote"]" />
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn-save-result" onclick="saveResult(@schedule.Id)">
+                                                @Localizer["Save"]
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Plugins {
+    <partial name="_DataTablesJS" />
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Manual DataTable Initialization for Split Tables
+            // We removed 'js-datatables' class to prevent global initDatatable from running incorrectly on multiple tables.
+
+            // 1. Define Columns for Export (Get from FIRST table only to avoid index overflow)
+            var exportedCols = [];
+            $('#todayTestResultsTable th').each(function(i) {
+                if (!$(this).hasClass('js-no-export')) {
+                    exportedCols.push(i);
+                }
+            });
+
+            // 2. Define Columns to Exclude from Search
+            var excludedSearchCols = [];
+            $('#todayTestResultsTable th').each(function(i) {
+                if ($(this).hasClass('js-exclude-search')) {
+                    excludedSearchCols.push(i);
+                }
+            });
+
+            var documentTitle = '@Localizer["TestResults"]';
+
+            // 3. Initialize DataTables
+            var tableConfig = {
+                lengthMenu: [5, 10, 25, 50, 100],
+                dom: 'lBfrtip',
+                buttons: [
+                    {
+                        extend: 'copy',
+                        className: 'btn btn-primary',
+                        title: documentTitle,
+                        exportOptions: { columns: exportedCols }
+                    },
+                    {
+                        extend: 'csv',
+                        className: 'btn btn-primary',
+                        title: documentTitle,
+                        exportOptions: { columns: exportedCols }
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-primary',
+                        title: documentTitle,
+                        exportOptions: { columns: exportedCols }
+                    }
+                ],
+                order: [[5, 'desc']],
+                columnDefs: [{ searchable: false, targets: excludedSearchCols }]
+            };
+
+            var tableToday = $('#todayTestResultsTable').DataTable(tableConfig);
+            var tablePast = $('#pastTestResultsTable').DataTable(tableConfig);
+
+            // 4. Update Global 'table' variable so site.js functions work
+            table = $('#todayTestResultsTable, #pastTestResultsTable').DataTable();
+
+            // Function to cleanup plugins
+            function cleanupPlugins() {
+                $('.result-select').each(function() {
+                    // Try to destroy niceSelect
+                    if ($.fn.niceSelect) {
+                        $(this).niceSelect('destroy');
+                    }
+                    
+                    // Try to destroy select2
+                    if ($.fn.select2 && $(this).hasClass('select2-hidden-accessible')) {
+                         $(this).select2('destroy');
+                    }
+                    
+                    // Try to destroy bootstrap-select
+                    if ($.fn.selectpicker) {
+                        try { $(this).selectpicker('destroy'); } catch(e) {}
+                    }
+                    
+                    // Remove next sibling if it looks like a nice-select or dropdown (fallback for CSS)
+                    $(this).next('.nice-select').remove();
+                    $(this).next('.btn-group').remove(); // Bootstrap select often wraps in btn-group
+                    $(this).siblings('.nice-select').remove();
+                    
+                    $(this).show(); // Ensure native is visible
+                    $(this).css('display', 'block');
+                });
+            }
+
+            // Run on load
+            setTimeout(cleanupPlugins, 100);
+            setTimeout(cleanupPlugins, 500); // Double check
+            setTimeout(cleanupPlugins, 1000); // Triple check
+
+            // Bind events to tables
+            tableToday.on('draw', function() { setTimeout(cleanupPlugins, 10); });
+            tablePast.on('draw', function() { setTimeout(cleanupPlugins, 10); });
+        });
+
+        function saveResult(scheduleId) {
+            var resultVal = $('select[data-schedule-id="' + scheduleId + '"]').val();
+            var noteVal = $('input[data-note-for="' + scheduleId + '"]').val();
+
+            if (!resultVal) {
+                Swal.fire({ icon: 'warning', title: '@Localizer["Error"]', text: '@Localizer["PleaseSelectResult"]' });
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("SetTestResult", "Interview")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ ScheduleId: scheduleId, Result: parseInt(resultVal), Note: noteVal }),
+                success: function(r) {
+                    if (r.success) {
+                        Swal.fire({ icon: 'success', title: '@Localizer["Success!"]', text: r.message }).then(function() { location.reload(); });
+                    } else {
+                        Swal.fire({ icon: 'error', title: '@Localizer["Error"]', text: r.message });
+                    }
+                },
+                error: function() {
+                    Swal.fire({ icon: 'error', title: '@Localizer["Error"]', text: '@Localizer["An unexpected error occurred."]' });
+                }
+            });
+        }
+    </script>
+}

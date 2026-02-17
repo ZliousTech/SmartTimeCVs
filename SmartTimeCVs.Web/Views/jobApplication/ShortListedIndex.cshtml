@@ -4,10 +4,9 @@
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
 
 @{
-	ViewData["HideSidebars"] = true;
-	ViewData["Title"] = @Localizer["JobApplications"];
-	ViewData["ControllerName"] = "JobApplication";
-	ViewData["Path"] = $"{@Localizer["JobApplications"]} / {@Localizer["Index"]}";
+	ViewData["Title"] = @Localizer["ShortListed"];
+	ViewData["ControllerName"] = "JobApplication-ShortListed";
+	ViewData["Path"] = @Localizer["ShortListed"];
 	ViewData["Icon"] = "description";
 }
 

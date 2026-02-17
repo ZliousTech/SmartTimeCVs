@@ -1,3 +1,5 @@
+using SmartTimeCVs.Web.Core.Enums;
+
 namespace SmartTimeCVs.Web.Core.ViewModels
 {
     /// <summary>
@@ -35,6 +37,19 @@ namespace SmartTimeCVs.Web.Core.ViewModels
 
         // Notes
         public string? Notes { get; set; }
+
+        // Results
+        public InterviewResult? InterviewResult { get; set; }
+        public string? InterviewResultNote { get; set; }
+        public TestResult? TestResult { get; set; }
+
+
+        public string? TestResultNote { get; set; }
+
+        // Offer Status
+        public bool HasOffer { get; set; }
+        public JobOfferStatus? OfferStatus { get; set; }
+        public string? OfferStatusString { get; set; }
 
         // Timestamps
         public DateTime? CreatedOn { get; set; }

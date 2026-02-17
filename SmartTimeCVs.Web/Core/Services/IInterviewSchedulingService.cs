@@ -20,6 +20,34 @@ namespace SmartTimeCVs.Web.Core.Services
         Task<List<InterviewScheduleListViewModel>> GetAllSchedulesAsync(string? companyId);
 
         /// <summary>
+        /// Get all test schedules for a company (only records with test data and no result yet)
+        /// </summary>
+        /// <param name="companyId">Company identifier</param>
+        /// <returns>List of scheduled tests</returns>
+        Task<List<InterviewScheduleListViewModel>> GetTestSchedulesAsync(string? companyId);
+
+        /// <summary>
+        /// Get all interview results for a company
+        /// </summary>
+        /// <summary>
+        /// Get all interview results for a company (split by Today and Past)
+        /// </summary>
+        Task<ResultsViewModel> GetInterviewResultsAsync(string? companyId);
+
+        /// <summary>
+        /// Get all test results for a company
+        /// </summary>
+        /// <summary>
+        /// Get all test results for a company (split by Today and Past)
+        /// </summary>
+        Task<ResultsViewModel> GetTestResultsAsync(string? companyId);
+
+        /// <summary>
+        /// Get all final results (Interviews + Tests) for a company
+        /// </summary>
+        Task<List<InterviewScheduleListViewModel>> GetFinalResultsAsync(string? companyId);
+
+        /// <summary>
         /// Get a specific schedule by ID
         /// </summary>
         /// <param name="id">Schedule ID</param>

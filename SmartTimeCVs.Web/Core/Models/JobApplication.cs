@@ -1,8 +1,8 @@
 ﻿namespace SmartTimeCVs.Web.Core.Models
 {
-    [Index(nameof(FullName), IsUnique = true)]
-    [Index(nameof(NationalID), IsUnique = true)]
-    [Index(nameof(Email), IsUnique = true)]
+    [Index(nameof(FullName), nameof(CompanyId), IsUnique = true)]
+    [Index(nameof(NationalID), nameof(CompanyId), IsUnique = true)]
+    [Index(nameof(Email), nameof(CompanyId), IsUnique = true)]
     public class JobApplication : BaseModel
     {
         #region Basic Information.
@@ -129,8 +129,12 @@
 
         #endregion Attachments.
 
-        #region Interview Scheduling.
+        #region Job Offer
+        public int? JobOfferId { get; set; }
+        public JobOffer? JobOffer { get; set; }
+        #endregion
 
+        #region Interview Scheduling.
         /// <summary>
         /// Current status of the candidate in the hiring process
         /// </summary>

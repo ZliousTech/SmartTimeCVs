@@ -40,6 +40,9 @@ function tableExcludedSearchColumns() {
 
 function initDatatable(exportedCols, excludedsearchCols) {
 	const documentTitle = $('.js-datatables').data('document-title');
+	const orderData = $('.js-datatables').data('order');
+	const order = orderData ? orderData : [[0, 'desc']];
+
 	table = $('.js-datatables').DataTable({
 		lengthMenu: [5, 10, 25, 50, 100],
 		dom: 'lBfrtip',
@@ -69,7 +72,7 @@ function initDatatable(exportedCols, excludedsearchCols) {
 				}
 			}
 		],
-		order: [[0, 'desc']],
+		order: order,
 		columnDefs: [{ searchable: false, targets: excludedsearchCols }]
 	});
 }
@@ -102,7 +105,7 @@ function updateDatatableData(row, currentStatus, btn, lastUpdatedOn, currentPage
 	rowData[statusColumnIndex] = newStatusHtml
 
 	var controllerName = btn.data('name').split(' ').join('');
-	
+
 	var modelName = btn.data('name');
 
 	// Update DataTable row
@@ -118,7 +121,7 @@ function updateDatatableData(row, currentStatus, btn, lastUpdatedOn, currentPage
 	dropdownMenu.empty();
 
 	if (newStatus === 'Deleted') {
-		dropdownMenu.html('<li class="js-delete-retrieve" data-id=' + btn.data('id') + ' data-url="/' + controllerName + '/ToggleStatus/' + btn.data('id') + '" data-name="' + modelName +'"><a class="js-toggle" href="javascript:;">Retrieve</a></li>');
+		dropdownMenu.html('<li class="js-delete-retrieve" data-id=' + btn.data('id') + ' data-url="/' + controllerName + '/ToggleStatus/' + btn.data('id') + '" data-name="' + modelName + '"><a class="js-toggle" href="javascript:;">Retrieve</a></li>');
 	} else {
 		if (dropdownMenu.data('for-modal') === undefined) {
 			dropdownMenu.html(
@@ -132,7 +135,7 @@ function updateDatatableData(row, currentStatus, btn, lastUpdatedOn, currentPage
 				'<li class="js-delete-retrieve" data-id=' + btn.data('id') + ' data-url="/' + controllerName + '/ToggleStatus/' + btn.data('id') + '" data-name="' + modelName + '"><a class="js-toggle" href="javascript:;">Delete</a></li>'
 			);
 		}
-		
+
 	}
 
 	table.page(currentPage).draw('page');
@@ -265,6 +268,6 @@ function onRequestComplete() {
 
 $(document).ready(function () {
 
-	
+
 })
 // End javascript

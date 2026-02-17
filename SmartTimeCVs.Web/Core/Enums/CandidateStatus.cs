@@ -14,6 +14,8 @@ namespace SmartTimeCVs.Web.Core.Enums
         Offered = 7,
         Hired = 8,
         Rejected = 9,
-        Withdrawn = 10
+        Withdrawn = 10,
+        OfferAccepted = 11,
+        OfferRejected = 12
     }
 }

@@ -94,6 +94,32 @@ namespace SmartTimeCVs.Web.Core.Models
 
         #endregion Status
 
+        #region Results
+
+        /// <summary>
+        /// Result of the interview
+        /// </summary>
+        public InterviewResult? InterviewResult { get; set; }
+
+        /// <summary>
+        /// Notes about the interview result
+        /// </summary>
+        [MaxLength(1000)]
+        public string? InterviewResultNote { get; set; }
+
+        /// <summary>
+        /// Result of the test
+        /// </summary>
+        public TestResult? TestResult { get; set; }
+
+        /// <summary>
+        /// Notes about the test result
+        /// </summary>
+        [MaxLength(1000)]
+        public string? TestResultNote { get; set; }
+
+        #endregion Results
+
         /// <summary>
         /// Company identifier
         /// </summary>

@@ -18,6 +18,7 @@ namespace SmartTimeCVs.Web.Data
         public DbSet<LevelType> LevelType { get; set; }
         public DbSet<MaritalStatusType> MaritalStatusType { get; set; }
         public DbSet<AttachmentFile> AttachmentFile { get; set; }
+        public DbSet<JobOffer> JobOffer { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -55,6 +56,12 @@ namespace SmartTimeCVs.Web.Data
                 .WithMany(g => g.JobApplications)
                 .HasForeignKey(j => j.GenderId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<JobOffer>()
+                .HasOne(o => o.JobApplication)
+                .WithOne(j => j.JobOffer)
+                .HasForeignKey<JobOffer>(o => o.JobApplicationId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(builder);
         }

@@ -12,5 +12,10 @@ namespace SmartTimeCVs.Web.Core.Services
         /// <param name="notificationType">How to notify (Email, SMS, or Both)</param>
         /// <returns>True if notification sent successfully</returns>
         Task<bool> SendInterviewNotificationAsync(InterviewSchedule schedule, NotificationType notificationType);
+        
+        /// <summary>
+        /// Send job offer notification to candidate
+        /// </summary>
+        Task<bool> SendJobOfferNotificationAsync(JobOffer offer, NotificationType notificationType);
     }
 }

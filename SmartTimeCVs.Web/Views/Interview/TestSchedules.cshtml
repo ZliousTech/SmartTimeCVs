@@ -4,10 +4,10 @@
 
 @{
     var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
-    ViewData["Title"] = Localizer["InterviewSchedules"];
-    ViewData["Path"] = Localizer["InterviewSchedules"];
-    ViewData["Icon"] = "event";
-    ViewData["ControllerName"] = "Interview";
+    ViewData["Title"] = Localizer["TestSchedules"];
+    ViewData["Path"] = Localizer["TestSchedules"];
+    ViewData["Icon"] = "assignment";
+    ViewData["ControllerName"] = "Interview-Test";
 }
 
 @section Styles {
@@ -15,19 +15,12 @@
     <style>
         .card {
             border-radius: 8px;
-            /* box-shadow: 0 2px 10px rgba(0,0,0,0.05); */
             border: none;
             overflow: hidden;
         }
 
-        /* Custom badge styles */
-        .badge-status-scheduled { background-color: #ffc107; color: #212529; }
-        .badge-status-confirmed { background-color: #28a745; color: white; } 
-        .badge-status-completed { background-color: #17a2b8; color: white; }
-        .badge-status-cancelled { background-color: #dc3545; color: white; }
-        
         .btn-edit-custom {
-            background-color: #fd7e14; /* Orange/Yellow for Edit button */
+            background-color: #fd7e14;
             color: white;
             border: none;
             border-radius: 4px;
@@ -38,7 +31,7 @@
             background-color: #e36d0a;
             color: white;
         }
-        
+
         /* Modal overrides */
         .modal { z-index: 100050 !important; }
         .modal-backdrop { z-index: 100040 !important; }
@@ -58,7 +51,7 @@
     </div>
     <div class="card-body">
         <div class="body table-responsive">
-            <table class="table js-datatables" id="schedulesTable" data-document-title="InterviewSchedules" data-order='[[5, "asc"], [6, "asc"]]'>
+            <table class="table js-datatables" id="testSchedulesTable" data-document-title="TestSchedules" data-order='[[5, "asc"], [6, "asc"]]'>
                 <thead>
                     <tr class="cyan">
                                 <th class="js-no-export js-exclude-search">@Localizer["Image"]</th>
@@ -66,8 +59,6 @@
                                 <th>@Localizer["ApplicationDate"]</th>
                                 <th>@Localizer["MobileNumber"]</th>
                                 <th>@Localizer["JobTitle"]</th>
-                                <th>@Localizer["InterviewDate"]</th>
-                                <th>@Localizer["InterviewTime"]</th>
                                 <th>@Localizer["TestDate"]</th>
                                 <th>@Localizer["TestTime"]</th>
                                 <th class="js-no-export">@Localizer["View"]</th>
@@ -91,10 +82,8 @@
                                         <td>@schedule.ApplicationDate.ToString("yyyy-MM-dd")</td>
                                         <td dir="ltr">@schedule.CandidatePhone</td>
                                         <td>@schedule.JobTitle</td>
-                                        <td>@schedule.InterviewDate.ToString("yyyy-MM-dd")</td>
-                                        <td>@schedule.InterviewTime.ToString(@"hh\:mm")</td>
-                                        <td>@(schedule.TestDate?.ToString("yyyy-MM-dd") ?? "-")</td>
-                                        <td>@(schedule.TestTime?.ToString(@"hh\:mm") ?? "-")</td>
+                                        <td>@(schedule.TestDate.HasValue ? schedule.TestDate.Value.ToString("yyyy-MM-dd") : "-")</td>
+                                        <td>@(schedule.TestTime.HasValue ? schedule.TestTime.Value.ToString(@"hh\:mm") : "-")</td>
                                         <td>
                                             <a asp-controller="JobApplication"
                                                asp-action="ShortList"
@@ -144,7 +133,7 @@
         // Function to load the edit modal
         function loadEditModal(scheduleId) {
             $.ajax({
-                url: '@Url.Action("GetEditScheduleModal", "Interview")',
+                url: '@Url.Action("GetEditTestModal", "Interview")',
                 type: 'GET',
                 data: { id: scheduleId },
                 beforeSend: function() {
@@ -181,9 +170,8 @@
                 var formData = {
                     Id: parseInt($('input[name="Id"]').val()),
                     JobApplicationId: parseInt($('input[name="JobApplicationId"]').val()),
-                    InterviewDate: $('#EditInterviewDate').val(),
-                    InterviewTime: $('#EditInterviewTime').val() + ':00',
-                    InterviewLocation: $('#EditInterviewLocation').val(),
+                    TestDate: $('#EditTestDate').val(),
+                    TestTime: $('#EditTestTime').val() + ':00',
                     NotificationType: parseInt($('input[name="NotificationType"]:checked').val()),
                     Notes: $('#EditNotes').val()
                 };
@@ -195,7 +183,7 @@
                 
                 // Send AJAX request
                 $.ajax({
-                    url: '@Url.Action("UpdateSchedule", "Interview")',
+                    url: '@Url.Action("UpdateTestSchedule", "Interview")',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(formData),

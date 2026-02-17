@@ -33,6 +33,7 @@ namespace SmartTimeCVs.Web.Controllers
                     .JobApplication.Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
                     .OrderByDescending(p => p.Id)
                     .Where(p => !p.IsShortListed && !p.IsExcluded && !p.IsHolding)
+                    .Where(p => !p.InterviewSchedules.Any(s => !s.IsDeleted))
                     .AsNoTracking()
                     .ToListAsync();
 
