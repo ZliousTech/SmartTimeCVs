@@ -18,7 +18,7 @@ namespace SmartTimeCVs.Web.Core.Services
             _logger = logger;
         }
 
-        public async Task<bool> SendEmailAsync(string to, string subject, string body)
+        public async Task<bool> SendEmailAsync(string to, string subject, string body, string? replyTo = null, string? senderDisplayName = null)
         {
             try
             {
@@ -28,14 +28,21 @@ namespace SmartTimeCVs.Web.Core.Services
                     Credentials = new NetworkCredential(_emailSettings.Username, _emailSettings.Password)
                 };
 
+                var displayName = !string.IsNullOrEmpty(senderDisplayName) ? senderDisplayName : _emailSettings.SenderName;
+
                 var mailMessage = new MailMessage
                 {
-                    From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
+                    From = new MailAddress(_emailSettings.SenderEmail, displayName),
                     Subject = subject,
                     Body = body,
                     IsBodyHtml = true
                 };
                 mailMessage.To.Add(to);
+
+                if (!string.IsNullOrEmpty(replyTo))
+                {
+                    mailMessage.ReplyToList.Add(new MailAddress(replyTo));
+                }
 
                 await client.SendMailAsync(mailMessage);
                 

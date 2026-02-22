@@ -36,6 +36,7 @@ namespace SmartTimeCVs.Web.Core.Services
                 {
                     JobApplicationId = application.Id,
                     CandidateName = application.FullName,
+                    CandidateAddress = application.Address,
                     JobTitle = application.JobTitle,
                     StartDate = DateTime.Now.AddDays(14), // Default start date
                     ProbationPeriod = "3 Months",
@@ -46,6 +47,7 @@ namespace SmartTimeCVs.Web.Core.Services
                 {
                     model.Id = application.JobOffer.Id;
                     model.OfferedSalary = application.JobOffer.OfferedSalary;
+                    model.Currency = application.JobOffer.Currency ?? "JOD";
                     model.Allowances = application.JobOffer.Allowances;
                     model.StartDate = application.JobOffer.StartDate;
                     model.ProbationPeriod = application.JobOffer.ProbationPeriod;
@@ -53,6 +55,8 @@ namespace SmartTimeCVs.Web.Core.Services
                     model.Benefits = application.JobOffer.Benefits;
                     model.ManagerName = application.JobOffer.ManagerName;
                     model.Department = application.JobOffer.Department;
+                    model.SenderName = application.JobOffer.SenderName;
+                    model.SenderEmail = application.JobOffer.SenderEmail;
                     model.Notes = application.JobOffer.Notes;
                     model.Status = application.JobOffer.Status;
                     model.StatusString = application.JobOffer.Status.ToString();
@@ -89,6 +93,7 @@ namespace SmartTimeCVs.Web.Core.Services
                     if (offer == null) throw new Exception("Offer not found");
 
                     offer.OfferedSalary = model.OfferedSalary;
+                    offer.Currency = model.Currency;
                     offer.Allowances = model.Allowances;
                     offer.StartDate = model.StartDate;
                     offer.ProbationPeriod = model.ProbationPeriod;
@@ -96,6 +101,8 @@ namespace SmartTimeCVs.Web.Core.Services
                     offer.Benefits = model.Benefits;
                     offer.ManagerName = model.ManagerName;
                     offer.Department = model.Department;
+                    offer.SenderName = model.SenderName;
+                    offer.SenderEmail = model.SenderEmail;
                     offer.Notes = model.Notes;
                     offer.LastUpdatedOn = DateTime.Now;
 
@@ -109,6 +116,7 @@ namespace SmartTimeCVs.Web.Core.Services
                     {
                         JobApplicationId = model.JobApplicationId,
                         OfferedSalary = model.OfferedSalary,
+                        Currency = model.Currency,
                         Allowances = model.Allowances,
                         StartDate = model.StartDate,
                         ProbationPeriod = model.ProbationPeriod,
@@ -116,6 +124,8 @@ namespace SmartTimeCVs.Web.Core.Services
                         Benefits = model.Benefits,
                         ManagerName = model.ManagerName,
                         Department = model.Department,
+                        SenderName = model.SenderName,
+                        SenderEmail = model.SenderEmail,
                         Notes = model.Notes,
                         Status = JobOfferStatus.Draft,
                         CreatedOn = DateTime.Now
@@ -207,6 +217,25 @@ namespace SmartTimeCVs.Web.Core.Services
                 _logger.LogError(ex, "Error responding to job offer {OfferId}", jobOfferId);
                 return false;
             }
+        }
+
+        public async Task<bool> ValidateCandidateMobileAsync(int offerId, string mobileNumber)
+        {
+            var offer = await _context.JobOffer
+                .Include(o => o.JobApplication)
+                .FirstOrDefaultAsync(o => o.Id == offerId);
+
+            if (offer == null || offer.JobApplication == null) 
+                return false;
+
+            if (string.IsNullOrWhiteSpace(offer.JobApplication.MobileNumber) || string.IsNullOrWhiteSpace(mobileNumber))
+                return false;
+
+            // Simple validation: ignoring spaces, dashes, parentheses
+            var storedMobile = new string(offer.JobApplication.MobileNumber.Where(char.IsDigit).ToArray());
+            var inputMobile = new string(mobileNumber.Where(char.IsDigit).ToArray());
+
+            return storedMobile == inputMobile && storedMobile.Length > 0;
         }
     }
 }

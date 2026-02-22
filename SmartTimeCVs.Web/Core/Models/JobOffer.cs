@@ -17,6 +17,8 @@ namespace SmartTimeCVs.Web.Core.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal OfferedSalary { get; set; }
 
+        public string? Currency { get; set; }
+
         public string? Allowances { get; set; }
 
         public string? WorkingHours { get; set; }
@@ -30,6 +32,10 @@ namespace SmartTimeCVs.Web.Core.Models
         public string? ManagerName { get; set; }
 
         public string? Department { get; set; }
+
+        public string? SenderName { get; set; }
+
+        public string? SenderEmail { get; set; }
 
         public string? Notes { get; set; }
 

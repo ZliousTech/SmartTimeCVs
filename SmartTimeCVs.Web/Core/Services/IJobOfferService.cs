@@ -10,5 +10,6 @@ namespace SmartTimeCVs.Web.Core.Services
         Task<JobOffer> SaveOfferAsync(JobOfferViewModel model);
         Task<bool> SendOfferAsync(int jobOfferId, NotificationType notificationType);
         Task<bool> RespondToOfferAsync(int jobOfferId, bool accepted);
+        Task<bool> ValidateCandidateMobileAsync(int offerId, string mobileNumber);
     }
 }

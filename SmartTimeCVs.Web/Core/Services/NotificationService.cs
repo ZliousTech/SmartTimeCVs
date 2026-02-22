@@ -9,17 +9,20 @@ namespace SmartTimeCVs.Web.Core.Services
         private readonly ISmsService _smsService;
         private readonly ApplicationDbContext _context;
         private readonly ILogger<NotificationService> _logger;
+        private readonly IConfiguration _configuration;
 
         public NotificationService(
             IEmailService emailService,
             ISmsService smsService,
             ApplicationDbContext context,
-            ILogger<NotificationService> logger)
+            ILogger<NotificationService> logger,
+            IConfiguration configuration)
         {
             _emailService = emailService;
             _smsService = smsService;
             _context = context;
             _logger = logger;
+            _configuration = configuration;
         }
 
         public async Task<bool> SendInterviewNotificationAsync(InterviewSchedule schedule, NotificationType notificationType)
@@ -188,7 +191,9 @@ namespace SmartTimeCVs.Web.Core.Services
                     emailSuccess = await _emailService.SendEmailAsync(
                         offer.JobApplication.Email,
                         subject,
-                        emailBody
+                        emailBody,
+                        offer.SenderEmail,
+                        offer.SenderName
                     );
                 }
             }
@@ -209,56 +214,81 @@ namespace SmartTimeCVs.Web.Core.Services
                 : (emailSuccess || smsSuccess);
         }
 
-        private static string BuildJobOfferEmailBody(JobOffer offer)
+        private string BuildJobOfferEmailBody(JobOffer offer)
         {
+            var baseUrl = _configuration["BaseUrl"] ?? "http://localhost:5090";
+            var actionUrl = $"{baseUrl}/CandidatePortal/Login?appId={offer.JobApplicationId}";
+            var companyName = string.IsNullOrEmpty(offer.SenderName) ? "SmartTime CVs" : offer.SenderName;
+            var expiryDate = offer.CreatedOn?.AddDays(7).ToString("dd MMM yyyy") ?? DateTime.Now.AddDays(7).ToString("dd MMM yyyy");
+            var managerName = string.IsNullOrEmpty(offer.ManagerName) ? "Management" : offer.ManagerName;
+            var department = string.IsNullOrEmpty(offer.Department) ? "" : " / " + offer.Department;
+            var allowances = string.IsNullOrEmpty(offer.Allowances) ? "N/A" : offer.Allowances;
+            var probation = string.IsNullOrEmpty(offer.ProbationPeriod) ? "N/A" : offer.ProbationPeriod;
+            var hours = string.IsNullOrEmpty(offer.WorkingHours) ? "N/A" : offer.WorkingHours;
+            var benefits = string.IsNullOrEmpty(offer.Benefits) ? "N/A" : offer.Benefits;
+            var address = string.IsNullOrEmpty(offer.JobApplication?.Address) ? "N/A" : offer.JobApplication.Address;
+
              return $@"
             <!DOCTYPE html>
             <html>
             <head>
                 <style>
-                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
-                    .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                    .header {{ background: linear-gradient(135deg, #0d6efd, #0dcaf0); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
-                    .content {{ background: #fff; padding: 30px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 10px 10px; }}
-                    .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; }}
-                    table {{ width: 100%; border-collapse: collapse; }}
+                    body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background-color: #f4f7f6; margin: 0; padding: 0; }}
+                    .container {{ max-width: 800px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 40px; }}
+                    .header {{ text-align: center; margin-bottom: 30px; }}
+                    .header h1 {{ margin: 0; font-size: 24px; font-weight: bold; text-decoration: underline; }}
+                    .content {{ color: #333; font-size: 15px; }}
+                    .content p {{ margin-bottom: 15px; }}
+                    .content ul {{ margin-bottom: 15px; margin-top: 10px; }}
+                    .btn-primary {{ background-color: #0d6efd; color: #ffffff !important; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px; margin-top: 20px; box-shadow: 0 2px 4px rgba(13, 110, 253, 0.4); transition: transform 0.2s; }}
+                    .signature-block {{ margin-top: 40px; }}
+                    .signature-line {{ width: 250px; border-bottom: 1px solid #333; margin-bottom: 5px; display: inline-block; }}
+                    .action-section {{ text-align: center; margin-top: 50px; padding-top: 30px; border-top: 1px solid #eee; }}
                 </style>
             </head>
             <body>
                 <div class='container'>
                     <div class='header'>
-                        <h1>Job Offer</h1>
+                        <h1>JOB OFFER LETTER</h1>
                     </div>
                     <div class='content'>
-                        <p>Dear <strong>{offer.JobApplication.FullName}</strong>,</p>
-                        <p>We are delighted to offer you the position of <strong>{offer.JobApplication.JobTitle ?? "Candidate"}</strong> at SmartTime CVs.</p>
+                        <p><strong>Date:</strong> {DateTime.Now.ToString("dd MMM yyyy")}</p>
+                        <br/>
+                        <p><strong>Candidate Name:</strong> {offer.JobApplication?.FullName}<br/>
+                        <strong>Address:</strong> {address}</p>
                         
-                        <h3 style='color: #0d6efd;'>Offer Details</h3>
-                        <table>
-                            <tr>
-                                <td style='padding: 10px; border-bottom: 1px solid #eee;'><strong>Salary:</strong></td>
-                                <td style='padding: 10px; border-bottom: 1px solid #eee;'>{offer.OfferedSalary:C}</td>
-                            </tr>
-                            <tr>
-                                <td style='padding: 10px; border-bottom: 1px solid #eee;'><strong>Start Date:</strong></td>
-                                <td style='padding: 10px; border-bottom: 1px solid #eee;'>{offer.StartDate:dddd, MMMM dd, yyyy}</td>
-                            </tr>
-                             <tr>
-                                <td style='padding: 10px; border-bottom: 1px solid #eee;'><strong>Department:</strong></td>
-                                <td style='padding: 10px; border-bottom: 1px solid #eee;'>{offer.Department ?? "General"}</td>
-                            </tr>
-                        </table>
-
-                        {(string.IsNullOrEmpty(offer.Benefits) ? "" : $"<p><strong>Benefits:</strong> {offer.Benefits}</p>")}
-                        {(string.IsNullOrEmpty(offer.Notes) ? "" : $"<p><strong>Notes:</strong> {offer.Notes}</p>")}
-
-                        <p style='margin-top: 20px;'>Please review this offer and let us know your decision.</p>
-                        <p>We look forward to welcoming you to the team!</p>
+                        <p>Dear {offer.JobApplication?.FullName},</p>
                         
-                        <p>Best regards,<br/>{offer.ManagerName ?? "HR Team"}</p>
-                    </div>
-                    <div class='footer'>
-                        <p>This is an automated message from SmartTime CVs</p>
+                        <p>We are pleased to offer you the position of <strong>{offer.JobApplication?.JobTitle}</strong> at <strong>{companyName}</strong>, reporting to <strong>{managerName}</strong>{department}.</p>
+                        
+                        <p>Your employment will commence on <strong>{offer.StartDate.ToString("dd MMM yyyy")}</strong>. The compensation package for this position is as follows:</p>
+                        
+                        <ul>
+                            <li><strong>Basic Salary:</strong> {offer.OfferedSalary.ToString("N2")} {offer.Currency ?? "JOD"} per month</li>
+                            <li><strong>Allowances (if any):</strong> {allowances}</li>
+                            <li><strong>Probation Period:</strong> {probation}</li>
+                            <li><strong>Working Hours:</strong> {hours}</li>
+                            <li><strong>Other Benefits:</strong> {benefits}</li>
+                        </ul>
+                        
+                        <p>This offer is contingent upon successful completion of all pre-employment requirements and signing the official employment contract.</p>
+                        
+                        <p>Please confirm your acceptance of this offer by signing below and returning a copy of this letter by <strong>{expiryDate}</strong>.</p>
+                        
+                        <p>We look forward to welcoming you to our team.</p>
+                        
+                        <p>Sincerely,</p>
+                        
+                        <div class='signature-block'>
+                            <div class='signature-line'></div><br/>
+                            <strong>{offer.SenderName ?? offer.ManagerName ?? "HR Department"}</strong><br/>
+                            {companyName}
+                        </div>
+                        
+                        <div class='action-section'>
+                            <p>To securely view and electronically respond to this offer, please click the button below:</p>
+                            <a href='{actionUrl}' class='btn-primary'>View & Respond to Offer</a>
+                        </div>
                     </div>
                 </div>
             </body>

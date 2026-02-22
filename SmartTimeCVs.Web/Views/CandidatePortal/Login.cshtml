@@ -1,0 +1,64 @@
+@model SmartTimeCVs.Web.Core.ViewModels.CandidateLoginViewModel
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+    ViewData["HideSidebars"] = true;
+    ViewData["Title"] = "Candidate Verification";
+    ViewData["ControllerName"] = "CandidatePortal";
+    ViewData["Path"] = "Job Offer Review";
+    ViewData["Icon"] = "assignment_ind";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        @if (!string.IsNullOrWhiteSpace(ViewBag.CompanyLogo) && !string.IsNullOrWhiteSpace(ViewBag.HomePageHtml) && !string.IsNullOrWhiteSpace(ViewBag.CompanyName))
+        {
+            <div class="row mt-2">
+                <div class="col-md-3" style="text-align: end;">
+                    <div class="form-group">
+                        <div class="image">
+                            <br><br>
+                            <img src="@ViewBag.CompanyLogo" alt="Company Logo" class="mb-2" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="form-group">
+                        <h4><span id="LblCompName">@ViewBag.CompanyName</span></h4>
+                        <br>
+                        <span id="LblTxtCompanyHomePageText">
+                            @Html.Raw(ViewBag.HomePageHtml)
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-6"><i class="material-icons breadcrumb theme-main-color align-self-center">@ViewData["Icon"]</i></div>
+            </div>
+        }
+    </div>
+    <div class="card-body">
+        <div class="body table-responsive">
+            <form asp-action="Login" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="AppId" />
+
+                <div class="row clearfix mb-4 mt-4">
+                    <div class="col-md-6">
+                        <h2 class="card-inside-title mb-2">@Localizer["MobileNumber"] <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input asp-for="MobileNumber" class="form-control" placeholder="@Localizer["MobileNumber"]" />
+                            <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mt-4" style="text-align: end;">
+                        <button type="submit" class="btn btn-lg btn-round btn-primary font-bold waves-effect float-end">@Localizer["Start"]</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

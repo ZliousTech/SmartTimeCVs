@@ -1,0 +1,156 @@
+@using SmartTimeCVs.Web.Core.Enums
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+@model SmartTimeCVs.Web.Core.ViewModels.JobOfferViewModel
+
+@{
+    ViewData["HideSidebars"] = true;
+    ViewData["Title"] = "Your Job Offer";
+    ViewData["ControllerName"] = "CandidatePortal";
+    ViewData["Path"] = "Job Offer Details";
+    ViewData["Icon"] = "assignment_ind";
+    var mobileNumber = ViewBag.MobileNumber as string;
+}
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        @if (!string.IsNullOrWhiteSpace(ViewBag.CompanyLogo) && !string.IsNullOrWhiteSpace(ViewBag.HomePageHtml) && !string.IsNullOrWhiteSpace(ViewBag.CompanyName))
+        {
+            <div class="row mt-2">
+                <div class="col-md-3" style="text-align: end;">
+                    <div class="form-group">
+                        <div class="image">
+                            <br><br>
+                            <img src="@ViewBag.CompanyLogo" alt="Company Logo" class="mb-2" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="form-group">
+                        <h4><span id="LblCompName">@ViewBag.CompanyName</span></h4>
+                        <br>
+                        <span id="LblTxtCompanyHomePageText">
+                            @Html.Raw(ViewBag.HomePageHtml)
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-6"><i class="material-icons breadcrumb theme-main-color align-self-center">@ViewData["Icon"]</i></div>
+            </div>
+        }
+    </div>
+    
+    <div class="card-body p-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0 text-dark">Job Offer Details</h4>
+            @if (Model.Status == JobOfferStatus.Accepted)
+            {
+                <span class="badge bg-success fs-6 px-3 py-2">Accepted</span>
+            }
+            else if (Model.Status == JobOfferStatus.Rejected)
+            {
+                <span class="badge bg-danger fs-6 px-3 py-2">Rejected</span>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark fs-6 px-3 py-2">Pending Review</span>
+            }
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-sm-6 text-sm-start text-center mb-3 mb-sm-0">
+                <h6 class="text-muted text-uppercase mb-1">Prepared For</h6>
+                <h3 class="fw-bold mb-0 text-primary">@Model.CandidateName</h3>
+            </div>
+            <div class="col-sm-6 text-sm-end text-center">
+                <h6 class="text-muted text-uppercase mb-1">Position</h6>
+                <h4 class="fw-bold mb-0">@Model.JobTitle</h4>
+            </div>
+        </div>
+
+        <hr class="mb-4" />
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 mb-3">
+                <div class="p-3 bg-light rounded h-100">
+                    <span class="d-block text-muted small fw-bold mb-1">Basic Salary</span>
+                    <span class="fs-4 fw-bold text-success">@Model.OfferedSalary.ToString("N2") @(string.IsNullOrEmpty(Model.Currency) ? "JOD" : Model.Currency)</span>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="p-3 bg-light rounded h-100">
+                    <span class="d-block text-muted small fw-bold mb-1">Allowances</span>
+                    <span class="fs-5">@(string.IsNullOrEmpty(Model.Allowances) ? "N/A" : Model.Allowances)</span>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="p-3 bg-light rounded h-100">
+                    <span class="d-block text-muted small fw-bold mb-1">Start Date</span>
+                    <span class="fs-5">@Model.StartDate.ToString("dd MMM yyyy")</span>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="p-3 bg-light rounded h-100">
+                    <span class="d-block text-muted small fw-bold mb-1">Working Hours</span>
+                    <span class="fs-5">@Model.WorkingHours</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4 mt-4">
+            <div class="col-12">
+                <h6 class="text-muted fw-bold mb-3 border-bottom pb-2">Additional Information</h6>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">Probation Period</dt>
+                    <dd class="col-sm-8 text-dark">@(Model.ProbationPeriod ?? "N/A")</dd>
+
+                    <dt class="col-sm-4 text-muted">Department</dt>
+                    <dd class="col-sm-8 text-dark">@(Model.Department ?? "N/A")</dd>
+
+                    <dt class="col-sm-4 text-muted">Reporting To</dt>
+                    <dd class="col-sm-8 text-dark">@(Model.ManagerName ?? "N/A")</dd>
+
+                    <dt class="col-sm-4 text-muted pt-2 border-top mt-2">Benefits</dt>
+                    <dd class="col-sm-8 text-dark pt-2 border-top mt-2">@(Model.Benefits ?? "N/A")</dd>
+                    
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <dt class="col-sm-4 text-muted pt-2 border-top mt-2">Notes</dt>
+                        <dd class="col-sm-8 text-dark pt-2 border-top mt-2">@Model.Notes</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+
+        @if (Model.Status == JobOfferStatus.Sent || Model.Status == JobOfferStatus.Draft)
+        {
+            <div class="mt-5 p-4 bg-light rounded-3 text-center border">
+                <h5 class="mb-3">Your Decision</h5>
+                <p class="text-muted mb-4">Please note that your response is final and will be immediately communicated to the HR team.</p>
+                
+                <form asp-action="SubmitResponse" method="post" class="d-inline-flex gap-3">
+                    <input type="hidden" name="offerId" value="@Model.Id" />
+                    <input type="hidden" name="mobileNumber" value="@mobileNumber" />
+                    
+                    <button type="submit" name="isAccepted" value="true" class="btn btn-success btn-lg px-5 shadow-sm">
+                        <i class="bi bi-check-circle me-2"></i> Accept Offer
+                    </button>
+                    
+                    <button type="submit" name="isAccepted" value="false" class="btn btn-outline-danger btn-lg px-5 shadow-sm" onclick="return confirm('Are you sure you want to REJECT this job offer? This action cannot be undone.');">
+                        <i class="bi bi-x-circle me-2"></i> Reject Offer
+                    </button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="mt-4 alert alert-info text-center border-0 shadow-sm">
+                <h5 class="mb-0">You have already responded to this offer.</h5>
+                <p class="mb-0 mt-2">If you have any questions, please contact the HR department.</p>
+            </div>
+        }
+    </div>
+</div>

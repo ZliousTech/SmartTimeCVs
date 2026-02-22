@@ -66,5 +66,13 @@ namespace SmartTimeCVs.Web.Controllers
             else
                 return Json(new { success = false, message = "Failed to update offer status." });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> PrintOffer(int appId)
+        {
+            var model = await _jobOfferService.GetOfferViewModelAsync(appId);
+            if (model == null) return NotFound();
+            return View("PrintOffer", model);
+        }
     }
 }

@@ -11,11 +11,14 @@ namespace SmartTimeCVs.Web.Core.ViewModels
         public int JobApplicationId { get; set; }
 
         public string? CandidateName { get; set; }
+        public string? CandidateAddress { get; set; }
         public string? JobTitle { get; set; }
 
         [Required(ErrorMessage = "Offered Salary is required")]
         [Range(0, double.MaxValue, ErrorMessage = "Please enter a valid salary")]
         public decimal OfferedSalary { get; set; }
+
+        public string? Currency { get; set; }
 
         public string? Allowances { get; set; }
 
@@ -27,6 +30,14 @@ namespace SmartTimeCVs.Web.Core.ViewModels
         public string? Benefits { get; set; }
         public string? ManagerName { get; set; }
         public string? Department { get; set; }
+
+        [Display(Name = "Sender Name / Company Name")]
+        public string? SenderName { get; set; }
+
+        [Display(Name = "Sender Email (Reply-To)")]
+        [EmailAddress(ErrorMessage = "Invalid Email Address")]
+        public string? SenderEmail { get; set; }
+
         public string? Notes { get; set; }
 
         public JobOfferStatus Status { get; set; }
