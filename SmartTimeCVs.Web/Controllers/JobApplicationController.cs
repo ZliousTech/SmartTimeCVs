@@ -140,10 +140,11 @@ namespace SmartTimeCVs.Web.Controllers
             }
         }
 
-        public IActionResult View(int id)
+        public IActionResult View(int id, bool fromFinalResults = false)
         {
             try
             {
+                ViewData["FromFinalResults"] = fromFinalResults;
                 var job = _context.JobApplication.FirstOrDefault(x => x.Id == id);
 
                 var uni = _context.University.Where(x => x.JobApplicationId == job.Id).ToList();

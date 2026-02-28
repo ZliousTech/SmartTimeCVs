@@ -265,6 +265,7 @@ namespace SmartTimeCVs.Web.Core.Services
                 CandidateEmail = s.JobApplication?.Email,
                 CandidatePhone = s.JobApplication?.MobileNumber,
                 CandidateImageUrl = s.JobApplication?.ImageUrl,
+                CVFilePath = s.JobApplication?.AttachmentUrl,
                 JobTitle = s.JobApplication?.JobTitle ?? s.JobApplication?.ApplyingFor,
                 InterviewDate = s.InterviewDate,
                 InterviewTime = s.InterviewTime,

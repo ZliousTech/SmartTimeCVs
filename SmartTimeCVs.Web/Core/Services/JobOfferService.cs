@@ -178,8 +178,20 @@ namespace SmartTimeCVs.Web.Core.Services
 
                 await _context.SaveChangesAsync();
 
-                // 3. Send Notification
-                await _notificationService.SendJobOfferNotificationAsync(offer, notificationType);
+                // 3. Send Notification in the background (fire-and-forget)
+                // This prevents the email sending from blocking the response
+                // and avoids session/context loss during long operations
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _notificationService.SendJobOfferNotificationAsync(offer, notificationType);
+                    }
+                    catch (Exception emailEx)
+                    {
+                        _logger.LogError(emailEx, "Background email sending failed for offer {OfferId}. The offer was saved successfully but the notification may not have been delivered.", jobOfferId);
+                    }
+                });
 
                 return true;
             }

@@ -112,6 +112,7 @@
                                 <th>@Localizer["InterviewResult"]</th>
                                 <th>@Localizer["TestResult"]</th>
                                 <th>@Localizer["JobOffer"]</th>
+                                <th>@Localizer["View"]</th>
                                 <th>@Localizer["Notes"]</th>
                             </tr>
                         </thead>
@@ -237,6 +238,18 @@
                                             {
                                                 <span class="text-muted">-</span>
                                             }
+                                        </td>
+                                        
+                                        <!-- View App -->
+                                        <td>
+                                            <a asp-controller="JobApplication"
+                                               asp-action="View"
+                                               asp-route-id="@schedule.JobApplicationId"
+                                               asp-route-fromFinalResults="true"
+                                               class="btn btn-sm btn-info"
+                                               title="@Localizer["View"]">
+                                                @Localizer["View"]
+                                            </a>
                                         </td>
                                         
                                         <!-- Notes (Combined) -->
@@ -392,7 +405,7 @@
                 $('#jobOfferModalContent').html(data);
                 $('#jobOfferModal').modal('show');
             }).fail(function() {
-                alert('Error loading job offer details.');
+                Swal.fire('Error', 'Error loading job offer details.', 'error');
             });
         }
 
@@ -400,18 +413,13 @@
             var form = $('#jobOfferForm');
             if (form.valid && !form.valid()) return;
 
-            // Serialize form to object to handle complexity if needed, or just standard serialization
-            // Since we are sending JSON to [FromBody], we need to construct the object
-            // Use a helper or simple object construction
-            
             var formData = {};
             form.serializeArray().forEach(function(item) {
                 formData[item.name] = item.value;
             });
             
-            // Fix data types
             if (!formData.Id || formData.Id === "") {
-                delete formData.Id; // Or set to null: formData.Id = null;
+                delete formData.Id;
             } else {
                 formData.Id = parseInt(formData.Id);
             }
@@ -422,9 +430,6 @@
             if (formData.NotificationType) {
                 formData.NotificationType = parseInt(formData.NotificationType);
             }
-
-            // Handle enums or other specific fields if necessary
-            // For Date, string format yyyy-MM-dd is usually fine for ASP.NET Core binding
             
             $.ajax({
                 url: '@Url.Action("SaveOffer", "JobOffer")',
@@ -433,54 +438,85 @@
                 data: JSON.stringify(formData),
                 success: function(response) {
                     if (response.success) {
-                        // alert(response.message);
-                        // Reload modal to show "Send" button or update state
                         openJobOfferModal(formData.JobApplicationId);
-                        
-                        // Optionally refresh table if we want to show status there
+                        Swal.fire({
+                            title: 'Success!',
+                            text: response.message || 'Offer drafted successfully!',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
                     } else {
-                        alert(response.message);
+                        Swal.fire('Error', response.message, 'error');
                     }
                 },
                 error: function() {
-                    alert('Error saving offer.');
+                    Swal.fire('Error', 'Error saving offer.', 'error');
                 }
             });
         }
 
         function sendOffer(offerId) {
-            if (!confirm('@Localizer["Are you sure you want to send this offer?"]')) return;
+            Swal.fire({
+                title: 'Are you sure?',
+                text: '@Localizer["Are you sure you want to send this offer?"]',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, send it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var notificationType = $('input[name="NotificationType"]:checked').val();
 
-            var notificationType = $('input[name="NotificationType"]:checked').val();
-
-            $.post('@Url.Action("SendOffer", "JobOffer")', { id: offerId, notificationType: notificationType }, function(response) {
-                if (response.success) {
-                    alert(response.message);
-                     $('#jobOfferModal').modal('hide');
-                     // Refresh page/table?
-                     location.reload(); // Reload to show updated status if needed
-                } else {
-                    alert(response.message);
+                    $.post('@Url.Action("SendOffer", "JobOffer")', { id: offerId, notificationType: notificationType }, function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: response.message,
+                                icon: 'success'
+                            }).then(() => {
+                                $('#jobOfferModal').modal('hide');
+                                window.location.href = '@Url.Action("FinalResults", "Interview")';
+                            });
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    }).fail(function() {
+                        Swal.fire('Error', 'Error sending offer.', 'error');
+                    });
                 }
-            }).fail(function() {
-                alert('Error sending offer.');
             });
         }
 
         function respondToOffer(offerId, accepted) {
             var actionText = accepted ? '@Localizer["accept"]' : '@Localizer["reject"]';
-            if (!confirm('@Localizer["Are you sure you want to"] ' + actionText + ' @Localizer["this offer?"]')) return;
-
-            $.post('@Url.Action("RespondToOffer", "JobOffer")', { id: offerId, accepted: accepted }, function(response) {
-                if (response.success) {
-                    alert(response.message);
-                     $('#jobOfferModal').modal('hide');
-                     location.reload(); 
-                } else {
-                    alert(response.message);
+            Swal.fire({
+                title: 'Are you sure?',
+                text: '@Localizer["Are you sure you want to"] ' + actionText + ' @Localizer["this offer?"]',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, proceed!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("RespondToOffer", "JobOffer")', { id: offerId, accepted: accepted }, function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: response.message,
+                                icon: 'success'
+                            }).then(() => {
+                                $('#jobOfferModal').modal('hide');
+                                window.location.href = '@Url.Action("FinalResults", "Interview")'; 
+                            });
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    }).fail(function() {
+                        Swal.fire('Error', 'Error updating offer status.', 'error');
+                    });
                 }
-            }).fail(function() {
-                alert('Error updating offer status.');
             });
         }
     </script>

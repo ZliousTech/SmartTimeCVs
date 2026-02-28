@@ -58,11 +58,17 @@ namespace SmartTimeCVs.Web.Controllers
             try
             {
                 var customer = await _context.JobApplication
+                        .Include(j => j.JobOffer)
                         .FirstOrDefaultAsync(j => j.CompanyId == GlobalVariablesService.CompanyId && j.MobileNumber.Equals(mobileNumber));
 
                 if (customer is null)
                 {
                     return RedirectToAction(nameof(Create), new { mobileNumber = mobileNumber });
+                }
+                else if (customer.JobOffer != null && customer.JobOffer.Status == JobOfferStatus.Sent)
+                {
+                    // Candidate has a pending Job Offer → redirect to view it
+                    return RedirectToAction("ViewOfferFromBiography", "CandidatePortal", new { appId = customer.Id });
                 }
                 else
                 {

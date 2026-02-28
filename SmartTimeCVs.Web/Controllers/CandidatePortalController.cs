@@ -46,6 +46,22 @@ namespace SmartTimeCVs.Web.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ViewOfferFromBiography(int appId)
+        {
+            if (appId <= 0) return NotFound();
+            await LoadCompanyDataAsync(appId);
+
+            var offerViewModel = await _jobOfferService.GetOfferViewModelAsync(appId);
+            if (offerViewModel == null) return NotFound();
+
+            // Get mobile from the application for SubmitResponse verification
+            var app = await _context.JobApplication.FindAsync(appId);
+            ViewBag.MobileNumber = app?.MobileNumber;
+
+            return View("ViewOffer", offerViewModel);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Login(int appId)
         {
             if (appId <= 0) return NotFound();

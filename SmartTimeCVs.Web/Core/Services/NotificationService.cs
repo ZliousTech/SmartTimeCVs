@@ -217,7 +217,7 @@ namespace SmartTimeCVs.Web.Core.Services
         private string BuildJobOfferEmailBody(JobOffer offer)
         {
             var baseUrl = _configuration["BaseUrl"] ?? "http://localhost:5090";
-            var actionUrl = $"{baseUrl}/CandidatePortal/Login?appId={offer.JobApplicationId}";
+            var actionUrl = $"{baseUrl}/Biography";
             var companyName = string.IsNullOrEmpty(offer.SenderName) ? "SmartTime CVs" : offer.SenderName;
             var expiryDate = offer.CreatedOn?.AddDays(7).ToString("dd MMM yyyy") ?? DateTime.Now.AddDays(7).ToString("dd MMM yyyy");
             var managerName = string.IsNullOrEmpty(offer.ManagerName) ? "Management" : offer.ManagerName;

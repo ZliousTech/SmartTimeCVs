@@ -15,6 +15,7 @@ namespace SmartTimeCVs.Web.Core.ViewModels
         public string? CandidateEmail { get; set; }
         public string? CandidatePhone { get; set; }
         public string? CandidateImageUrl { get; set; }
+        public string? CVFilePath { get; set; }
         public DateTime ApplicationDate { get; set; }
         public string? JobTitle { get; set; }
 
