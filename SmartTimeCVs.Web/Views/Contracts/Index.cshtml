@@ -1,0 +1,80 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model IEnumerable<SmartTimeCVs.Web.Core.Models.Contract>
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+	ViewData["Title"] = "Contract organization";
+	ViewData["ControllerName"] = "Contracts";
+	ViewData["Path"] = $"Contracts / Contract organization";
+	ViewData["Icon"] = "gavel";
+}
+
+@section Styles {
+	<link rel="stylesheet" href="~/theme/assets/css/plugins/datatables.bootstrap4.min.css" />
+	<link rel="stylesheet" href="~/lib/animate.css/animate.min.css" />
+}
+
+<div class="card shadow-sm">
+	<div class="card-header">
+		<div class="row justify-content-between">
+			<div class="col-6 text-left text-start">
+				 <a asp-controller="Contracts" asp-action="Create" class="btn btn-round btn-info font-bold waves-effect mt-2">
+					<div class="row">
+						<div class="col-md-4 px-2 align-self-center">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+								<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+							</svg>
+						</div>
+						<div class="col-md-8 px-1 align-self-center" style="white-space: nowrap;">
+							@Localizer["Add New"]
+						</div>
+					</div>
+				</a> 
+			</div>
+			<div class="col-6">
+			</div>
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="body table-responsive">
+			<table class="table js-datatables" data-document-title="Contracts">
+				<thead>
+					<tr class="cyan">
+						<th class="d-none">Id</th>
+						<th>@Localizer["Employee Name"]</th>
+						<th>@Localizer["National ID"]</th>
+						<th>@Localizer["Job Title"]</th>
+						<th>@Localizer["Start Date"]</th>
+						<th>@Localizer["End Date"]</th>
+						<th class="js-no-export text-center">@Localizer["Actions"]</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var contract in Model)
+					{
+						<tr>
+							<td class="d-none">@contract.Id</td>
+							<td>@contract.EmployeeName</td>
+							<td>@contract.EmployeeNationalId</td>
+							<td>@contract.JobTitle</td>
+							<td>@contract.StartDate.ToString("yyyy-MM-dd")</td>
+							<td>@contract.EndDate.ToString("yyyy-MM-dd")</td>
+                            <td class="text-center">
+                                <a asp-controller="Contracts"
+                                   asp-action="Print"
+                                   asp-route-id="@contract.Id"
+                                   class="btn btn-sm btn-primary" title="Print Contract">
+                                    <i class="material-icons" style="font-size: 18px!important">print</i>
+                                </a>
+                            </td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+@section Plugins {
+	<partial name="_DataTablesJS" />
+}

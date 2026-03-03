@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Mail;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace SmartTimeCVs.Web.Core.Services
@@ -18,7 +19,7 @@ namespace SmartTimeCVs.Web.Core.Services
             _logger = logger;
         }
 
-        public async Task<bool> SendEmailAsync(string to, string subject, string body, string? replyTo = null, string? senderDisplayName = null)
+        public async Task<bool> SendEmailAsync(string to, string subject, string body, string? replyTo = null, string? senderDisplayName = null, IFormFile? attachment = null)
         {
             try
             {
@@ -42,6 +43,11 @@ namespace SmartTimeCVs.Web.Core.Services
                 if (!string.IsNullOrEmpty(replyTo))
                 {
                     mailMessage.ReplyToList.Add(new MailAddress(replyTo));
+                }
+
+                if (attachment != null && attachment.Length > 0)
+                {
+                    mailMessage.Attachments.Add(new Attachment(attachment.OpenReadStream(), attachment.FileName, attachment.ContentType));
                 }
 
                 await client.SendMailAsync(mailMessage);

@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+
 namespace SmartTimeCVs.Web.Core.Services
 {
     /// <summary>
@@ -14,6 +16,7 @@ namespace SmartTimeCVs.Web.Core.Services
         /// <returns>True if email sent successfully</returns>
         /// <param name="replyTo">Optional Reply-To email address</param>
         /// <param name="senderDisplayName">Optional Display Name for Sender</param>
-        Task<bool> SendEmailAsync(string to, string subject, string body, string? replyTo = null, string? senderDisplayName = null);
+        /// <param name="attachment">Optional file attachment</param>
+        Task<bool> SendEmailAsync(string to, string subject, string body, string? replyTo = null, string? senderDisplayName = null, IFormFile? attachment = null);
     }
 }

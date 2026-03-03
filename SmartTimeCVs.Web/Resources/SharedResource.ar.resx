@@ -582,7 +582,7 @@
   <data name="Candidate Name" xml:space="preserve">
       <value>اسم المرشح</value>
   </data>
-   <data name="Close" xml:space="preserve">
+  <data name="Close" xml:space="preserve">
       <value>إغلاق</value>
   </data>
   <data name="Are you sure you want to send this offer?" xml:space="preserve">
@@ -599,5 +599,245 @@
   </data>
   <data name="this offer?" xml:space="preserve">
       <value>هذا العرض؟</value>
+  </data>
+  <data name="Representative Title Placeholder" xml:space="preserve">
+    <value>صفة الممثل (مثال: بصفته المدير العام)</value>
+  </data>
+  <data name="Salary Payment Day" xml:space="preserve">
+    <value>يوم دفع الراتب</value>
+  </data>
+  <data name="Contract Organization" xml:space="preserve">
+    <value>إدارة العقود</value>
+  </data>
+  <data name="Monthly Salary" xml:space="preserve">
+    <value>الراتب الشهري</value>
+  </data>
+  <data name="Contracts" xml:space="preserve">
+    <value>العقود</value>
+  </data>
+  <data name="Employee Name" xml:space="preserve">
+    <value>اسم الموظف</value>
+  </data>
+  <data name="Employer Info" xml:space="preserve">
+    <value>معلومات صاحب العمل</value>
+  </data>
+  <data name="Representative Name" xml:space="preserve">
+    <value>اسم الممثل</value>
+  </data>
+  <data name="Auto Fill From Job Applications" xml:space="preserve">
+    <value>التعبئة التلقائية من طلبات التوظيف</value>
+  </data>
+  <data name="End Date" xml:space="preserve">
+    <value>تاريخ الانتهاء</value>
+  </data>
+  <data name="Employee Info" xml:space="preserve">
+    <value>معلومات الموظف</value>
+  </data>
+  <data name="School Name" xml:space="preserve">
+    <value>اسم المدرسة</value>
+  </data>
+  <data name="Contract Duration" xml:space="preserve">
+    <value>مدة العقد</value>
+  </data>
+  <data name="Auto Fill Help Text" xml:space="preserve">
+    <value>سيؤدي اختيار مرشح إلى تعبئة التفاصيل الأساسية تلقائياً</value>
+  </data>
+  <data name="Representative Name Placeholder" xml:space="preserve">
+    <value>اسم الممثل (مثال: مدير المدرسة)</value>
+  </data>
+  <data name="Add New Contract" xml:space="preserve">
+    <value>إضافة عقد جديد</value>
+  </data>
+  <data name="Add New" xml:space="preserve">
+    <value>إضافة جديد</value>
+  </data>
+  <data name="Select Candidate" xml:space="preserve">
+    <value>اختر المرشح</value>
+  </data>
+  <data name="Contract Details" xml:space="preserve">
+    <value>تفاصيل العقد</value>
+  </data>
+  <data name="Representative Title" xml:space="preserve">
+    <value>صفة الممثل</value>
+  </data>
+  <data name="National ID" xml:space="preserve">
+    <value>الرقم القومي / الهوية</value>
+  </data>
+  <data name="Print Contract" xml:space="preserve">
+    <value>طباعة العقد</value>
+  </data>
+  <data name="Print Document" xml:space="preserve">
+    <value>طباعة المستند</value>
+  </data>
+  <data name="Download PDF" xml:space="preserve">
+    <value>تنزيل PDF</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>رجوع</value>
+  </data>
+  <data name="Work Contract" xml:space="preserve">
+    <value>عقد عمل</value>
+  </data>
+  <data name="It is on day" xml:space="preserve">
+    <value>إنه في يوم</value>
+  </data>
+  <data name="Corresponding to" xml:space="preserve">
+    <value>الموافق</value>
+  </data>
+  <data name="Agreement has been made between:" xml:space="preserve">
+    <value>تم الاتفاق بين كلٍ من:</value>
+  </data>
+  <data name="First Party:" xml:space="preserve">
+    <value>أولاً:</value>
+  </data>
+  <data name="Represented by Mr/Ms:" xml:space="preserve">
+    <value>ويمثلها السيد/</value>
+  </data>
+  <data name="in his capacity as" xml:space="preserve">
+    <value>بصفته</value>
+  </data>
+  <data name="Hereinafter referred to as the First Party" xml:space="preserve">
+    <value>ويشار إليها فيما بعد بـ (الطرف الأول)</value>
+  </data>
+  <data name="Second Party: Mr/Ms:" xml:space="preserve">
+    <value>ثانياً: السيد/السيدة</value>
+  </data>
+  <data name="National ID:" xml:space="preserve">
+    <value>الرقم القومي:</value>
+  </data>
+  <data name="Address:" xml:space="preserve">
+    <value>العنوان:</value>
+  </data>
+  <data name="Hereinafter referred to as the Second Party" xml:space="preserve">
+    <value>ويشار إليه فيما بعد بـ (الطرف الثاني)</value>
+  </data>
+  <data name="Preamble:" xml:space="preserve">
+    <value>تمهيد:</value>
+  </data>
+  <data name="Whereas the First Party wishes to utilize the services of the Second Party in the position of" xml:space="preserve">
+    <value>حيث إن الطرف الأول يرغب في الاستعانة بخدمات الطرف الثاني للعمل بوظيفة</value>
+  </data>
+  <data name="at" xml:space="preserve">
+    <value>لدى</value>
+  </data>
+  <data name="and the Second Party has agreed to work according to the terms and conditions outlined in this contract, the following has been agreed upon:" xml:space="preserve">
+    <value>وقد أقر الطرف الثاني بقبوله العمل وفق الشروط والأحكام الواردة بهذا العقد، فقد تم الاتفاق على ما يلي:</value>
+  </data>
+  <data name="Clause One: Contract Subject" xml:space="preserve">
+    <value>البند الأول: موضوع العقد</value>
+  </data>
+  <data name="The Second Party works for the First Party in the position of" xml:space="preserve">
+    <value>يعمل الطرف الثاني لدى الطرف الأول بوظيفة</value>
+  </data>
+  <data name="and is committed to performing the specified job duties according to the school policy and internal regulations." xml:space="preserve">
+    <value>ويلتزم بأداء المهام الوظيفية المحددة وفق سياسة المدرسة ولوائحها الداخلية.</value>
+  </data>
+  <data name="Clause Two: Contract Duration" xml:space="preserve">
+    <value>البند الثاني: مدة العقد</value>
+  </data>
+  <data name="The duration of this contract is" xml:space="preserve">
+    <value>مدة هذا العقد</value>
+  </data>
+  <data name="starting from the date" xml:space="preserve">
+    <value>تبدأ من تاريخ</value>
+  </data>
+  <data name="and ending on" xml:space="preserve">
+    <value>وتنتهي في</value>
+  </data>
+  <data name="and will be automatically renewed unless one of the parties notifies the other of non-renewal at least one month before the end date." xml:space="preserve">
+    <value>ويجدد تلقائياً ما لم يخطر أحد الطرفين الآخر بعدم الرغبة في التجديد قبل انتهاء المدة بشهر على الأقل.</value>
+  </data>
+  <data name="Clause Three: Probation Period" xml:space="preserve">
+    <value>البند الثالث: فترة الاختبار</value>
+  </data>
+  <data name="The Second Party is subject to a probation period of" xml:space="preserve">
+    <value>يخضع الطرف الثاني لفترة اختبار مدتها</value>
+  </data>
+  <data name="from the date of starting work, and the First Party has the right to terminate the contract during this period without prior notice if incompetence is proven." xml:space="preserve">
+    <value>من تاريخ استلام العمل، ويحق للطرف الأول إنهاء العقد خلالها دون إنذار مسبق إذا ثبت عدم الكفاءة.</value>
+  </data>
+  <data name="Clause Four: Salary and Allowances" xml:space="preserve">
+    <value>البند الرابع: الأجر والبدلات</value>
+  </data>
+  <data name="Monthly Salary:" xml:space="preserve">
+    <value>الراتب الشهري:</value>
+  </data>
+  <data name="Currency Name" xml:space="preserve">
+    <value>جنيه مصري</value>
+  </data>
+  <data name="The salary will be paid at the latest on day" xml:space="preserve">
+    <value>يتم صرف الراتب في موعد أقصاه يوم</value>
+  </data>
+  <data name="of each month." xml:space="preserve">
+    <value>من كل شهر.</value>
+  </data>
+  <data name="Any incentives or bonuses will be according to the school policy and performance evaluation." xml:space="preserve">
+    <value>أي حوافز أو مكافآت تكون وفق سياسة المدرسة وتقييم الأداء.</value>
+  </data>
+  <data name="Clause Five: Working Hours" xml:space="preserve">
+    <value>البند الخامس: ساعات العمل</value>
+  </data>
+  <data name="The Second Party is committed to the working hours specified by the school administration according to the academic schedule, with commitment to attendance and departure at official times." xml:space="preserve">
+    <value>يلتزم الطرف الثاني بساعات العمل المحددة من قبل إدارة المدرسة وفق الجدول الدراسي، مع الالتزام بالحضور والانصراف في المواعيد الرسمية.</value>
+  </data>
+  <data name="Clause Six: Vacations" xml:space="preserve">
+    <value>البند السادس: الإجازات</value>
+  </data>
+  <data name="The Second Party is entitled to annual and official holidays according to the local Labor Law and the school's internal regulations." xml:space="preserve">
+    <value>يستحق الطرف الثاني الإجازات السنوية والرسمية وفق قانون العمل المصري ولوائح المدرسة الداخلية.</value>
+  </data>
+  <data name="Clause Seven: Professional Obligations" xml:space="preserve">
+    <value>البند السابع: الالتزامات المهنية</value>
+  </data>
+  <data name="Commitment to the school's policy and educational values." xml:space="preserve">
+    <value>الالتزام بسياسة المدرسة وقيمها التربوية.</value>
+  </data>
+  <data name="Maintaining the confidentiality of information related to students and the school." xml:space="preserve">
+    <value>الحفاظ على سرية المعلومات الخاصة بالطلاب والمدرسة.</value>
+  </data>
+  <data name="Commitment to a decent appearance and professional behavior." xml:space="preserve">
+    <value>الالتزام بالمظهر اللائق والسلوك المهني.</value>
+  </data>
+  <data name="Participating in school activities and professional training upon request." xml:space="preserve">
+    <value>المشاركة في الأنشطة المدرسية والتدريبات المهنية عند الطلب.</value>
+  </data>
+  <data name="Clause Eight: Contract Termination" xml:space="preserve">
+    <value>البند الثامن: إنهاء العقد</value>
+  </data>
+  <data name="Either party may terminate the contract with a written notice at least one month in advance, with a commitment to hand over all school-related documents and belongings." xml:space="preserve">
+    <value>يجوز لأي من الطرفين إنهاء العقد بإخطار كتابي قبل شهر على الأقل، مع الالتزام بتسليم كافة العهد والمستندات الخاصة بالمدرسة.</value>
+  </data>
+  <data name="Clause Nine: General Provisions" xml:space="preserve">
+    <value>البند التاسع: أحكام عامة</value>
+  </data>
+  <data name="This contract is subject to the provisions of the local Labor Law." xml:space="preserve">
+    <value>يخضع هذا العقد لأحكام قانون العمل المصري.</value>
+  </data>
+  <data name="Any dispute will be resolved amicably, and in case of impossibility, jurisdiction will be to the local courts." xml:space="preserve">
+    <value>أي نزاع يتم حله ودياً، وفي حال التعذر يكون الاختصاص للمحاكم المصرية.</value>
+  </data>
+  <data name="First Party Signature" xml:space="preserve">
+    <value>توقيع الطرف الأول</value>
+  </data>
+  <data name="Name:" xml:space="preserve">
+    <value>الاسم:</value>
+  </data>
+  <data name="Signature:" xml:space="preserve">
+    <value>التوقيع:</value>
+  </data>
+  <data name="Second Party Signature" xml:space="preserve">
+    <value>توقيع الطرف الثاني</value>
+  </data>
+  <data name="Employee/Teacher" xml:space="preserve">
+    <value>الموظف/المعلمة</value>
+  </data>
+  <data name="Contract" xml:space="preserve">
+    <value>عقد</value>
+  </data>
+  <data name="Email Contract" xml:space="preserve">
+    <value>إرسال العقد بالإيميل</value>
+  </data>
+  <data name="Sending..." xml:space="preserve">
+    <value>جاري الإرسال...</value>
   </data>
 </root>

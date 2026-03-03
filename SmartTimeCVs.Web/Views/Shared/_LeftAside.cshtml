@@ -59,6 +59,16 @@
 					</li>
 				</ul>
 			</li>
+			<li active-when="Contracts">
+				<a href="javascript:void(0);" class="menu-toggle">
+					<i class="material-icons">gavel</i><span>@Localizer["Contracts"]</span>
+				</a>
+				<ul class="ml-menu">
+					<li active-when="Contracts-Index, Contracts-Create">
+						<a asp-controller="Contracts" asp-action="Index">@Localizer["Contract Organization"]</a>
+					</li>
+				</ul>
+			</li>
 		</ul>
 	</div>
 </aside>

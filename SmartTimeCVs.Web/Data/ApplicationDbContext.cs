@@ -19,6 +19,7 @@ namespace SmartTimeCVs.Web.Data
         public DbSet<MaritalStatusType> MaritalStatusType { get; set; }
         public DbSet<AttachmentFile> AttachmentFile { get; set; }
         public DbSet<JobOffer> JobOffer { get; set; }
+        public DbSet<Contract> Contracts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -28,6 +29,8 @@ namespace SmartTimeCVs.Web.Data
             builder.Entity<Course>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Entity<WorkExperience>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Entity<AttachmentFile>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
+            builder.Entity<Contract>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
+            builder.Entity<Contract>().Property(p => p.MonthlySalary).HasPrecision(18, 2);
             builder.Entity<JobApplication>().Property(p => p.IsShortListed);
             builder.Entity<JobApplication>().Property(p => p.IsExcluded);
             builder.Entity<JobApplication>().Property(p => p.IsHolding);
