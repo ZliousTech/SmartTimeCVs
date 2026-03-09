@@ -155,7 +155,7 @@ namespace SmartTimeCVs.Web.Core.Services
             }
         }
 
-        public async Task<bool> SendOfferAsync(int jobOfferId, NotificationType notificationType)
+        public async Task<bool> SendOfferAsync(int jobOfferId, NotificationType notificationType, string? baseUrl = null)
         {
             try
             {
@@ -185,7 +185,7 @@ namespace SmartTimeCVs.Web.Core.Services
                 {
                     try
                     {
-                        await _notificationService.SendJobOfferNotificationAsync(offer, notificationType);
+                        await _notificationService.SendJobOfferNotificationAsync(offer, notificationType, baseUrl);
                     }
                     catch (Exception emailEx)
                     {

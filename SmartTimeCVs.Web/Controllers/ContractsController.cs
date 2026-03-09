@@ -31,15 +31,16 @@ namespace SmartTimeCVs.Web.Controllers
         }
 
         // GET: Contracts/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewBag.ContractTypes = await _context.ContractTypes.ToListAsync();
             return View();
         }
 
         // POST: Contracts/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SchoolName,RepresentativeName,RepresentativeTitle,EmployeeName,EmployeeNationalId,EmployeeAddress,JobTitle,ContractDuration,StartDate,EndDate,ProbationPeriod,MonthlySalary,SalaryPaymentDay,JobApplicationId")] Contract contract)
+        public async Task<IActionResult> Create([Bind("CompanyName,CompanyAddress,CommercialNumber,RepresentativeName,RepresentativeTitle,EmployeeName,EmployeeNationalId,EmployeeAddress,JobTitle,ContractDuration,StartDate,EndDate,ProbationPeriod,MonthlySalary,SalaryPaymentDay,JobApplicationId,ContractTypeId")] Contract contract)
         {
             if (ModelState.IsValid)
             {
@@ -61,6 +62,7 @@ namespace SmartTimeCVs.Web.Controllers
 
             var contract = await _context.Contracts
                 .Include(c => c.JobApplication)
+                .Include(c => c.ContractType)
                 .FirstOrDefaultAsync(m => m.Id == id);
             
             if (contract == null)
@@ -77,7 +79,9 @@ namespace SmartTimeCVs.Web.Controllers
         {
             var applications = await _context.JobApplication
                 .Include(j => j.JobOffer)
-                .Where(j => j.JobOffer != null && j.JobOffer.Status == Core.Enums.JobOfferStatus.Accepted)
+                .Where(j => j.JobOffer != null 
+                         && j.JobOffer.Status == Core.Enums.JobOfferStatus.Accepted
+                         && !_context.Contracts.Any(c => c.JobApplicationId == j.Id))
                 .Select(j => new 
                 { 
                     id = j.Id, 
@@ -90,6 +94,24 @@ namespace SmartTimeCVs.Web.Controllers
                 })
                 .ToListAsync();
             return Json(applications);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetContractTypeDetails(int id)
+        {
+            var contractType = await _context.ContractTypes.FindAsync(id);
+            if (contractType == null)
+            {
+                return NotFound();
+            }
+
+            return Json(new 
+            {
+                companyName = contractType.FirstPartyName,
+                companyAddress = contractType.FirstPartyAddress,
+                representativeName = contractType.AuthorizedSignatory,
+                commercialNumber = contractType.CommercialNumber
+            });
         }
 
         [HttpPost]
@@ -105,11 +127,11 @@ namespace SmartTimeCVs.Web.Controllers
             if (contract == null || contract.JobApplication == null || string.IsNullOrEmpty(contract.JobApplication.Email))
                 return Json(new { success = false, message = _localizer["Contract or Employee Email not found"].Value ?? "Contract or Employee Email not found" });
 
-            var subject = (_localizer["Work Contract"].Value ?? "Work Contract") + " - " + contract.SchoolName;
+            var subject = (_localizer["Work Contract"].Value ?? "Work Contract") + " - " + contract.CompanyName;
             var body = $@"
                 <p>Dear {contract.EmployeeName},</p>
-                <p>Please find attached your work contract with {contract.SchoolName}.</p>
-                <p>Best regards,<br/>{contract.SchoolName}</p>
+                <p>Please find attached your work contract with {contract.CompanyName}.</p>
+                <p>Best regards,<br/>{contract.CompanyName}</p>
             ";
 
             var success = await _emailService.SendEmailAsync(

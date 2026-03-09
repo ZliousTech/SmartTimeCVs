@@ -20,6 +20,8 @@ namespace SmartTimeCVs.Web.Data
         public DbSet<AttachmentFile> AttachmentFile { get; set; }
         public DbSet<JobOffer> JobOffer { get; set; }
         public DbSet<Contract> Contracts { get; set; }
+        public DbSet<ContractType> ContractTypes { get; set; }
+        public DbSet<ContractCategory> ContractCategories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

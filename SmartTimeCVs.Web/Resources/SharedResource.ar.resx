@@ -840,4 +840,112 @@
   <data name="Sending..." xml:space="preserve">
     <value>جاري الإرسال...</value>
   </data>
+  <data name="Contract Types" xml:space="preserve">
+    <value>أنواع العقود</value>
+  </data>
+  <data name="ADD CONTRACT TYPE" xml:space="preserve">
+    <value>إضافة نوع عقد</value>
+  </data>
+  <data name="Contract Type" xml:space="preserve">
+    <value>نوع العقد</value>
+  </data>
+  <data name="Contract For" xml:space="preserve">
+    <value>العقد لـ</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>الوصف</value>
+  </data>
+  <data name="Clauses" xml:space="preserve">
+    <value>البنود</value>
+  </data>
+  <data name="Clause" xml:space="preserve">
+    <value>بند</value>
+  </data>
+  <data name="No contract types found. Add a new one to get started." xml:space="preserve">
+    <value>لا توجد أنواع عقود. أضف واحداً جديداً للبدء.</value>
+  </data>
+  <data name="Are you sure?" xml:space="preserve">
+    <value>هل أنت متأكد؟</value>
+  </data>
+  <data name="You won't be able to revert this!" xml:space="preserve">
+    <value>لن تتمكن من التراجع عن هذا!</value>
+  </data>
+  <data name="Yes, delete it!" xml:space="preserve">
+    <value>نعم، احذفه!</value>
+  </data>
+  <data name="Introduction" xml:space="preserve">
+    <value>تمهيد</value>
+  </data>
+  <data name="First Party Details" xml:space="preserve">
+    <value>بيانات الطرف الأول</value>
+  </data>
+  <data name="First Party Name" xml:space="preserve">
+    <value>اسم الطرف الأول</value>
+  </data>
+  <data name="Company Address" xml:space="preserve">
+    <value>عنوان الشركة</value>
+  </data>
+  <data name="Authorized Signatory" xml:space="preserve">
+    <value>المفوض بالتوقيع</value>
+  </data>
+  <data name="Commercial Number" xml:space="preserve">
+    <value>الرقم التجاري</value>
+  </data>
+  <data name="Contract For" xml:space="preserve">
+    <value>عقد لـ</value>
+  </data>
+  <data name="(e.g. Manager, Driver)" xml:space="preserve">
+    <value>(مثلاً مدير، سائق)</value>
+  </data>
+  <data name="Target Role..." xml:space="preserve">
+    <value>المسمى المستهدف...</value>
+  </data>
+  <data name="e.g. Zlious Tech, Hope School" xml:space="preserve">
+    <value>مثال: شركة Zlious، أو مدرسة الأمل</value>
+  </data>
+  <data name="e.g. 123 Business St, Building 4" xml:space="preserve">
+    <value>مثال: شارع الأعمال 123، مبنى 4</value>
+  </data>
+  <data name="e.g. Ahmad Ali" xml:space="preserve">
+    <value>مثال: أحمد علي</value>
+  </data>
+  <data name="e.g. CR-902348" xml:space="preserve">
+    <value>مثال: CR-902348</value>
+  </data>
+  <data name="English Details" xml:space="preserve">
+    <value>التفاصيل الإنجليزية</value>
+  </data>
+  <data name="Introduction English" xml:space="preserve">
+    <value>تمهيد (إنجليزي)</value>
+  </data>
+  <data name="Native Details" xml:space="preserve">
+    <value>التفاصيل المحلية</value>
+  </data>
+  <data name="Introduction Native" xml:space="preserve">
+    <value>تمهيد (محلي)</value>
+  </data>
+  <data name="Clauses" xml:space="preserve">
+    <value>البنود</value>
+  </data>
+  <data name="Clause" xml:space="preserve">
+    <value>بند</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>إنجليزي</value>
+  </data>
+  <data name="Native" xml:space="preserve">
+    <value>محلي</value>
+  </data>
+  <data name="Clause English" xml:space="preserve">
+    <value>بند إنجليزي</value>
+  </data>
+  <data name="Clause Native" xml:space="preserve">
+    <value>بند محلي</value>
+  </data>
+  <data name="Add Clause" xml:space="preserve">
+    <value>إضافة بند</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>إزالة</value>
+  </data>
 </root>

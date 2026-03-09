@@ -9,13 +9,19 @@ namespace SmartTimeCVs.Web.Core.Models
         public int Id { get; set; }
 
         [MaxLength(250)]
-        public string SchoolName { get; set; } = "مدرسة Novara للغات";
+        public string CompanyName { get; set; } = "مدرسة Novara للغات";
 
         [MaxLength(250)]
         public string RepresentativeName { get; set; } = null!;
 
         [MaxLength(250)]
         public string RepresentativeTitle { get; set; } = null!;
+
+        [MaxLength(500)]
+        public string? CompanyAddress { get; set; }
+
+        [MaxLength(100)]
+        public string? CommercialNumber { get; set; }
 
         [MaxLength(250)]
         public string EmployeeName { get; set; } = null!;
@@ -46,5 +52,8 @@ namespace SmartTimeCVs.Web.Core.Models
         // Optional relationship with JobApplication if we want to link it directly
         public int? JobApplicationId { get; set; }
         public JobApplication? JobApplication { get; set; }
+
+        public int? ContractTypeId { get; set; }
+        public ContractType? ContractType { get; set; }
     }
 }

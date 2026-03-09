@@ -16,6 +16,6 @@ namespace SmartTimeCVs.Web.Core.Services
         /// <summary>
         /// Send job offer notification to candidate
         /// </summary>
-        Task<bool> SendJobOfferNotificationAsync(JobOffer offer, NotificationType notificationType);
+        Task<bool> SendJobOfferNotificationAsync(JobOffer offer, NotificationType notificationType, string? baseUrl = null);
     }
 }

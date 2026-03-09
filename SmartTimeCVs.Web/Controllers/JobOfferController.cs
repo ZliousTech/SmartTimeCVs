@@ -50,7 +50,8 @@ namespace SmartTimeCVs.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> SendOffer(int id, NotificationType notificationType)
         {
-            var result = await _jobOfferService.SendOfferAsync(id, notificationType);
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            var result = await _jobOfferService.SendOfferAsync(id, notificationType, baseUrl);
             if (result)
                 return Json(new { success = true, message = "Offer sent successfully!" });
             else

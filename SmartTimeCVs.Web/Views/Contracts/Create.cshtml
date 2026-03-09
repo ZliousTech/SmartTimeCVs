@@ -11,20 +11,6 @@
 
 @section Styles {
     <style>
-        .select2-container .select2-selection--single {
-            height: 38px !important;
-            border: 1px solid #E3E3E3 !important;
-            border-radius: 30px !important;
-            outline: none !important;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: 38px !important;
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 38px !important;
-        }
         /* Hide any injected select styling to avoid duplicates */
         .nice-select.form-control { display: none !important; }
     </style>
@@ -43,7 +29,7 @@
                     <div class="row clearfix mb-4">
                         <div class="col-sm-12">
                             <label class="font-weight-bold" style="color: #00bcd4;">@Localizer["Auto Fill From Job Applications"]</label>
-                            <select id="jobApplicationSelect" name="JobApplicationId" class="form-control" style="width: 100%;">
+                            <select id="jobApplicationSelect" name="JobApplicationId" class="form-control js-select2 w-100">
                                 <option value="">-- @Localizer["Select Candidate"] --</option>
                             </select>
                             <small class="form-text text-muted">@Localizer["Auto Fill Help Text"]</small>
@@ -55,15 +41,22 @@
                     <div class="row clearfix">
                         <div class="col-sm-4">
                             <div class="form-group">
-                                <label asp-for="SchoolName">@Localizer["School Name"]</label>
-                                <input asp-for="SchoolName" class="form-control" required />
-                                <span asp-validation-for="SchoolName" class="text-danger"></span>
+                                <label asp-for="CompanyName">@Localizer["Company Name"]</label>
+                                <input asp-for="CompanyName" class="form-control" id="companyName" required />
+                                <span asp-validation-for="CompanyName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-group">
+                                <label asp-for="CompanyAddress">@Localizer["Company Address"]</label>
+                                <input asp-for="CompanyAddress" class="form-control" id="companyAddress" required />
+                                <span asp-validation-for="CompanyAddress" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label asp-for="RepresentativeName">@Localizer["Representative Name"]</label>
-                                <input asp-for="RepresentativeName" class="form-control" placeholder="@Localizer["Representative Name Placeholder"]" required />
+                                <input asp-for="RepresentativeName" class="form-control" id="representativeName" placeholder="@Localizer["Representative Name Placeholder"]" required />
                                 <span asp-validation-for="RepresentativeName" class="text-danger"></span>
                             </div>
                         </div>
@@ -72,6 +65,13 @@
                                 <label asp-for="RepresentativeTitle">@Localizer["Representative Title"]</label>
                                 <input asp-for="RepresentativeTitle" class="form-control" placeholder="@Localizer["Representative Title Placeholder"]" required />
                                 <span asp-validation-for="RepresentativeTitle" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label asp-for="CommercialNumber">@Localizer["Commercial Number"]</label>
+                                <input asp-for="CommercialNumber" class="form-control" id="commercialNumber" required />
+                                <span asp-validation-for="CommercialNumber" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -105,14 +105,31 @@
                     <h6 class="mt-4 text-info">@Localizer["Contract Details"]</h6>
                     <hr />
                     <div class="row clearfix">
-                        <div class="col-sm-6">
+                        <div class="col-sm-4">
                             <div class="form-group">
                                 <label asp-for="JobTitle">@Localizer["Job Title"]</label>
                                 <input asp-for="JobTitle" class="form-control" id="jobTitle" required />
                                 <span asp-validation-for="JobTitle" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label asp-for="ContractTypeId">@Localizer["Contract Type"]</label>
+                                <select asp-for="ContractTypeId" class="form-control js-select2 w-100" required>
+                                    <option value="">-- @Localizer["Select Contract Type"] --</option>
+                                    @if(ViewBag.ContractTypes != null) {
+                                        var isRtlCulture = System.Globalization.CultureInfo.CurrentCulture.Name.StartsWith("ar");
+                                        foreach (var ct in (IEnumerable<SmartTimeCVs.Web.Core.Models.ContractType>)ViewBag.ContractTypes) {
+                                            var cName = isRtlCulture ? ct.NameNative : ct.NameEn;
+                                            var cDisplay = string.IsNullOrWhiteSpace(ct.ContractFor) ? cName : $"{cName} ({ct.ContractFor})";
+                                            <option value="@ct.Id">@cDisplay</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="ContractTypeId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
                             <div class="form-group">
                                 <label asp-for="ContractDuration">@Localizer["Contract Duration"]</label>
                                 <input asp-for="ContractDuration" class="form-control" required />
@@ -170,17 +187,12 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/shared/form-select-validator.js" asp-append-version="true"></script>
     <script>
         $(document).ready(function() {
             // Load candidates
             var select = $('#jobApplicationSelect');
             
-            // Initialize select2
-            select.select2({
-                width: '100%',
-                placeholder: '-- @Localizer["Select Candidate"] --',
-                allowClear: true
-            });
             $.get('@Url.Action("GetJobApplications", "Contracts")', function(data) {
                 $.each(data, function(index, item) {
                     select.append($('<option/>', {
@@ -209,6 +221,21 @@
                     if(selectedOption.data('probation')) {
                         $('#ProbationPeriod').val(selectedOption.data('probation'));
                     }
+                }
+            });
+
+            // Bind Contract Type change event for Employer Info auto-fill
+            $('#ContractTypeId').on('change', function() {
+                var contractTypeId = $(this).val();
+                if (contractTypeId) {
+                    $.get('@Url.Action("GetContractTypeDetails", "Contracts")/' + contractTypeId, function(data) {
+                        if(data) {
+                            if(data.companyName) $('#companyName').val(data.companyName);
+                            if(data.companyAddress) $('#companyAddress').val(data.companyAddress);
+                            if(data.representativeName) $('#representativeName').val(data.representativeName);
+                            if(data.commercialNumber) $('#commercialNumber').val(data.commercialNumber);
+                        }
+                    });
                 }
             });
         });

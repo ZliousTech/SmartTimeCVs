@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartTimeCVs.Web.Data;
 
@@ -11,9 +12,11 @@ using SmartTimeCVs.Web.Data;
 namespace SmartTimeCVs.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260309143452_AddContractCategories")]
+    partial class AddContractCategories
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -264,14 +267,6 @@ namespace SmartTimeCVs.Web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CommercialNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("CompanyAddress")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -396,19 +391,11 @@ namespace SmartTimeCVs.Web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AuthorizedSignatory")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
                     b.Property<string>("ClausesEn")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClausesNative")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CommercialNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ContractFor")
                         .HasMaxLength(200)
@@ -424,14 +411,6 @@ namespace SmartTimeCVs.Web.Migrations
                     b.Property<string>("DescriptionNative")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("FirstPartyAddress")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("FirstPartyName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");

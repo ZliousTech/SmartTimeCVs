@@ -651,4 +651,112 @@
   <data name="Sending..." xml:space="preserve">
     <value>Sending...</value>
   </data>
+  <data name="Contract Types" xml:space="preserve">
+    <value>Contract Types</value>
+  </data>
+  <data name="ADD CONTRACT TYPE" xml:space="preserve">
+    <value>ADD CONTRACT TYPE</value>
+  </data>
+  <data name="Contract Type" xml:space="preserve">
+    <value>Contract Type</value>
+  </data>
+  <data name="Contract For" xml:space="preserve">
+    <value>Contract For</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Clauses" xml:space="preserve">
+    <value>Clauses</value>
+  </data>
+  <data name="Clause" xml:space="preserve">
+    <value>Clause</value>
+  </data>
+  <data name="No contract types found. Add a new one to get started." xml:space="preserve">
+    <value>No contract types found. Add a new one to get started.</value>
+  </data>
+  <data name="Are you sure?" xml:space="preserve">
+    <value>Are you sure?</value>
+  </data>
+  <data name="You won't be able to revert this!" xml:space="preserve">
+    <value>You won't be able to revert this!</value>
+  </data>
+  <data name="Yes, delete it!" xml:space="preserve">
+    <value>Yes, delete it!</value>
+  </data>
+  <data name="Introduction" xml:space="preserve">
+    <value>Introduction</value>
+  </data>
+  <data name="First Party Details" xml:space="preserve">
+    <value>First Party Details</value>
+  </data>
+  <data name="First Party Name" xml:space="preserve">
+    <value>First Party Name</value>
+  </data>
+  <data name="Company Address" xml:space="preserve">
+    <value>Company Address</value>
+  </data>
+  <data name="Authorized Signatory" xml:space="preserve">
+    <value>Authorized Signatory</value>
+  </data>
+  <data name="Commercial Number" xml:space="preserve">
+    <value>Commercial Number</value>
+  </data>
+  <data name="Contract For" xml:space="preserve">
+    <value>Contract For</value>
+  </data>
+  <data name="(e.g. Manager, Driver)" xml:space="preserve">
+    <value>(e.g. Manager, Driver)</value>
+  </data>
+  <data name="Target Role..." xml:space="preserve">
+    <value>Target Role...</value>
+  </data>
+  <data name="e.g. Zlious Tech, Hope School" xml:space="preserve">
+    <value>e.g. Zlious Tech, Hope School</value>
+  </data>
+  <data name="e.g. 123 Business St, Building 4" xml:space="preserve">
+    <value>e.g. 123 Business St, Building 4</value>
+  </data>
+  <data name="e.g. Ahmad Ali" xml:space="preserve">
+    <value>e.g. Ahmad Ali</value>
+  </data>
+  <data name="e.g. CR-902348" xml:space="preserve">
+    <value>e.g. CR-902348</value>
+  </data>
+  <data name="English Details" xml:space="preserve">
+    <value>English Details</value>
+  </data>
+  <data name="Introduction English" xml:space="preserve">
+    <value>Introduction English</value>
+  </data>
+  <data name="Native Details" xml:space="preserve">
+    <value>Native Details</value>
+  </data>
+  <data name="Introduction Native" xml:space="preserve">
+    <value>Introduction Native</value>
+  </data>
+  <data name="Clauses" xml:space="preserve">
+    <value>Clauses</value>
+  </data>
+  <data name="Clause" xml:space="preserve">
+    <value>Clause</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Native" xml:space="preserve">
+    <value>Native</value>
+  </data>
+  <data name="Clause English" xml:space="preserve">
+    <value>Clause English</value>
+  </data>
+  <data name="Clause Native" xml:space="preserve">
+    <value>Clause Native</value>
+  </data>
+  <data name="Add Clause" xml:space="preserve">
+    <value>Add Clause</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
 </root>

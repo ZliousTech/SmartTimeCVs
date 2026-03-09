@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartTimeCVs.Web.Data;
 
@@ -11,9 +12,11 @@ using SmartTimeCVs.Web.Data;
 namespace SmartTimeCVs.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260304211922_SeedContractTypes")]
+    partial class SeedContractTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -264,14 +267,6 @@ namespace SmartTimeCVs.Web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CommercialNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("CompanyAddress")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -356,38 +351,6 @@ namespace SmartTimeCVs.Web.Migrations
                     b.ToTable("Contracts");
                 });
 
-            modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.ContractCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastUpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("NameEn")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("NameNative")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ContractCategories");
-                });
-
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.ContractType", b =>
                 {
                     b.Property<int>("Id")
@@ -396,23 +359,11 @@ namespace SmartTimeCVs.Web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AuthorizedSignatory")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
                     b.Property<string>("ClausesEn")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClausesNative")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CommercialNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ContractFor")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime?>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -424,14 +375,6 @@ namespace SmartTimeCVs.Web.Migrations
                     b.Property<string>("DescriptionNative")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("FirstPartyAddress")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("FirstPartyName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -452,6 +395,64 @@ namespace SmartTimeCVs.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ContractTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedOn = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            NameEn = "Fixed-Term Contract",
+                            NameNative = "عقد عمل محدد المدة"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedOn = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            NameEn = "Open-Ended Contract",
+                            NameNative = "عقد عمل غير محدد المدة"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedOn = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            NameEn = "Full-Time Contract",
+                            NameNative = "عقد عمل بدوام كامل"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedOn = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            NameEn = "Part-Time Contract",
+                            NameNative = "عقد عمل بدوام جزئي"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedOn = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            NameEn = "Temporary Contract",
+                            NameNative = "عقد عمل مؤقت"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CreatedOn = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            NameEn = "Freelance / Independent Contractor",
+                            NameNative = "عقد عمل مستقل / عمل حر"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CreatedOn = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            NameEn = "Internship / Training Contract",
+                            NameNative = "عقد تدريب"
+                        });
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.Course", b =>

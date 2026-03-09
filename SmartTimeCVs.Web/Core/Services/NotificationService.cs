@@ -10,19 +10,22 @@ namespace SmartTimeCVs.Web.Core.Services
         private readonly ApplicationDbContext _context;
         private readonly ILogger<NotificationService> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public NotificationService(
             IEmailService emailService,
             ISmsService smsService,
             ApplicationDbContext context,
             ILogger<NotificationService> logger,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IHttpContextAccessor httpContextAccessor)
         {
             _emailService = emailService;
             _smsService = smsService;
             _context = context;
             _logger = logger;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<bool> SendInterviewNotificationAsync(InterviewSchedule schedule, NotificationType notificationType)
@@ -163,7 +166,7 @@ namespace SmartTimeCVs.Web.Core.Services
 
             return $"Hi {application.FullName}, you're invited for an interview on {schedule.InterviewDate:MM/dd/yyyy} at {schedule.InterviewTime:hh\\:mm}.{testInfo} Please confirm your attendance. - SmartTime CVs";
         }
-        public async Task<bool> SendJobOfferNotificationAsync(JobOffer offer, NotificationType notificationType)
+        public async Task<bool> SendJobOfferNotificationAsync(JobOffer offer, NotificationType notificationType, string? baseUrl = null)
         {
             if (offer.JobApplication == null)
             {
@@ -181,7 +184,7 @@ namespace SmartTimeCVs.Web.Core.Services
             var smsSuccess = true;
 
             var subject = "Job Offer - SmartTime CVs";
-            var emailBody = BuildJobOfferEmailBody(offer);
+            var emailBody = BuildJobOfferEmailBody(offer, baseUrl);
             var smsMessage = BuildJobOfferSmsMessage(offer);
 
             if (notificationType == NotificationType.Email || notificationType == NotificationType.Both)
@@ -214,10 +217,14 @@ namespace SmartTimeCVs.Web.Core.Services
                 : (emailSuccess || smsSuccess);
         }
 
-        private string BuildJobOfferEmailBody(JobOffer offer)
+        private string BuildJobOfferEmailBody(JobOffer offer, string? baseUrlOverride = null)
         {
-            var baseUrl = _configuration["BaseUrl"] ?? "http://localhost:5090";
-            var actionUrl = $"{baseUrl}/Biography";
+            var request = _httpContextAccessor.HttpContext?.Request;
+            var baseUrl = baseUrlOverride ?? (request != null 
+                ? $"{request.Scheme}://{request.Host}" 
+                : _configuration["BaseUrl"] ?? "http://localhost:5090");
+
+            var actionUrl = $"{baseUrl}/CandidatePortal/Login?appId={offer.JobApplicationId}";
             var companyName = string.IsNullOrEmpty(offer.SenderName) ? "SmartTime CVs" : offer.SenderName;
             var expiryDate = offer.CreatedOn?.AddDays(7).ToString("dd MMM yyyy") ?? DateTime.Now.AddDays(7).ToString("dd MMM yyyy");
             var managerName = string.IsNullOrEmpty(offer.ManagerName) ? "Management" : offer.ManagerName;

@@ -1,0 +1,112 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+@{
+    ViewData["Title"] = "System lookups list";
+    ViewData["Path"] = "Home / System lookups list";
+    ViewData["Icon"] = "settings";
+}
+
+<style>
+    .lookup-section-title {
+        color: #fca170;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+    .lookup-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 15px; /* Added horizontal padding for a better hover box */
+        border-bottom: 1px solid #e0e0e0;
+        text-decoration: none !important; /* Remove link underline */
+        color: inherit; /* Inherit text color */
+        transition: background-color 0.2s ease;
+        border-radius: 4px; /* Slight rounding for hover */
+    }
+    .lookup-item:hover {
+        background-color: #f5f5f5; /* Grey hover effect */
+        cursor: pointer;
+    }
+    .lookup-item:last-child {
+        border-bottom: none;
+    }
+    .lookup-icon {
+        color: #ff5252;
+        font-size: 24px;
+        margin-right: 20px;
+        margin-left: 10px;
+    }
+    .lookup-details h5 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+    }
+    .lookup-details p {
+        margin: 5px 0 0;
+        font-size: 13px;
+        color: #777;
+    }
+    .btn-open {
+        color: #00bcd4;
+        border: 1px solid #00bcd4;
+        background: transparent;
+        padding: 5px 20px;
+        border-radius: 4px;
+        font-weight: 500;
+        text-transform: uppercase;
+        font-size: 12px;
+    }
+    .lookup-item:hover .btn-open {
+        background: #00bcd4; /* Make button light up on row hover */
+        color: #fff;
+    }
+</style>
+
+<div class="row clearfix">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="body">
+                <h4 style="color: #00bcd4; font-weight: normal; margin-bottom: 30px;">
+                    <i class="material-icons" style="vertical-align: middle; margin-right: 10px;">remove</i>
+                    To add and modify system lookup lists items, select the relevant list
+                </h4>
+                
+                <hr style="border-top: 2px solid #ff5252;">
+
+                <div class="lookup-section">
+                    <div class="lookup-section-title">SMART-TIME SYSTEM</div>
+
+                    <a href="@Url.Action("ContractTypes", "Settings")" class="lookup-item">
+                        <div class="d-flex align-items-center">
+                            <i class="material-icons lookup-icon">assignment</i>
+                            <div class="lookup-details">
+                                <h5>CONTRACT</h5>
+                                <p>Add and edit the contract templates</p>
+                            </div>
+                        </div>
+                        <span class="btn-open">OPEN</span>
+                    </a>
+                    
+                    <a href="@Url.Action("ContractCategories", "Settings")" class="lookup-item">
+                        <div class="d-flex align-items-center">
+                            <i class="material-icons lookup-icon">format_list_bulleted</i>
+                            <div class="lookup-details">
+                                <h5>CONTRACT TYPES</h5>
+                                <p>Add and edit the contract types</p>
+                            </div>
+                        </div>
+                        <span class="btn-open">OPEN</span>
+                    </a>
+                    
+                    <!-- More mock lookups can be added here -->
+                </div>
+
+                <hr style="margin-top: 40px; border-top: 2px solid #00bcd4;">
+            </div>
+        </div>
+    </div>
+</div>

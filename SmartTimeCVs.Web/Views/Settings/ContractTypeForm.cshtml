@@ -1,0 +1,329 @@
+@model SmartTimeCVs.Web.Core.Models.ContractType
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = isNew ? "Add Contract" : "Edit Contract";
+    ViewData["Path"] = $"Home / System lookups list / Contract / {(isNew ? "Add" : "Edit")} Contract";
+    ViewData["Icon"] = "assignment";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/theme/assets/css/plugins/bootstrap-select.css" />
+}
+
+<style>
+
+    .section-title {
+        color: #fca170;
+        font-weight: 600;
+        margin-bottom: 15px;
+        margin-top: 30px;
+        text-transform: uppercase;
+        font-size: 14px;
+    }
+    .btn-save {
+        background-color: #03a9f4;
+        color: #fff;
+        border: none;
+        padding: 8px 25px;
+        border-radius: 3px;
+    }
+    .btn-cancel {
+        background-color: #ff5252;
+        color: #fff;
+        border: none;
+        padding: 8px 25px;
+        border-radius: 3px;
+        margin-left: 10px;
+    }
+</style>
+
+<div class="row clearfix">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="body">
+                <form asp-action="SaveContractType" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="NameEn" id="NameEn" />
+                    <input type="hidden" asp-for="NameNative" id="NameNative" />
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title mb-2">@Localizer["Contract"] <span class="text-danger">*</span></h2>
+                            <div>
+                                <select id="ContractTypeDropdown" class="form-control js-select2 w-100" required>
+                                    <option value="">-- @Localizer["Select Contract Type"] --</option>
+                                    @if(ViewBag.ContractCategories != null)
+                                    {
+                                        foreach(var category in (IEnumerable<SmartTimeCVs.Web.Core.Models.ContractCategory>)ViewBag.ContractCategories)
+                                        {
+                                            <option value="@category.NameEn|@category.NameNative">@category.NameEn (@category.NameNative)</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title mb-2">@Localizer["Contract For"] <span class="text-muted" style="font-size: 11px;">@Localizer["(e.g. Manager, Driver)"]</span></h2>
+                            <div class="form-group form-float">
+                                <input asp-for="ContractFor" class="form-control w-100" placeholder="@Localizer["Target Role..."]" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3 mt-2">
+                            <h6 class="section-title">@Localizer["First Party Details"]</h6>
+                            <hr style="margin-top: 5px; margin-bottom: 20px;" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title mb-2">@Localizer["First Party Name"]</h2>
+                            <div class="form-group form-float">
+                                <input asp-for="FirstPartyName" class="form-control" placeholder="@Localizer["e.g. Zlious Tech, Hope School"]" />
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title mb-2">@Localizer["Company Address"]</h2>
+                            <div class="form-group form-float">
+                                <input asp-for="FirstPartyAddress" class="form-control" placeholder="@Localizer["e.g. 123 Business St, Building 4"]" />
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title mb-2">@Localizer["Authorized Signatory"]</h2>
+                            <div class="form-group form-float">
+                                <input asp-for="AuthorizedSignatory" class="form-control" placeholder="@Localizer["e.g. Ahmad Ali"]" />
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title mb-2">@Localizer["Commercial Number"]</h2>
+                            <div class="form-group form-float">
+                                <input asp-for="CommercialNumber" class="form-control" placeholder="@Localizer["e.g. CR-902348"]" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- English Section -->
+                        <div class="col-md-6 mb-3">
+                            <h6 class="section-title">@Localizer["English Details"]</h6>
+                            <h2 class="card-inside-title mb-2">@Localizer["Introduction English"]</h2>
+                            <div class="form-group form-float">
+                                <textarea asp-for="DescriptionEn" class="form-control auto-resize" placeholder="@Localizer["Introduction English"]" rows="2" style="overflow: hidden; resize: none;"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Native Section -->
+                        <div class="col-md-6 mb-3">
+                            <h6 class="section-title">@Localizer["Native Details"]</h6>
+                            <h2 class="card-inside-title mb-2">@Localizer["Introduction Native"]</h2>
+                            <div class="form-group form-float">
+                                <textarea asp-for="DescriptionNative" class="form-control auto-resize" placeholder="@Localizer["Introduction Native"]" rows="2" style="overflow: hidden; resize: none;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <h6 class="section-title">@Localizer["Clauses"]</h6>
+                            
+                            <input type="hidden" asp-for="ClausesEn" id="HiddenClausesEn" />
+                            <input type="hidden" asp-for="ClausesNative" id="HiddenClausesNative" />
+
+                            <div id="clausesContainer">
+                                @{
+                                    var clausesEnList = string.IsNullOrEmpty(Model.ClausesEn) ? new List<string>() : Model.ClausesEn.Split(new[] { "\\n", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                                    var clausesNativeList = string.IsNullOrEmpty(Model.ClausesNative) ? new List<string>() : Model.ClausesNative.Split(new[] { "\\n", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                                    int maxClauses = Math.Max(clausesEnList.Count, clausesNativeList.Count);
+
+                                    for (int i = 0; i < maxClauses; i++)
+                                    {
+                                        var enVal = i < clausesEnList.Count ? clausesEnList[i] : "";
+                                        var nativeVal = i < clausesNativeList.Count ? clausesNativeList[i] : "";
+                                        <div class="clause-entry border rounded p-3 mb-3">
+                                            <div class="row clearfix mb-1">
+                                                <div class="col-md-12 text-right">
+                                                    <button type="button" class="btn btn-danger btn-sm removeClauseBtn" style="padding: 4px 10px; font-size: 12px; border-radius: 3px; background-color: #ff5252; color: #fff; border: none; float: right;">@Localizer["Remove"]</button>
+                                                </div>
+                                            </div>
+                                            <div class="row clearfix mb-2">
+                                                <div class="col-md-6">
+                                                    <h2 class="card-inside-title mb-2 clause-num-en">@Localizer["Clause"] @(i + 1) @Localizer["English"] <span class="text-danger">*</span></h2>
+                                                    <div class="form-group form-float">
+                                                        <textarea class="form-control clause-en-input auto-resize" placeholder="@Localizer["Clause English"]" required rows="2" style="overflow: hidden; resize: none;">@enVal</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h2 class="card-inside-title mb-2 clause-num-native">@Localizer["Clause"] @(i + 1) @Localizer["Native"] <span class="text-danger">*</span></h2>
+                                                    <div class="form-group form-float">
+                                                        <textarea class="form-control clause-native-input auto-resize" placeholder="@Localizer["Clause Native"]" required rows="2" style="overflow: hidden; resize: none;">@nativeVal</textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            
+                            <div class="col-12 text-center mt-3">
+                                <button type="button" class="btn text-center" id="addClauseBtn" style="background-color: #fca170; color: #fff; border: none; padding: 8px 25px; border-radius: 3px;">
+                                    <div class="row">
+                                        <div class="col-md-3 px-2 align-self-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                                            </svg>
+                                        </div>
+                                        <div class="col-md-9 px-1 align-self-center">
+                                            @Localizer["Add Clause"]
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 bg-light p-3 border-top">
+                        <button type="submit" class="btn btn-save" id="submitFormBtn">@Localizer["Save"]</button>
+                        <a asp-action="ContractTypes" class="btn btn-cancel">@Localizer["Cancel"]</a>
+                        @if (!isNew)
+                        {
+                            <button type="button" class="btn btn-outline-danger float-right" onclick="deleteType(@Model.Id)">@Localizer["Delete"]</button>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/shared/form-select-validator.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function() {
+            // Auto resize textareas
+            $('.auto-resize').each(function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            }).on('input', function () {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+
+            var existingEn = $('#NameEn').val();
+            var existingNative = $('#NameNative').val();
+            if (existingEn && existingNative) {
+                var valToSelect = existingEn + '|' + existingNative;
+                $('#ContractTypeDropdown').val(valToSelect);
+            }
+
+            $('#ContractTypeDropdown').change(function() {
+                var val = $(this).val();
+                if (val) {
+                    var parts = val.split('|');
+                    $('#NameEn').val(parts[0]);
+                    $('#NameNative').val(parts[1]);
+                } else {
+                    $('#NameEn').val('');
+                    $('#NameNative').val('');
+                }
+            });
+
+            // Dynamic Clauses logic
+            function updateClauseNumbers() {
+                $('.clause-entry').each(function(index) {
+                    var num = index + 1;
+                    $(this).find('.clause-num-en').html('@Localizer["Clause"] ' + num + ' @Localizer["English"] <span class="text-danger">*</span>');
+                    $(this).find('.clause-num-native').html('@Localizer["Clause"] ' + num + ' @Localizer["Native"] <span class="text-danger">*</span>');
+                });
+            }
+
+            $('#addClauseBtn').click(function() {
+                var clauseHtml = `
+                    <div class="clause-entry border rounded p-3 mb-3">
+                        <div class="row clearfix mb-1">
+                            <div class="col-md-12 text-right">
+                                <button type="button" class="btn btn-danger btn-sm removeClauseBtn" style="padding: 4px 10px; font-size: 12px; border-radius: 3px; background-color: #ff5252; color: #fff; border: none; float: right;">@Localizer["Remove"]</button>
+                            </div>
+                        </div>
+                        <div class="row clearfix mb-2">
+                            <div class="col-md-6">
+                                <h2 class="card-inside-title mb-2 clause-num-en">@Localizer["Clause English"] <span class="text-danger">*</span></h2>
+                                <div class="form-group form-float">
+                                    <textarea class="form-control clause-en-input auto-resize" placeholder="@Localizer["Clause English"]" required rows="2" style="overflow: hidden; resize: none;"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h2 class="card-inside-title mb-2 clause-num-native">@Localizer["Clause Native"] <span class="text-danger">*</span></h2>
+                                <div class="form-group form-float">
+                                    <textarea class="form-control clause-native-input auto-resize" placeholder="@Localizer["Clause Native"]" required rows="2" style="overflow: hidden; resize: none;"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                var newClause = $(clauseHtml);
+                $('#clausesContainer').append(newClause);
+                
+                // Initialize auto-resize for new textareas
+                newClause.find('.auto-resize').each(function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                }).on('input', function () {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+                
+                updateClauseNumbers();
+            });
+
+            $(document).on('click', '.removeClauseBtn', function() {
+                $(this).closest('.clause-entry').remove();
+                updateClauseNumbers();
+            });
+
+            $('form').submit(function(e) {
+                var clausesEn = [];
+                var clausesNative = [];
+                $('.clause-entry').each(function() {
+                    var enVal = $(this).find('.clause-en-input').val();
+                    var nativeVal = $(this).find('.clause-native-input').val();
+                    if(enVal || nativeVal) {
+                        clausesEn.push((enVal || "").trim());
+                        clausesNative.push((nativeVal || "").trim());
+                    }
+                });
+                
+                $('#HiddenClausesEn').val(clausesEn.join('\n'));
+                $('#HiddenClausesNative').val(clausesNative.join('\n'));
+            });
+        });
+
+
+        function deleteType(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("DeleteContractType", "Settings")', { id: id }, function (data) {
+                        if (data.success) {
+                            window.location.href = '@Url.Action("ContractTypes", "Settings")';
+                        } else {
+                            Swal.fire('Error!', data.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

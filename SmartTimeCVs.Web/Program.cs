@@ -49,6 +49,25 @@ builder.Services.AddScoped<IJobOfferService, JobOfferService>();
 
 var app = builder.Build();
 
+// Automatically apply any pending database migrations
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            context.Database.Migrate();
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database.");
+    }
+}
+
 //adding multi-language support
 AddingMultiLanguageSupport(app);
 

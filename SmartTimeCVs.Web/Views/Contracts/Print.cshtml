@@ -119,7 +119,7 @@
                     <p>@Localizer["Agreement has been made between:"]</p>
 
                     <p>
-                        @Localizer["First Party:"] <strong>@Model.SchoolName</strong><br />
+                        @Localizer["First Party:"] <strong>@Model.CompanyName</strong><br />
                         @Localizer["Represented by Mr/Ms:"] <strong>@Model.RepresentativeName</strong> @Localizer["in his capacity as"] <strong>@Model.RepresentativeTitle</strong><br />
                         @Localizer["Hereinafter referred to as the First Party"]
                     </p>
@@ -133,63 +133,35 @@
 
                     <h4>@Localizer["Preamble:"]</h4>
                     <p>
-                        @Localizer["Whereas the First Party wishes to utilize the services of the Second Party in the position of"] (<strong>@Model.JobTitle</strong>) @Localizer["at"] @Model.SchoolName، @Localizer["and the Second Party has agreed to work according to the terms and conditions outlined in this contract, the following has been agreed upon:"]
+                        @Localizer["Whereas the First Party wishes to utilize the services of the Second Party in the position of"] (<strong>@Model.JobTitle</strong>) @Localizer["at"] @Model.CompanyName، @Localizer["and the Second Party has agreed to work according to the terms and conditions outlined in this contract, the following has been agreed upon:"]
                     </p>
 
-                    <h4>@Localizer["Clause One: Contract Subject"]</h4>
-                    <p>
-                        @Localizer["The Second Party works for the First Party in the position of"] (<strong>@Model.JobTitle</strong>) @Localizer["and is committed to performing the specified job duties according to the school policy and internal regulations."]
-                    </p>
+                    @if (Model.ContractType != null && (!string.IsNullOrWhiteSpace(Model.ContractType.ClausesNative) || !string.IsNullOrWhiteSpace(Model.ContractType.ClausesEn)))
+                    {
+                        var isRtlCulture = currentCulture.Name.StartsWith("ar");
+                        var clausesText = isRtlCulture && !string.IsNullOrWhiteSpace(Model.ContractType.ClausesNative) 
+                            ? Model.ContractType.ClausesNative 
+                            : Model.ContractType.ClausesEn;
 
-                    <h4>@Localizer["Clause Two: Contract Duration"]</h4>
-                    <p>
-                        @Localizer["The duration of this contract is"] (<strong>@Model.ContractDuration</strong>) @Localizer["starting from the date"] <strong>@Model.StartDate.ToString("dd / MM / yyyy")</strong> @Localizer["and ending on"] <strong>@Model.EndDate.ToString("dd / MM / yyyy")</strong>، @Localizer["and will be automatically renewed unless one of the parties notifies the other of non-renewal at least one month before the end date."]
-                    </p>
-
-                    <h4>@Localizer["Clause Three: Probation Period"]</h4>
-                    <p>
-                        @Localizer["The Second Party is subject to a probation period of"] (<strong>@Model.ProbationPeriod</strong>) @Localizer["from the date of starting work, and the First Party has the right to terminate the contract during this period without prior notice if incompetence is proven."]
-                    </p>
-
-                    <h4>@Localizer["Clause Four: Salary and Allowances"]</h4>
-                    <p>
-                        @Localizer["Monthly Salary:"] (<strong>@Model.MonthlySalary</strong>) @Localizer["Currency Name"].<br />
-                        @Localizer["The salary will be paid at the latest on day"] (<strong>@Model.SalaryPaymentDay</strong>) @Localizer["of each month."]<br />
-                        @Localizer["Any incentives or bonuses will be according to the school policy and performance evaluation."]
-                    </p>
-
-                    <h4>@Localizer["Clause Five: Working Hours"]</h4>
-                    <p>
-                        @Localizer["The Second Party is committed to the working hours specified by the school administration according to the academic schedule, with commitment to attendance and departure at official times."]
-                    </p>
-
-                    <h4>@Localizer["Clause Six: Vacations"]</h4>
-                    <p>
-                        @Localizer["The Second Party is entitled to annual and official holidays according to the local Labor Law and the school's internal regulations."]
-                    </p>
-
-                    <h4>@Localizer["Clause Seven: Professional Obligations"]</h4>
-                    <ul>
-                        <li>@Localizer["Commitment to the school's policy and educational values."]</li>
-                        <li>@Localizer["Maintaining the confidentiality of information related to students and the school."]</li>
-                        <li>@Localizer["Commitment to a decent appearance and professional behavior."]</li>
-                        <li>@Localizer["Participating in school activities and professional training upon request."]</li>
-                    </ul>
-
-                    <h4>@Localizer["Clause Eight: Contract Termination"]</h4>
-                    <p>
-                        @Localizer["Either party may terminate the contract with a written notice at least one month in advance, with a commitment to hand over all school-related documents and belongings."]
-                    </p>
-
-                    <h4>@Localizer["Clause Nine: General Provisions"]</h4>
-                    <p>
-                        @Localizer["This contract is subject to the provisions of the local Labor Law."]<br />
-                        @Localizer["Any dispute will be resolved amicably, and in case of impossibility, jurisdiction will be to the local courts."]
-                    </p>
+                        if (!string.IsNullOrWhiteSpace(clausesText))
+                        {
+                            var clauses = clausesText.Split(new[] { "\\n", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                            for (var i = 0; i < clauses.Length; i++)
+                            {
+                                <h4>@Localizer["Clause"] @(i + 1)</h4>
+                                <p>@clauses[i]</p>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        @* Fallback to displaying a message if there are no clauses attached, though this shouldn't happen usually *@
+                        <p class="text-muted">@Localizer["No additional clauses specified for this contract type."]</p>
+                    }
 
                     <div class="row signature-area">
                         <div class="col-md-6 @alignClass">
-                            <p><strong>@Localizer["First Party Signature"] (@Model.SchoolName):</strong></p>
+                            <p><strong>@Localizer["First Party Signature"] (@Model.CompanyName):</strong></p>
                             <p>@Localizer["Name:"] <strong>@Model.RepresentativeName</strong></p>
                             <p>@Localizer["Signature:"] …………………………</p>
                         </div>

@@ -1,0 +1,99 @@
+@model SmartTimeCVs.Web.Core.Models.ContractCategory
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = isNew ? "Add Contract Type" : "Edit Contract Type";
+    ViewData["Path"] = $"Home / System lookups list / Contract Types / {(isNew ? "Add" : "Edit")} Contract Type";
+    ViewData["Icon"] = "description";
+}
+
+<style>
+    .section-title {
+        color: #fca170;
+        font-weight: 600;
+        margin-bottom: 15px;
+        margin-top: 30px;
+        text-transform: uppercase;
+        font-size: 14px;
+    }
+    .btn-save {
+        background-color: #03a9f4;
+        color: #fff;
+        border: none;
+        padding: 8px 25px;
+        border-radius: 3px;
+    }
+    .btn-cancel {
+        background-color: #ff5252;
+        color: #fff;
+        border: none;
+        padding: 8px 25px;
+        border-radius: 3px;
+        margin-left: 10px;
+    }
+</style>
+
+<div class="row clearfix">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="body">
+                <form asp-action="SaveContractCategory" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title mb-2">Contract Type (English) <span class="text-danger">*</span></h2>
+                            <div class="form-group form-float">
+                                <input asp-for="NameEn" class="form-control w-100" placeholder="e.g. Fixed-Term Contract" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title mb-2">Contract Type (Arabic) <span class="text-danger">*</span></h2>
+                            <div class="form-group form-float">
+                                <input asp-for="NameNative" class="form-control w-100" placeholder="e.g. عقد عمل محدد المدة" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 bg-light p-3 border-top">
+                        <button type="submit" class="btn btn-save">Save</button>
+                        <a asp-action="ContractCategories" class="btn btn-cancel">Cancel</a>
+                        @if (!isNew)
+                        {
+                            <button type="button" class="btn btn-outline-danger float-right" onclick="deleteType(@Model.Id)">Delete</button>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function deleteType(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("DeleteContractCategory", "Settings")', { id: id }, function (data) {
+                        if (data.success) {
+                            window.location.href = '@Url.Action("ContractCategories", "Settings")';
+                        } else {
+                            Swal.fire('Error!', data.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}
