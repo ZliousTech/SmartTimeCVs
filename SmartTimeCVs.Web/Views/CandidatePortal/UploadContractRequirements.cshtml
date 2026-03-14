@@ -1,0 +1,76 @@
+@model SmartTimeCVs.Web.Core.ViewModels.UploadContractRequirementsViewModel
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+    ViewData["HideSidebars"] = true;
+    ViewData["Title"] = @Localizer["Upload Contract Requirements"];
+    ViewData["ControllerName"] = "CandidatePortal";
+    ViewData["Path"] = @Localizer["Contract Upload"];
+    ViewData["Icon"] = "cloud_upload";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        @if (!string.IsNullOrWhiteSpace(ViewBag.CompanyLogo) && !string.IsNullOrWhiteSpace(ViewBag.HomePageHtml) && !string.IsNullOrWhiteSpace(ViewBag.CompanyName))
+        {
+            <div class="row mt-2">
+                <div class="col-md-3" style="text-align: end;">
+                    <div class="form-group">
+                        <div class="image">
+                            <br><br>
+                            <img src="@ViewBag.CompanyLogo" alt="Company Logo" class="mb-2" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="form-group">
+                        <h4><span id="LblCompName">@ViewBag.CompanyName</span></h4>
+                        <br>
+                        <span id="LblTxtCompanyHomePageText">
+                            @Html.Raw(ViewBag.HomePageHtml)
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-6"><i class="material-icons breadcrumb theme-main-color align-self-center">@ViewData["Icon"]</i></div>
+            </div>
+        }
+    </div>
+    <div class="card-body">
+        <div class="body table-responsive">
+            <h4 class="mb-4 text-center">@Localizer["Please upload the required documents below to complete your hiring process"]</h4>
+            
+            <form asp-action="UploadContractRequirements" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="ContractId" />
+
+                <div class="row clearfix mb-4 mt-4">
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-2">@Localizer["Signed Contract"] (PDF / Image) <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="file" asp-for="SignedContract" class="form-control" accept="image/*,application/pdf" />
+                            <span asp-validation-for="SignedContract" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h2 class="card-inside-title mb-2">@Localizer["National ID"] (PDF / Image) <span class="text-danger">*</span></h2>
+                        <div class="form-group form-float">
+                            <input type="file" asp-for="NationalIdFile" class="form-control" accept="image/*,application/pdf" />
+                            <span asp-validation-for="NationalIdFile" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-12" style="text-align: center;">
+                        <button type="submit" class="btn btn-lg btn-round btn-success font-bold waves-effect">@Localizer["Submit Documents"]</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

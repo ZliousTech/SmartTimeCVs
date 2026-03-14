@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
 using SmartTimeCVs.Web.Core.Dtos;
+using SmartTimeCVs.Web.Core.Models;
 using SmartTimeCVs.Web.Core.Services;
 using SmartTimeCVs.Web.Core.ViewModels;
 using SmartTimeCVs.Web.Data;
@@ -14,12 +16,14 @@ namespace SmartTimeCVs.Web.Controllers
         private readonly IJobOfferService _jobOfferService;
         private readonly ApplicationDbContext _context;
         private readonly ILogger<CandidatePortalController> _logger;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public CandidatePortalController(IJobOfferService jobOfferService, ApplicationDbContext context, ILogger<CandidatePortalController> logger)
+        public CandidatePortalController(IJobOfferService jobOfferService, ApplicationDbContext context, ILogger<CandidatePortalController> logger, IWebHostEnvironment webHostEnvironment)
         {
             _jobOfferService = jobOfferService;
             _context = context;
             _logger = logger;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         private async Task LoadCompanyDataAsync(int appId)
@@ -133,6 +137,151 @@ namespace SmartTimeCVs.Web.Controllers
             }
             
             return StatusCode(500, "An error occurred while saving your response. Please contact HR.");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ContractLogin(int contractId)
+        {
+            if (contractId <= 0) return NotFound();
+            var contract = await _context.Contracts.FindAsync(contractId);
+            if (contract != null && contract.JobApplicationId.HasValue)
+            {
+                await LoadCompanyDataAsync(contract.JobApplicationId.Value);
+            }
+            return View(new ContractLoginViewModel { ContractId = contractId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ContractLogin(ContractLoginViewModel model)
+        {
+            var contract = await _context.Contracts.Include(c => c.JobApplication).FirstOrDefaultAsync(c => c.Id == model.ContractId);
+            if (contract != null && contract.JobApplicationId.HasValue)
+            {
+                await LoadCompanyDataAsync(contract.JobApplicationId.Value);
+            }
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            try
+            {
+                if (contract == null || contract.JobApplication == null)
+                {
+                    ModelState.AddModelError("", "Contract not found.");
+                    return View(model);
+                }
+
+                if (contract.JobApplication.MobileNumber == model.MobileNumber)
+                {
+                    // Successfully logged in via mobile
+                    TempData["AuthenticatedContractId"] = model.ContractId;
+                    return RedirectToAction("UploadContractRequirements", new { contractId = model.ContractId });
+                }
+
+                ModelState.AddModelError("", "The mobile number provided does not match our records.");
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during contract login for contractId {ContractId}", model.ContractId);
+                ModelState.AddModelError("", "An unexpected error occurred. Please try again later.");
+                return View(model);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UploadContractRequirements(int contractId)
+        {
+            if (TempData["AuthenticatedContractId"] == null || (int)TempData["AuthenticatedContractId"] != contractId)
+            {
+                return RedirectToAction("ContractLogin", new { contractId });
+            }
+            // Keep authenticated for postback
+            TempData.Keep("AuthenticatedContractId");
+
+            var contract = await _context.Contracts.FindAsync(contractId);
+            if (contract != null && contract.JobApplicationId.HasValue)
+            {
+                await LoadCompanyDataAsync(contract.JobApplicationId.Value);
+            }
+
+            return View(new UploadContractRequirementsViewModel { ContractId = contractId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadContractRequirements(UploadContractRequirementsViewModel model)
+        {
+            if (TempData["AuthenticatedContractId"] == null || (int)TempData["AuthenticatedContractId"] != model.ContractId)
+            {
+                return RedirectToAction("ContractLogin", new { contractId = model.ContractId });
+            }
+            TempData.Keep("AuthenticatedContractId");
+
+            var contract = await _context.Contracts.Include(c => c.JobApplication).FirstOrDefaultAsync(c => c.Id == model.ContractId);
+            if (contract != null && contract.JobApplicationId.HasValue)
+            {
+                await LoadCompanyDataAsync(contract.JobApplicationId.Value);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                if (contract == null || contract.JobApplication == null)
+                    return NotFound();
+
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/attachments");
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                // Save Signed Contract
+                if (model.SignedContract != null && model.SignedContract.Length > 0)
+                {
+                    var fileExtension1 = Path.GetExtension(model.SignedContract.FileName);
+                    var fileName1 = $"{Guid.NewGuid()}{fileExtension1}";
+                    var filePath1 = Path.Combine(uploadsFolder, fileName1);
+
+                    using (var fileStream = new FileStream(filePath1, FileMode.Create))
+                    {
+                        await model.SignedContract.CopyToAsync(fileStream);
+                    }
+
+                    contract.SignedContractUrl = fileName1;
+                }
+
+                // Save National ID
+                if (model.NationalIdFile != null && model.NationalIdFile.Length > 0)
+                {
+                    var fileExtension2 = Path.GetExtension(model.NationalIdFile.FileName);
+                    var fileName2 = $"{Guid.NewGuid()}{fileExtension2}";
+                    var filePath2 = Path.Combine(uploadsFolder, fileName2);
+
+                    using (var fileStream = new FileStream(filePath2, FileMode.Create))
+                    {
+                        await model.NationalIdFile.CopyToAsync(fileStream);
+                    }
+
+                    contract.NationalIdUrl = fileName2;
+                }
+
+                contract.IsSigned = true;
+                _context.Contracts.Update(contract);
+                await _context.SaveChangesAsync();
+
+                TempData.Remove("AuthenticatedContractId");
+                return View("ContractRequirementsSubmitted");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during uploading contract attachments for contractId {ContractId}", model.ContractId);
+                ModelState.AddModelError("", "An error occurred while uploading your documents.");
+                return View(model);
+            }
         }
     }
 }

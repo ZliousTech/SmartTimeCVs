@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Localization;
 using SmartTimeCVs.Web.Core.Dtos;
 using SmartTimeCVs.Web.Core.Enums;
@@ -105,8 +105,21 @@ namespace SmartTimeCVs.Web.Controllers
 
             try
             {
+                Console.WriteLine(">>> CREATE POST - Method entered");
                 if (!ModelState.IsValid)
+                {
+                    // DEBUG: Log ModelState errors to terminal
+                    foreach (var entry in ModelState.Where(e => e.Value!.Errors.Any()))
+                    {
+                        foreach (var err in entry.Value!.Errors)
+                        {
+                            Console.WriteLine($">>> VALIDATION ERROR - Field: [{entry.Key}] Error: [{err.ErrorMessage}]");
+                        }
+                    }
                     return View("Form", PopulateViewModel(model));
+                }
+
+                Console.WriteLine(">>> CREATE POST - ModelState is VALID, proceeding...");
 
                 #region Process ImageFile.
 
@@ -148,6 +161,22 @@ namespace SmartTimeCVs.Web.Controllers
 
                 #endregion Process Work Experience Attachments.
 
+                #region Process University Attachments.
+
+                foreach (var university in model.Universities)
+                {
+                    var universityAttachment = university.AttachmentFile;
+                    if (universityAttachment != null)
+                    {
+                        var attachmentFileName = await ProcessFileAsync(universityAttachment, "universityAttachments", "UniversityAttachmentFile", true);
+                        if (!ModelState.IsValid)
+                            return View("Form", PopulateViewModel(model));
+                        university.AttachmentUrl = attachmentFileName;
+                    }
+                }
+
+                #endregion Process University Attachments.
+
                 #region Process Attachments.
 
                 foreach (var attachment in model.AttachmentFiles)
@@ -188,15 +217,19 @@ namespace SmartTimeCVs.Web.Controllers
 
                 // Add and save
                 await _context.JobApplication.AddAsync(jobApplication);
+                Console.WriteLine(">>> CREATE POST - About to SaveChanges...");
                 await _context.SaveChangesAsync();
 
                 await transaction.CommitAsync();
+                Console.WriteLine(">>> CREATE POST - SAVED SUCCESSFULLY!");
 
                 return Json(new { success = true, message = Messages.Saved });
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
+                Console.WriteLine($">>> CREATE POST - EXCEPTION: {ex.Message}");
+                Console.WriteLine($">>> CREATE POST - STACK TRACE: {ex.StackTrace}");
                 ModelState.AddModelError(string.Empty, "An error occurred while saving the data.");
                 return View("Error", new ErrorViewModel { Exception = ex.Message });
             }
@@ -326,6 +359,34 @@ namespace SmartTimeCVs.Web.Controllers
                 model.WorkExperiences = workExperienceList;
 
                 #endregion Process Work Experience Attachments.
+
+                #region Process University Attachments.
+
+                var universityList = model.Universities.ToList();
+                var originalUniversityList = jobApplication.Univesity.ToList();
+
+                for (int universityIndex = 0; universityIndex < universityList.Count; universityIndex++)
+                {
+                    var universityAttachment = universityList[universityIndex].AttachmentFile;
+
+                    if (universityAttachment != null)
+                    {
+                        var attachmentFileName = await ProcessFileAsync(universityAttachment, "universityAttachments", "UniversityAttachmentFile", true);
+
+                        if (!ModelState.IsValid)
+                            return View("Form", PopulateViewModel(model));
+
+                        universityList[universityIndex].AttachmentUrl = attachmentFileName;
+                    }
+                    else if (universityIndex < originalUniversityList.Count)
+                    {
+                        universityList[universityIndex].AttachmentUrl = originalUniversityList[universityIndex].AttachmentUrl;
+                    }
+                }
+
+                model.Universities = universityList;
+
+                #endregion Process University Attachments.
 
                 #region Process Attachments.
 

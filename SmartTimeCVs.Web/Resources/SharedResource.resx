@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -758,5 +758,65 @@
   </data>
   <data name="Remove" xml:space="preserve">
     <value>Remove</value>
+  </data>
+  <data name="Newcomers" xml:space="preserve">
+    <value>Newcomers</value>
+  </data>
+  <data name="Archive" xml:space="preserve">
+    <value>Archive</value>
+  </data>
+  <data name="Employee Archive" xml:space="preserve">
+    <value>Employee Archive</value>
+  </data>
+  <data name="Uploaded Documents" xml:space="preserve">
+    <value>Uploaded Documents</value>
+  </data>
+  <data name="Contract Upload" xml:space="preserve">
+    <value>Contract Upload</value>
+  </data>
+  <data name="Upload Contract Requirements" xml:space="preserve">
+    <value>Upload Contract Requirements</value>
+  </data>
+  <data name="Signed Contract" xml:space="preserve">
+    <value>Signed Contract</value>
+  </data>
+  <data name="Submit Documents" xml:space="preserve">
+    <value>Submit Documents</value>
+  </data>
+  <data name="Documents Submitted" xml:space="preserve">
+    <value>Documents Submitted</value>
+  </data>
+  <data name="Thank You!" xml:space="preserve">
+    <value>Thank You!</value>
+  </data>
+  <data name="Your contract and National ID have been successfully uploaded." xml:space="preserve">
+    <value>Your contract and National ID have been successfully uploaded.</value>
+  </data>
+  <data name="Our HR department will review your documents shortly." xml:space="preserve">
+    <value>Our HR department will review your documents shortly.</value>
+  </data>
+  <data name="Contract Verification" xml:space="preserve">
+    <value>Contract Verification</value>
+  </data>
+  <data name="Please upload the required documents below to complete your hiring process" xml:space="preserve">
+    <value>Please upload the required documents below to complete your hiring process</value>
+  </data>
+  <data name="No additional documents uploaded." xml:space="preserve">
+    <value>No additional documents uploaded.</value>
+  </data>
+  <data name="No universities found." xml:space="preserve">
+    <value>No universities found.</value>
+  </data>
+  <data name="No work experiences found." xml:space="preserve">
+    <value>No work experiences found.</value>
+  </data>
+  <data name="Graduation Year" xml:space="preserve">
+    <value>Graduation Year</value>
+  </data>
+  <data name="Action" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="CompanyName" xml:space="preserve">
+    <value>Company Name</value>
   </data>
 </root>

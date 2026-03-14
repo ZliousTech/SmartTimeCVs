@@ -55,5 +55,10 @@ namespace SmartTimeCVs.Web.Core.Models
 
         public int? ContractTypeId { get; set; }
         public ContractType? ContractType { get; set; }
+
+        public bool IsSigned { get; set; } = false;
+
+        public string? SignedContractUrl { get; set; }
+        public string? NationalIdUrl { get; set; }
     }
 }

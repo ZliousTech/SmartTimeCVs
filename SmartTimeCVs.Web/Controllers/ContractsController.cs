@@ -128,11 +128,26 @@ namespace SmartTimeCVs.Web.Controllers
                 return Json(new { success = false, message = _localizer["Contract or Employee Email not found"].Value ?? "Contract or Employee Email not found" });
 
             var subject = (_localizer["Work Contract"].Value ?? "Work Contract") + " - " + contract.CompanyName;
+            var request = HttpContext.Request;
+            var baseUrl = $"{request.Scheme}://{request.Host}";
+            var actionUrl = $"{baseUrl}/CandidatePortal/ContractLogin?contractId={contract.Id}";
+
             var body = $@"
-                <p>Dear {contract.EmployeeName},</p>
-                <p>Please find attached your work contract with {contract.CompanyName}.</p>
-                <p>Best regards,<br/>{contract.CompanyName}</p>
-            ";
+<html dir='ltr'>
+<body>
+    <p>Dear {contract.EmployeeName},</p>
+    <p>Please find attached your work contract with {contract.CompanyName}.</p>
+    <p>To proceed, please print the contract, sign it, and upload the signed copy along with your National ID.</p>
+    <br/>
+    <p>Please click the button below to upload your documents:</p>
+    <p><a href='{actionUrl}' style='display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;'>Upload Contract Requirements</a></p>
+    <br/>
+    <p>If the button is not clickable or hidden, you can copy and paste this link into your browser:</p>
+    <p><b>{actionUrl}</b></p>
+    <br/>
+    <p>Best regards,<br/>{contract.CompanyName}</p>
+</body>
+</html>";
 
             var success = await _emailService.SendEmailAsync(
                 to: contract.JobApplication.Email,

@@ -171,7 +171,8 @@ namespace SmartTimeCVs.Web.Core.Services
             if (offer.JobApplication == null)
             {
                 // Ensure JobApplication is loaded
-                offer.JobApplication = await _context.JobApplication.FindAsync(offer.JobApplicationId);
+                var app = await _context.JobApplication.FindAsync(offer.JobApplicationId);
+                if (app != null) { offer.JobApplication = app; }
             }
 
             if (offer.JobApplication == null)

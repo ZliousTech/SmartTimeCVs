@@ -1,4 +1,4 @@
-﻿namespace SmartTimeCVs.Web.Core.Models
+namespace SmartTimeCVs.Web.Core.Models
 {
     public class University : BaseModel
     {
@@ -12,6 +12,8 @@
         public string Collage { get; set; } = null!;
 
         public int UniversityGraduationYear { get; set; }
+
+        public string? AttachmentUrl { get; set; }
 
         #region Table Relations.
 

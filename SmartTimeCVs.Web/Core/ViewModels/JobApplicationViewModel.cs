@@ -1,4 +1,4 @@
-﻿using SmartTimeCVs.Web.Core.Enums;
+using SmartTimeCVs.Web.Core.Enums;
 
 public class JobApplicationViewModel : BaseModel
 {
@@ -141,6 +141,8 @@ public class JobApplicationViewModel : BaseModel
     public string? AttachmentUrl { get; set; }
 
     public List<AttachmentFileViewModel> AttachmentFiles { get; set; } = new();
+
+    public List<SmartTimeCVs.Web.Core.Models.Contract> Contracts { get; set; } = new();
 
     #endregion Attachment.
 

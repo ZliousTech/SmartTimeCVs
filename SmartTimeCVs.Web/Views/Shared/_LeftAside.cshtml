@@ -1,5 +1,12 @@
-﻿@using SmartTimeCVs.Web
+@using SmartTimeCVs.Web
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    var activeKey = $"{controller}-{action}";
+}
+
 <aside id="leftsidebar" class="sidebar">
 	<div class="menu">
 		<ul class="list">
@@ -40,6 +47,7 @@
 					</li>
 				</ul>
 			</li>
+
 			<li active-when="Interview, Interview-Result, Interview-TestResult, Interview-FinalResult">
 				<a href="javascript:void(0);" class="menu-toggle">
 					<i class="material-icons">event</i><span>@Localizer["Schedules"]</span>
@@ -69,7 +77,20 @@
 					</li>
 				</ul>
 			</li>
-			<li active-when="Settings, Settings-ManageLookups">
+            <li active-when="JobApplication-NewcomersIndex, JobApplication-NewcomerArchive, JobApplication-NewcomersIndexArchive">
+                <a href="javascript:void(0);" class="menu-toggle">
+                    <i class="material-icons">people</i><span>@Localizer["Newcomers"]</span>
+                </a>
+                <ul class="ml-menu">
+                    <li active-when="JobApplication-NewcomersIndex">
+                        <a asp-controller="JobApplication" asp-action="NewcomersIndex">@Localizer["PersonalInformation"]</a>
+                    </li>
+                    <li active-when="JobApplication-NewcomersIndexArchive">
+                        <a asp-controller="JobApplication" asp-action="NewcomersIndexArchive">@Localizer["Archive"]</a>
+                    </li>
+                </ul>
+            </li>
+			<li active-when="Settings, Settings-GenderTypes, Settings-LevelTypes, Settings-MaritalStatusTypes, Settings-ContractCategories, Settings-ContractTypes">
 				<a href="javascript:void(0);" class="menu-toggle">
 					<i class="material-icons">settings</i><span>@Localizer["Settings"]</span>
 				</a>
@@ -82,3 +103,34 @@
 		</ul>
 	</div>
 </aside>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var activeKey = '@activeKey';
+
+        // Find all li elements with active-when attribute
+        document.querySelectorAll('#leftsidebar li[active-when]').forEach(function (li) {
+            var keys = li.getAttribute('active-when').split(',').map(function (k) { return k.trim(); });
+
+            if (keys.indexOf(activeKey) !== -1) {
+                li.classList.add('active');
+
+                // If this is a sub-item, also expand the parent menu
+                var parentUl = li.closest('.ml-menu');
+                if (parentUl) {
+                    parentUl.style.display = 'block';
+                    var parentLi = parentUl.closest('li[active-when]');
+                    if (parentLi) {
+                        parentLi.classList.add('active', 'toggled');
+                    }
+                }
+
+                // Bold the active link
+                var link = li.querySelector('a');
+                if (link && !link.classList.contains('menu-toggle')) {
+                    link.style.fontWeight = 'bold';
+                }
+            }
+        });
+    });
+</script>

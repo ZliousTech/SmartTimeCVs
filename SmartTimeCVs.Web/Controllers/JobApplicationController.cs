@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SmartTimeCVs.Web.Controllers
 {
@@ -146,6 +146,7 @@ namespace SmartTimeCVs.Web.Controllers
             {
                 ViewData["FromFinalResults"] = fromFinalResults;
                 var job = _context.JobApplication.FirstOrDefault(x => x.Id == id);
+                if (job == null) return NotFound();
 
                 var uni = _context.University.Where(x => x.JobApplicationId == job.Id).ToList();
 
@@ -188,6 +189,8 @@ namespace SmartTimeCVs.Web.Controllers
             try
             {
                 var job = _context.JobApplication.FirstOrDefault(x => x.Id == id);
+                if (job == null) return NotFound();
+
                 var uni = _context.University.Where(x => x.JobApplicationId == job.Id).ToList();
                 var course = _context.Course.Where(x => x.JobApplicationId == job.Id).ToList();
 
@@ -334,6 +337,74 @@ namespace SmartTimeCVs.Web.Controllers
             catch (Exception ex)
             {
                 return View("Error", new ErrorViewModel { Exception = ex.Message });
+            }
+        }
+
+        public async Task<IActionResult> NewcomersIndex()
+        {
+            try
+            {
+                 var jobApplications = await _context
+                    .JobApplication
+                    .Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
+                    .Where(p => _context.Contracts.Any(c => c.JobApplicationId == p.Id && c.IsSigned))
+                    .OrderByDescending(p => p.Id)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                var viewModel = _mapper.Map<List<JobApplicationViewModel>>(jobApplications);
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new ErrorViewModel { Exception = ex.Message });
+            }
+        }
+
+        public async Task<IActionResult> NewcomersIndexArchive()
+        {
+            try
+            {
+                 var jobApplications = await _context
+                    .JobApplication
+                    .Include(p => p.Univesity)
+                    .Include(p => p.WorkExperience)
+                    .Include(p => p.AttachmentFiles)
+                    .Include(p => p.Contracts)
+                    .Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
+                    .Where(p => p.Contracts.Any(c => c.IsSigned))
+                    .OrderByDescending(p => p.Id)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                var viewModel = _mapper.Map<List<JobApplicationViewModel>>(jobApplications);
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new ErrorViewModel { Exception = ex.Message });
+            }
+        }
+
+        public async Task<IActionResult> NewcomerArchive(int id)
+        {
+            try
+            {
+                var jobApplication = await _context.JobApplication
+                    .Include(x => x.Univesity)
+                    .Include(x => x.Course)
+                    .Include(x => x.WorkExperience)
+                    .Include(x => x.AttachmentFiles)
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (jobApplication == null)
+                    return NotFound();
+
+                return View(jobApplication);
+            }
+            catch (Exception ex)
+            {
+                 return View("Error", new ErrorViewModel { Exception = ex.Message });
             }
         }
     }

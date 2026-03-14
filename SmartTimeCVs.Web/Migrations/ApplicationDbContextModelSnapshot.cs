@@ -311,6 +311,9 @@ namespace SmartTimeCVs.Web.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsSigned")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("JobApplicationId")
                         .HasColumnType("int");
 
@@ -325,6 +328,9 @@ namespace SmartTimeCVs.Web.Migrations
                     b.Property<decimal>("MonthlySalary")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("NationalIdUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProbationPeriod")
                         .IsRequired()
@@ -343,6 +349,9 @@ namespace SmartTimeCVs.Web.Migrations
 
                     b.Property<int>("SalaryPaymentDay")
                         .HasColumnType("int");
+
+                    b.Property<string>("SignedContractUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -418,12 +427,10 @@ namespace SmartTimeCVs.Web.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DescriptionEn")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DescriptionNative")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstPartyAddress")
                         .HasMaxLength(500)
@@ -892,6 +899,9 @@ namespace SmartTimeCVs.Web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AttachmentUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Collage")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -1046,7 +1056,7 @@ namespace SmartTimeCVs.Web.Migrations
                         .HasForeignKey("ContractTypeId");
 
                     b.HasOne("SmartTimeCVs.Web.Core.Models.JobApplication", "JobApplication")
-                        .WithMany()
+                        .WithMany("Contracts")
                         .HasForeignKey("JobApplicationId");
 
                     b.Navigation("ContractType");
@@ -1153,6 +1163,8 @@ namespace SmartTimeCVs.Web.Migrations
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.JobApplication", b =>
                 {
                     b.Navigation("AttachmentFiles");
+
+                    b.Navigation("Contracts");
 
                     b.Navigation("Course");
 

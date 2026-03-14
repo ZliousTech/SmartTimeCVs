@@ -1,4 +1,4 @@
-﻿@model JobApplicationViewModel
+@model JobApplicationViewModel
 @{
     ViewData["Title"] = "Biographies";
     ViewData["Path"] = "CVs / Biographies / " + (Model?.Id > 0 ? "Edit" : "Create");
@@ -89,7 +89,7 @@
                         <h2 class="card-inside-title mb-2">Email <span class="text-danger">*</span></h2>
                         <div class="form-group form-float">
                             <input type="email" class="form-control
-                            @(ViewData.ModelState["Email"] is null? "" :
+                            @(ViewData?.ModelState["Email"] is null? "" :
                             ViewData.ModelState["Email"]?.Errors.Any() == true ? "form-control-invalid" :"form-control-valid")"
                                    placeholder="Email" asp-for="Email">
                             <span asp-validation-for="Email" class="text-danger mb-5"></span>
@@ -284,6 +284,24 @@
                                                        placeholder="University Graduation Year" />
                                                 <span class="text-danger mb-5"
                                                       data-valmsg-for="Universities[@i].UniversityGraduationYear"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h2 class="card-inside-title mb-2">University Certificate</h2>
+                                            <div class="custom-file-uploader"
+                                                 style="border: 2px dashed #ccc; padding: 20px; text-align: center; border-radius: 10px; background: #eee !important;">
+                                                <input name="Universities[@i].AttachmentFile" type="file" class="form-control-file attachment-input" style="display: none;" id="universityAttachmentFile_@i" accept=".jpg,.jpeg,.png,.pdf,.docx" />
+                                                <div onclick="document.getElementById('universityAttachmentFile_@i').click()" style="cursor: pointer;">
+                                                    <i class="material-icons" style="font-size: 40px; color:#777">cloud_upload</i>
+                                                    <p class="mb-0">Click to upload certificate</p>
+                                                    <p class="text-muted selected-file-name"></p>
+                                                    @if (!string.IsNullOrEmpty(Model.Universities[i].AttachmentUrl))
+                                                    {
+                                                        <a href="~/images/universityAttachments/@Model.Universities[i].AttachmentUrl" target="_blank" class="btn btn-sm btn-outline-success mt-1">
+                                                            <i class="material-icons" style="font-size: 14px; vertical-align: middle;">visibility</i> View Current
+                                                        </a>
+                                                    }
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -643,7 +661,7 @@
                                         @if (!string.IsNullOrEmpty(Model.WorkExperiences[i].AttachmentUrl))
                                         {
                                             <div class="col-12 mb-3">
-                                                @if (Model.WorkExperiences[i].AttachmentUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                                                @if (Model.WorkExperiences[i].AttachmentUrl?.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase) == true)
                                                 {
                                                     <!-- PDF Preview -->
                                                     <embed src="@Url.Content("~/images/workExperienceAttachments/" + Model.WorkExperiences[i].AttachmentUrl)"
@@ -735,7 +753,7 @@
                                         @if (!string.IsNullOrEmpty(Model.AttachmentFiles[i].AttachmentUrl))
                                         {
                                             <div class="col-12 mb-3">
-                                                @if (Model.AttachmentFiles[i].AttachmentUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                                                @if (Model.AttachmentFiles[i].AttachmentUrl?.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase) == true)
                                                 {
                                                     <!-- PDF Preview -->
                                                     <embed src="@Url.Content("~/images/attachments/" + Model.AttachmentFiles[i].AttachmentUrl)"
@@ -919,13 +937,23 @@
             <div class="col-md-6">
                 <h2 class="card-inside-title mb-2">University Graduation Year <span class="text-danger">*</span></h2>
                 <div class="form-group form-float">
-                    <input type="number" class="form-control
-                        @(ViewData.ModelState[$"Universities[index].UniversityGraduationYear"]?.Errors.Any() == true ? "form-control-invalid" :
-                          ViewData.ModelState.ContainsKey($"Universities[index].UniversityGraduationYear") ? "form-control-valid" : "")"
+                    <input type="number" class="form-control"
                            name="Universities[index].UniversityGraduationYear"
                            placeholder="University Graduation Year" />
                     <span class="text-danger mb-5"
                           data-valmsg-for="Universities[index].UniversityGraduationYear"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h2 class="card-inside-title mb-2">University Certificate</h2>
+                <div class="custom-file-uploader"
+                     style="border: 2px dashed #ccc; padding: 20px; text-align: center; border-radius: 10px; background: #eee !important;">
+                    <input name="Universities[index].AttachmentFile" type="file" class="form-control-file attachment-input" style="display: none;" id="universityAttachmentFile_index" accept=".jpg,.jpeg,.png,.pdf,.docx" />
+                    <div onclick="document.getElementById('universityAttachmentFile_index').click()" style="cursor: pointer;">
+                        <i class="material-icons" style="font-size: 40px; color:#777">cloud_upload</i>
+                        <p class="mb-0">Click to upload certificate</p>
+                        <p class="text-muted selected-file-name"></p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1164,6 +1192,9 @@
         let coursesIndex = @((Model?.Courses?.Count ?? 0));
         let workExperienceIndex = @((Model?.WorkExperiences?.Count ?? 0));
         let attachmentIndex = @((Model?.AttachmentFiles?.Count ?? 0));
+
+        // Ignore hidden fields during validation (required for multi-step form)
+        $.validator.setDefaults({ ignore: ':hidden' });
 
         document.addEventListener("DOMContentLoaded", () => {
             showStep(currentStep);

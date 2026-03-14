@@ -136,14 +136,47 @@
 
                             <div id="clausesContainer">
                                 @{
-                                    var clausesEnList = string.IsNullOrEmpty(Model.ClausesEn) ? new List<string>() : Model.ClausesEn.Split(new[] { "\\n", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                                    var clausesNativeList = string.IsNullOrEmpty(Model.ClausesNative) ? new List<string>() : Model.ClausesNative.Split(new[] { "\\n", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                                    var clausesEnJson = string.IsNullOrEmpty(Model.ClausesEn) ? "[]" : Model.ClausesEn;
+                                    var clausesNativeJson = string.IsNullOrEmpty(Model.ClausesNative) ? "[]" : Model.ClausesNative;
+                                    
+                                    // Fallback for old data format (newline separated)
+                                    var isOldFormatEn = !clausesEnJson.TrimStart().StartsWith("[");
+                                    var isOldFormatNative = !clausesNativeJson.TrimStart().StartsWith("[");
+                                    
+                                    var clausesEnList = new List<Dictionary<string, string>>();
+                                    if (isOldFormatEn)
+                                    {
+                                        var items = Model.ClausesEn.Split(new[] { "\\n", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                                        foreach(var c in items) clausesEnList.Add(new Dictionary<string, string>{ {"Title", ""}, {"Content", c} });
+                                    }
+                                    else
+                                    {
+                                        clausesEnList = System.Text.Json.JsonSerializer.Deserialize<List<Dictionary<string, string>>>(clausesEnJson) ?? new List<Dictionary<string, string>>();
+                                    }
+
+                                    var clausesNativeList = new List<Dictionary<string, string>>();
+                                    if (isOldFormatNative)
+                                    {
+                                        var items = Model.ClausesNative.Split(new[] { "\\n", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                                        foreach(var c in items) clausesNativeList.Add(new Dictionary<string, string>{ {"Title", ""}, {"Content", c} });
+                                    }
+                                    else
+                                    {
+                                        clausesNativeList = System.Text.Json.JsonSerializer.Deserialize<List<Dictionary<string, string>>>(clausesNativeJson) ?? new List<Dictionary<string, string>>();
+                                    }
+                                        
                                     int maxClauses = Math.Max(clausesEnList.Count, clausesNativeList.Count);
 
                                     for (int i = 0; i < maxClauses; i++)
                                     {
-                                        var enVal = i < clausesEnList.Count ? clausesEnList[i] : "";
-                                        var nativeVal = i < clausesNativeList.Count ? clausesNativeList[i] : "";
+                                        var enItem = i < clausesEnList.Count ? clausesEnList[i] : null;
+                                        var nativeItem = i < clausesNativeList.Count ? clausesNativeList[i] : null;
+                                        
+                                        var enTitle = enItem != null && enItem.ContainsKey("Title") ? enItem["Title"] : "";
+                                        var enContent = enItem != null && enItem.ContainsKey("Content") ? enItem["Content"] : "";
+                                        var nativeTitle = nativeItem != null && nativeItem.ContainsKey("Title") ? nativeItem["Title"] : "";
+                                        var nativeContent = nativeItem != null && nativeItem.ContainsKey("Content") ? nativeItem["Content"] : "";
+
                                         <div class="clause-entry border rounded p-3 mb-3">
                                             <div class="row clearfix mb-1">
                                                 <div class="col-md-12 text-right">
@@ -153,14 +186,20 @@
                                             <div class="row clearfix mb-2">
                                                 <div class="col-md-6">
                                                     <h2 class="card-inside-title mb-2 clause-num-en">@Localizer["Clause"] @(i + 1) @Localizer["English"] <span class="text-danger">*</span></h2>
+                                                    <div class="form-group form-float mb-2">
+                                                        <input type="text" class="form-control clause-en-title" placeholder="@Localizer["Clause Title (Optional)"]" value="@enTitle" />
+                                                    </div>
                                                     <div class="form-group form-float">
-                                                        <textarea class="form-control clause-en-input auto-resize" placeholder="@Localizer["Clause English"]" required rows="2" style="overflow: hidden; resize: none;">@enVal</textarea>
+                                                        <textarea class="form-control clause-en-input auto-resize" placeholder="@Localizer["Clause Content"]" required rows="2" style="overflow: hidden; resize: none;">@enContent</textarea>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <h2 class="card-inside-title mb-2 clause-num-native">@Localizer["Clause"] @(i + 1) @Localizer["Native"] <span class="text-danger">*</span></h2>
+                                                    <div class="form-group form-float mb-2">
+                                                        <input type="text" class="form-control clause-native-title" placeholder="@Localizer["Clause Title (Optional)"]" value="@nativeTitle" />
+                                                    </div>
                                                     <div class="form-group form-float">
-                                                        <textarea class="form-control clause-native-input auto-resize" placeholder="@Localizer["Clause Native"]" required rows="2" style="overflow: hidden; resize: none;">@nativeVal</textarea>
+                                                        <textarea class="form-control clause-native-input auto-resize" placeholder="@Localizer["Clause Content"]" required rows="2" style="overflow: hidden; resize: none;">@nativeContent</textarea>
                                                     </div>
                                                 </div>
                                             </div>
@@ -253,12 +292,18 @@
                         <div class="row clearfix mb-2">
                             <div class="col-md-6">
                                 <h2 class="card-inside-title mb-2 clause-num-en">@Localizer["Clause English"] <span class="text-danger">*</span></h2>
+                                <div class="form-group form-float mb-2">
+                                    <input type="text" class="form-control clause-en-title" placeholder="@Localizer["Clause Title (Optional)"]" />
+                                </div>
                                 <div class="form-group form-float">
                                     <textarea class="form-control clause-en-input auto-resize" placeholder="@Localizer["Clause English"]" required rows="2" style="overflow: hidden; resize: none;"></textarea>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <h2 class="card-inside-title mb-2 clause-num-native">@Localizer["Clause Native"] <span class="text-danger">*</span></h2>
+                                <div class="form-group form-float mb-2">
+                                    <input type="text" class="form-control clause-native-title" placeholder="@Localizer["Clause Title (Optional)"]" />
+                                </div>
                                 <div class="form-group form-float">
                                     <textarea class="form-control clause-native-input auto-resize" placeholder="@Localizer["Clause Native"]" required rows="2" style="overflow: hidden; resize: none;"></textarea>
                                 </div>
@@ -290,16 +335,21 @@
                 var clausesEn = [];
                 var clausesNative = [];
                 $('.clause-entry').each(function() {
-                    var enVal = $(this).find('.clause-en-input').val();
-                    var nativeVal = $(this).find('.clause-native-input').val();
-                    if(enVal || nativeVal) {
-                        clausesEn.push((enVal || "").trim());
-                        clausesNative.push((nativeVal || "").trim());
+                    var enTitle = $(this).find('.clause-en-title').val() || "";
+                    var enVal = $(this).find('.clause-en-input').val() || "";
+                    var nativeTitle = $(this).find('.clause-native-title').val() || "";
+                    var nativeVal = $(this).find('.clause-native-input').val() || "";
+                    
+                    if(enVal) {
+                        clausesEn.push({ Title: enTitle.trim(), Content: enVal.trim() });
+                    }
+                    if(nativeVal) {
+                        clausesNative.push({ Title: nativeTitle.trim(), Content: nativeVal.trim() });
                     }
                 });
                 
-                $('#HiddenClausesEn').val(clausesEn.join('\n'));
-                $('#HiddenClausesNative').val(clausesNative.join('\n'));
+                $('#HiddenClausesEn').val(JSON.stringify(clausesEn));
+                $('#HiddenClausesNative').val(JSON.stringify(clausesNative));
             });
         });
 

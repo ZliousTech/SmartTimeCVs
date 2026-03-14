@@ -1,0 +1,58 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgery
+@model IEnumerable<JobApplicationViewModel>
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+	ViewData["Title"] = @Localizer["PersonalInformation"];
+	ViewData["ControllerName"] = "JobApplication";
+	ViewData["Path"] = $"{@Localizer["Newcomers"]} / {@Localizer["PersonalInformation"]}";
+	ViewData["Icon"] = "people";
+}
+
+@section Styles {
+	<link rel="stylesheet" href="~/theme/assets/css/plugins/datatables.bootstrap4.min.css" />
+}
+
+<div class="card shadow-sm">
+	<div class="card-header">
+		<div class="row">
+			<div class="col-6"><i class="material-icons breadcrumb theme-main-color align-self-center">@ViewData["Icon"]</i></div>
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="body table-responsive">
+			<table class="table js-datatables" data-document-title="Newcomers">
+				<thead>
+					<tr class="cyan">
+						<th class="js-no-export js-exclude-search d-none">Id</th>
+						<th>@Localizer["FullName"]</th>
+						<th>@Localizer["Email"]</th>
+						<th>@Localizer["Mobile"]</th>
+						<th>@Localizer["NationalID"]</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var jobApp in Model)
+					{
+						<tr>
+							<td class="d-none">@jobApp.Id</td>
+							<td scope="row">
+								<span class="list-name">@jobApp.FullName</span>
+							</td>
+							<td>@jobApp.Email</td>
+							<td>@jobApp.MobileNumber</td>
+							<td>@jobApp.NationalID</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<input type="hidden" name="__RequestVerificationToken" value="@antiforgery.GetAndStoreTokens(Context).RequestToken" />
+
+@section Plugins {
+	<partial name="_DataTablesJS" />
+}

@@ -1,4 +1,4 @@
-﻿public class WorkExperienceViewModel : BaseModel
+public class WorkExperienceViewModel : BaseModel
 {
     public int Id { get; set; }
 
@@ -11,10 +11,10 @@
     public DateTime? To { get; set; }
 
     [MaxLength(1000, ErrorMessage = Errors.MaxLength), Display(Name = "Job Description")]
-    public string JobDescription { get; set; } = null!;
+    public string? JobDescription { get; set; }
 
     [MaxLength(500, ErrorMessage = Errors.MaxLength), Display(Name = "Reason for Leaving")]
-    public string ReasonForLeaving { get; set; } = null!;
+    public string? ReasonForLeaving { get; set; }
 
     [Display(Name = "Attachment")]
     public IFormFile? AttachmentFile { get; set; }

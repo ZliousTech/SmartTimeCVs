@@ -1,0 +1,22 @@
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+    ViewData["HideSidebars"] = true;
+    ViewData["Title"] = @Localizer["Documents Submitted"];
+    ViewData["ControllerName"] = "CandidatePortal";
+    ViewData["Path"] = @Localizer["Contract Upload"];
+    ViewData["Icon"] = "check_circle_outline";
+}
+
+<div class="card shadow-sm text-center">
+    <div class="card-body py-5">
+        <i class="material-icons text-success" style="font-size: 80px;">check_circle_outline</i>
+        <h2 class="mt-4 mb-3">@Localizer["Thank You!"]</h2>
+        <p class="lead">
+            @Localizer["Your contract and National ID have been successfully uploaded."]
+        </p>
+        <p class="text-muted">
+            @Localizer["Our HR department will review your documents shortly."]
+        </p>
+    </div>
+</div>

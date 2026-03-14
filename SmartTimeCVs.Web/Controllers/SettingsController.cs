@@ -138,6 +138,7 @@ namespace SmartTimeCVs.Web.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(ContractTypes));
             }
+            ViewBag.ContractCategories = await _context.ContractCategories.ToListAsync();
             return View("ContractTypeForm", model);
         }
 

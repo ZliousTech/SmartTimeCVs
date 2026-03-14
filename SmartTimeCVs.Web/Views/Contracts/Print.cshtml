@@ -132,9 +132,21 @@
                     </p>
 
                     <h4>@Localizer["Preamble:"]</h4>
-                    <p>
-                        @Localizer["Whereas the First Party wishes to utilize the services of the Second Party in the position of"] (<strong>@Model.JobTitle</strong>) @Localizer["at"] @Model.CompanyName، @Localizer["and the Second Party has agreed to work according to the terms and conditions outlined in this contract, the following has been agreed upon:"]
-                    </p>
+                    @if (Model.ContractType != null && (!string.IsNullOrWhiteSpace(Model.ContractType.DescriptionNative) || !string.IsNullOrWhiteSpace(Model.ContractType.DescriptionEn)))
+                    {
+                        var isRtlCulture = currentCulture.Name.StartsWith("ar");
+                        var preambleText = isRtlCulture && !string.IsNullOrWhiteSpace(Model.ContractType.DescriptionNative) 
+                            ? Model.ContractType.DescriptionNative 
+                            : Model.ContractType.DescriptionEn;
+                            
+                        <p style="white-space: pre-wrap;">@preambleText</p>
+                    }
+                    else
+                    {
+                        <p>
+                            @Localizer["Whereas the First Party wishes to utilize the services of the Second Party in the position of"] (<strong>@Model.JobTitle</strong>) @Localizer["at"] @Model.CompanyName، @Localizer["and the Second Party has agreed to work according to the terms and conditions outlined in this contract, the following has been agreed upon:"]
+                        </p>
+                    }
 
                     @if (Model.ContractType != null && (!string.IsNullOrWhiteSpace(Model.ContractType.ClausesNative) || !string.IsNullOrWhiteSpace(Model.ContractType.ClausesEn)))
                     {
@@ -145,11 +157,45 @@
 
                         if (!string.IsNullOrWhiteSpace(clausesText))
                         {
-                            var clauses = clausesText.Split(new[] { "\\n", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-                            for (var i = 0; i < clauses.Length; i++)
+                            if (clausesText.TrimStart().StartsWith("[")) 
                             {
-                                <h4>@Localizer["Clause"] @(i + 1)</h4>
-                                <p>@clauses[i]</p>
+                                try 
+                                {
+                                    var clausesDocs = System.Text.Json.JsonSerializer.Deserialize<List<dynamic>>(clausesText);
+                                    if (clausesDocs != null) 
+                                    {
+                                        for (var i = 0; i < clausesDocs.Count; i++)
+                                        {
+                                            var titleStr = Convert.ToString(clausesDocs[i].GetProperty("Title").GetString());
+                                            var contentStr = Convert.ToString(clausesDocs[i].GetProperty("Content").GetString());
+                                            
+                                            var displayTitle = !string.IsNullOrWhiteSpace(titleStr) ? titleStr : (isRtlCulture ? $"ثانياً: البند {i + 1}" : $"Clause {i + 1}");
+                                            
+                                            <h4>@displayTitle</h4>
+                                            <p style="white-space: pre-wrap;">@contentStr</p>
+                                        }
+                                    }
+                                } 
+                                catch 
+                                {
+                                    // Fallback if parsing fails for some reason
+                                    var clauses = clausesText.Split(new[] { "\\n", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                                    for (var i = 0; i < clauses.Length; i++)
+                                    {
+                                        <h4>@Localizer["Clause"] @(i + 1)</h4>
+                                        <p>@clauses[i]</p>
+                                    }
+                                }
+                            }
+                            else 
+                            {
+                                // Old format fallback
+                                var clauses = clausesText.Split(new[] { "\\n", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                                for (var i = 0; i < clauses.Length; i++)
+                                {
+                                    <h4>@Localizer["Clause"] @(i + 1)</h4>
+                                    <p>@clauses[i]</p>
+                                }
                             }
                         }
                     }

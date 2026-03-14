@@ -1,4 +1,4 @@
-﻿namespace SmartTimeCVs.Web.Core.ViewModels
+namespace SmartTimeCVs.Web.Core.ViewModels
 {
     public class UniversityViewModel : BaseModel
     {
@@ -15,6 +15,10 @@
         [Required]
         [Display(Name = "Graduation Year")]
         public int UniversityGraduationYear { get; set; }
+
+        [Display(Name = "Attachment")]
+        public IFormFile? AttachmentFile { get; set; }
+        public string? AttachmentUrl { get; set; }
 
         #region Table Relations.
 

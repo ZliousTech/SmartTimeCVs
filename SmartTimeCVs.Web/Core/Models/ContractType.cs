@@ -16,10 +16,8 @@ namespace SmartTimeCVs.Web.Core.Models
         [MaxLength(100)]
         public string NameNative { get; set; } = null!;
 
-        [MaxLength(500)]
         public string? DescriptionEn { get; set; }
 
-        [MaxLength(500)]
         public string? DescriptionNative { get; set; }
 
         [MaxLength(200)]

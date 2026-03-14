@@ -89,8 +89,9 @@ namespace SmartTimeCVs.Web.Core.Services
                 if (model.Id.HasValue && model.Id.Value > 0)
                 {
                     // Update existing
-                    offer = await _context.JobOffer.FindAsync(model.Id.Value);
-                    if (offer == null) throw new Exception("Offer not found");
+                    var offerEntity = await _context.JobOffer.FindAsync(model.Id.Value);
+                    if (offerEntity == null) throw new Exception("Offer not found");
+                    offer = offerEntity;
 
                     offer.OfferedSalary = model.OfferedSalary;
                     offer.Currency = model.Currency;

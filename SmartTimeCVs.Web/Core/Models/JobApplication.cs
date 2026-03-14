@@ -1,4 +1,4 @@
-﻿namespace SmartTimeCVs.Web.Core.Models
+namespace SmartTimeCVs.Web.Core.Models
 {
     [Index(nameof(FullName), nameof(CompanyId), IsUnique = true)]
     [Index(nameof(NationalID), nameof(CompanyId), IsUnique = true)]
@@ -145,6 +145,11 @@
         /// </summary>
         public ICollection<InterviewSchedule> InterviewSchedules { get; set; } =
             new List<InterviewSchedule>();
+
+        /// <summary>
+        /// Collection of generated contracts for this application
+        /// </summary>
+        public ICollection<Contract> Contracts { get; set; } = new List<Contract>();
 
         #endregion Interview Scheduling.
 

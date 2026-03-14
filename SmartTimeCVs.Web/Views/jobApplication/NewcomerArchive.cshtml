@@ -1,0 +1,67 @@
+@model SmartTimeCVs.Web.Core.Models.JobApplication
+@using System.Globalization
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+    var isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    ViewData["Title"] = Localizer["Newcomer Archive"];
+    ViewData["HideSidebars"] = true;
+}
+
+<div class="container @(isRtl ? "rtl" : "ltr") mt-5 mb-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h3 class="mb-0">@Localizer["Employee Archive"]: @Model.FullName</h3>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-light btn-sm" onclick="window.history.back()">
+                        <i class="material-icons align-middle" style="font-size: 16px;">arrow_back</i> @Localizer["Back"]
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            
+
+                    
+                    <h4 class="text-info border-bottom pb-2 mb-3">@Localizer["Uploaded Documents"]</h4>
+            
+                    <div class="row mb-4">
+                        @if (!string.IsNullOrEmpty(Model.AttachmentUrl))
+                        {
+                            <div class="col-md-4 mb-3">
+                                <div class="card shadow-sm border-0 h-100">
+                                    <div class="card-body text-center">
+                                        <i class="material-icons text-primary" style="font-size: 48px;">description</i>
+                                        <h6 class="mt-2 text-truncate" title="Original CV">Original CV</h6>
+                                        <a href="~/images/cvAttachments/@Model.AttachmentUrl" target="_blank" class="btn btn-outline-primary btn-sm mt-3">@Localizer["View"]</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        @if (Model.AttachmentFiles != null && Model.AttachmentFiles.Any())
+                        {
+                            @foreach (var file in Model.AttachmentFiles)
+                            {
+                                <div class="col-md-4 mb-3">
+                                    <div class="card shadow-sm border-0 h-100">
+                                        <div class="card-body text-center">
+                                            <i class="material-icons text-success" style="font-size: 48px;">task</i>
+                                            <h6 class="mt-2 text-truncate" title="Uploaded Document">Uploaded Document</h6>
+                                            <a href="~/images/attachments/@file.AttachmentUrl" target="_blank" class="btn btn-outline-success btn-sm mt-3">@Localizer["View"]</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-12 text-muted">@Localizer["No additional documents uploaded."]</div>
+                        }
+            </div>
+        </div>
+    </div>
+</div>

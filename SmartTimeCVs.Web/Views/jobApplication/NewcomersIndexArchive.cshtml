@@ -1,0 +1,153 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgery
+@model IEnumerable<JobApplicationViewModel>
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+	ViewData["Title"] = @Localizer["Archive"];
+	ViewData["ControllerName"] = "JobApplication";
+	ViewData["Path"] = $"{@Localizer["Newcomers"]} / {@Localizer["Archive"]}";
+	ViewData["Icon"] = "folder";
+}
+
+@section Styles {
+	<link rel="stylesheet" href="~/theme/assets/css/plugins/datatables.bootstrap4.min.css" />
+}
+
+<div class="card shadow-sm">
+	<div class="card-header">
+		<div class="row">
+			<div class="col-6"><i class="material-icons breadcrumb theme-main-color align-self-center">@ViewData["Icon"]</i></div>
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="body table-responsive">
+			<table class="table js-datatables" data-document-title="NewcomersArchive">
+				<thead>
+					<tr class="cyan">
+						<th class="js-no-export js-exclude-search d-none">Id</th>
+						<th>@Localizer["Full Name"]</th>
+						<th>@Localizer["University Certificate"]</th>
+						<th>@Localizer["CV"]</th>
+						<th>@Localizer["Experience Certificates"]</th>
+						<th>@Localizer["National ID"]</th>
+						<th>@Localizer["Work Contract"]</th>
+						<th>@Localizer["Other Attachments"]</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var jobApp in Model)
+					{
+                        var signedContract = jobApp.Contracts?.FirstOrDefault(c => c.IsSigned);
+
+						<tr>
+							<td class="d-none">@jobApp.Id</td>
+							<td scope="row">
+								<span class="list-name">@jobApp.FullName</span>
+							</td>
+							
+							<!-- University Certificate -->
+							<td>
+								@if(jobApp.Universities != null && jobApp.Universities.Any(u => !string.IsNullOrEmpty(u.AttachmentUrl)))
+								{
+									<div class="dropdown">
+										<button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+											<i class="material-icons" style="font-size: 16px; vertical-align: middle;">school</i> @jobApp.Universities.Count(u => !string.IsNullOrEmpty(u.AttachmentUrl)) @Localizer["Files"]
+										</button>
+										<div class="dropdown-menu">
+											@foreach(var uni in jobApp.Universities.Where(u => !string.IsNullOrEmpty(u.AttachmentUrl)))
+											{
+												<a class="dropdown-item" href="~/images/universityAttachments/@uni.AttachmentUrl" target="_blank">@uni.UniversityName</a>
+											}
+										</div>
+									</div>
+								}
+								else { <span class="text-muted">-</span> }
+							</td>
+							
+							<!-- CV -->
+							<td>
+								@if(!string.IsNullOrEmpty(jobApp.AttachmentUrl))
+								{
+									<a href="~/images/cvAttachments/@jobApp.AttachmentUrl" target="_blank" class="btn btn-sm btn-outline-primary" title="@Localizer["View CV"]">
+										<i class="material-icons" style="font-size: 16px; vertical-align: middle;">description</i> @Localizer["View"]
+									</a>
+								}
+								else { <span class="text-muted">-</span> }
+							</td>
+
+							<!-- Experience Certificates -->
+							<td>
+								@if(jobApp.WorkExperiences != null && jobApp.WorkExperiences.Any(w => !string.IsNullOrEmpty(w.AttachmentUrl)))
+								{
+									<div class="dropdown">
+										<button class="btn btn-sm btn-outline-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+											<i class="material-icons" style="font-size: 16px; vertical-align: middle;">work</i> @jobApp.WorkExperiences.Count(w => !string.IsNullOrEmpty(w.AttachmentUrl)) @Localizer["Files"]
+										</button>
+										<div class="dropdown-menu">
+											@foreach(var exp in jobApp.WorkExperiences.Where(w => !string.IsNullOrEmpty(w.AttachmentUrl)))
+											{
+												<a class="dropdown-item" href="~/images/workExperienceAttachments/@exp.AttachmentUrl" target="_blank">@exp.EmployerName</a>
+											}
+										</div>
+									</div>
+								}
+								else { <span class="text-muted">-</span> }
+							</td>
+
+							<!-- National ID -->
+							<td>
+								@if(signedContract != null && !string.IsNullOrEmpty(signedContract.NationalIdUrl))
+								{
+									<a href="~/images/attachments/@signedContract.NationalIdUrl" target="_blank" class="btn btn-sm btn-outline-success" title="@Localizer["View National ID"]">
+										<i class="material-icons" style="font-size: 16px; vertical-align: middle;">badge</i> @Localizer["View"]
+									</a>
+								}
+								else { <span class="text-muted">-</span> }
+							</td>
+
+							<!-- Work Contract -->
+							<td>
+								@if(signedContract != null && !string.IsNullOrEmpty(signedContract.SignedContractUrl))
+								{
+									<a href="~/images/attachments/@signedContract.SignedContractUrl" target="_blank" class="btn btn-sm btn-outline-warning" title="@Localizer["View Contract"]">
+										<i class="material-icons" style="font-size: 16px; vertical-align: middle;">gavel</i> @Localizer["View"]
+									</a>
+								}
+								else { <span class="text-muted">-</span> }
+							</td>
+
+							<!-- Other Attachments -->
+							<td>
+								@if(jobApp.AttachmentFiles != null && jobApp.AttachmentFiles.Any())
+								{
+									<div class="dropdown">
+										<button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+											<i class="material-icons" style="font-size: 16px; vertical-align: middle;">folder</i> @jobApp.AttachmentFiles.Count() @Localizer["Files"]
+										</button>
+										<div class="dropdown-menu">
+											@{ int index = 1; }
+											@foreach(var file in jobApp.AttachmentFiles)
+											{
+												<a class="dropdown-item" href="~/images/attachments/@file.AttachmentUrl" target="_blank">@Localizer["Attachment"] #@index</a>
+												index++;
+											}
+										</div>
+									</div>
+								}
+								else { <span class="text-muted">-</span> }
+							</td>
+
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<input type="hidden" name="__RequestVerificationToken" value="@antiforgery.GetAndStoreTokens(Context).RequestToken" />
+
+@section Plugins {
+	<partial name="_DataTablesJS" />
+}
