@@ -108,38 +108,47 @@ namespace SmartTimeCVs.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveContractType(ContractType model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                if (model.Id == 0)
+                if (ModelState.IsValid)
                 {
-                    model.CreatedOn = DateTime.Now;
-                    _context.ContractTypes.Add(model);
-                }
-                else
-                {
-                    var existing = await _context.ContractTypes.FindAsync(model.Id);
-                    if (existing != null)
+                    if (model.Id == 0)
                     {
-                        existing.NameEn = model.NameEn;
-                        existing.NameNative = model.NameNative;
-                        existing.DescriptionEn = model.DescriptionEn;
-                        existing.DescriptionNative = model.DescriptionNative;
-                        existing.ContractFor = model.ContractFor;
-                        existing.ClausesEn = model.ClausesEn;
-                        existing.ClausesNative = model.ClausesNative;
-                        existing.FirstPartyName = model.FirstPartyName;
-                        existing.FirstPartyAddress = model.FirstPartyAddress;
-                        existing.AuthorizedSignatory = model.AuthorizedSignatory;
-                        existing.CommercialNumber = model.CommercialNumber;
-                        existing.LastUpdatedOn = DateTime.Now;
-                        _context.ContractTypes.Update(existing);
+                        model.CreatedOn = DateTime.Now;
+                        _context.ContractTypes.Add(model);
                     }
+                    else
+                    {
+                        var existing = await _context.ContractTypes.FindAsync(model.Id);
+                        if (existing != null)
+                        {
+                            existing.NameEn = model.NameEn;
+                            existing.NameNative = model.NameNative;
+                            existing.DescriptionEn = model.DescriptionEn;
+                            existing.DescriptionNative = model.DescriptionNative;
+                            existing.ContractFor = model.ContractFor;
+                            existing.ClausesEn = model.ClausesEn;
+                            existing.ClausesNative = model.ClausesNative;
+                            existing.FirstPartyName = model.FirstPartyName;
+                            existing.FirstPartyAddress = model.FirstPartyAddress;
+                            existing.AuthorizedSignatory = model.AuthorizedSignatory;
+                            existing.CommercialNumber = model.CommercialNumber;
+                            existing.LastUpdatedOn = DateTime.Now;
+                            _context.ContractTypes.Update(existing);
+                        }
+                    }
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ContractTypes));
                 }
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(ContractTypes));
+
+                // Log ModelState errors for debugging
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return Content("ModelState Errors: " + string.Join(" | ", errors));
             }
-            ViewBag.ContractCategories = await _context.ContractCategories.ToListAsync();
-            return View("ContractTypeForm", model);
+            catch (Exception ex)
+            {
+                return Content("Error: " + ex.Message + " | Inner: " + ex.InnerException?.Message);
+            }
         }
 
         [HttpPost]
