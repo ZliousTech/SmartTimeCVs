@@ -53,12 +53,14 @@ namespace SmartTimeCVs.Web.Controllers
         }
 
         // GET: Contracts/Print/5
-        public async Task<IActionResult> Print(int? id)
+        public async Task<IActionResult> Print(int? id, string lang = null)
         {
             if (id == null)
             {
                 return NotFound();
             }
+
+            ViewBag.ContractLang = lang;
 
             var contract = await _context.Contracts
                 .Include(c => c.JobApplication)
@@ -88,7 +90,7 @@ namespace SmartTimeCVs.Web.Controllers
                     fullName = j.FullName,
                     nationalId = j.NationalID,
                     address = j.Address,
-                    jobTitle = j.JobOffer != null && !string.IsNullOrEmpty(j.JobOffer.Department) ? j.JobOffer.Department : j.JobTitle ?? j.ApplyingFor,
+                    jobTitle = !string.IsNullOrEmpty(j.JobTitle) ? j.JobTitle : (j.JobOffer != null && !string.IsNullOrEmpty(j.JobOffer.Department) ? j.JobOffer.Department : j.ApplyingFor),
                     expectedSalary = j.JobOffer != null ? j.JobOffer.OfferedSalary : j.ExpectedSalary,
                     probationPeriod = j.JobOffer != null ? j.JobOffer.ProbationPeriod : "ثلاثة أشهر"
                 })
@@ -160,6 +162,43 @@ namespace SmartTimeCVs.Web.Controllers
                 return Json(new { success = true, message = _localizer["Email sent successfully!"].Value ?? "Email sent successfully!" });
             
             return Json(new { success = false, message = _localizer["Error sending email."].Value ?? "Error sending email." });
+        }
+        [HttpGet]
+        public async Task<IActionResult> DeleteSpecificContract()
+        {
+            var nationalId = "2000628930";
+            var contract = await _context.Contracts
+                .Include(c => c.JobApplication)
+                .FirstOrDefaultAsync(c => c.EmployeeNationalId == nationalId);
+
+            if (contract == null) return Content("Contract not found.");
+
+            var attachments = await _context.ContractAttachments.Where(a => a.ContractId == contract.Id).ToListAsync();
+            foreach (var attr in attachments)
+            {
+                if (!string.IsNullOrEmpty(attr.FileUrl))
+                {
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/attachments", attr.FileUrl);
+                    if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
+                }
+                _context.ContractAttachments.Remove(attr);
+            }
+
+            if (!string.IsNullOrEmpty(contract.SignedContractUrl))
+            {
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/attachments", contract.SignedContractUrl);
+                if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
+            }
+            if (!string.IsNullOrEmpty(contract.NationalIdUrl))
+            {
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/attachments", contract.NationalIdUrl);
+                if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
+            }
+
+            _context.Contracts.Remove(contract);
+            await _context.SaveChangesAsync();
+
+            return Content("Successfully deleted the contract and its associated files.");
         }
     }
 }

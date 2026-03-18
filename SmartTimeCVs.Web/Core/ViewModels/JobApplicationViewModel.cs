@@ -134,6 +134,21 @@ public class JobApplicationViewModel : BaseModel
 
     #endregion Application Information.
 
+    #region Hiring Details.
+
+    [Display(Name = "Date of Hiring")]
+    public DateTime? HiringDate { get; set; }
+
+    [Display(Name = "User Name")]
+    [MaxLength(250, ErrorMessage = Errors.MaxLength)]
+    public string? SystemUserName { get; set; }
+
+    [Display(Name = "Password")]
+    [MaxLength(250, ErrorMessage = Errors.MaxLength)]
+    public string? SystemPassword { get; set; }
+
+    #endregion Hiring Details.
+
     #region Attachment.
 
     [Display(Name = "CV Attachment")]

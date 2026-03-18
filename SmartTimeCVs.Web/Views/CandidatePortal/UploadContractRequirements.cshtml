@@ -64,6 +64,25 @@
                         </div>
                     </div>
                 </div>
+
+                @if (Model.DynamicRequirements != null && Model.DynamicRequirements.Any())
+                {
+                    <div class="row clearfix mb-4 mt-4">
+                        @for (int i = 0; i < Model.DynamicRequirements.Count; i++)
+                        {
+                            <div class="col-md-6 mb-3">
+                                <h2 class="card-inside-title mb-2">@Model.DynamicRequirements[i].RequirementName (PDF / Image) @(Model.DynamicRequirements[i].IsRequired ? Html.Raw("<span class=\"text-danger\">*</span>") : "")</h2>
+                                <div class="form-group form-float">
+                                    <input type="hidden" asp-for="DynamicRequirements[i].RequirementId" />
+                                    <input type="hidden" asp-for="DynamicRequirements[i].RequirementName" />
+                                    <input type="hidden" asp-for="DynamicRequirements[i].IsRequired" />
+                                    <input type="file" asp-for="DynamicRequirements[i].File" class="form-control" accept="image/*,application/pdf" />
+                                    <span asp-validation-for="DynamicRequirements[i].File" class="text-danger"></span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
                 
                 <div class="row mt-4">
                     <div class="col-md-12" style="text-align: center;">

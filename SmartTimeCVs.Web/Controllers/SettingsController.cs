@@ -31,13 +31,20 @@ namespace SmartTimeCVs.Web.Controllers
         public async Task<IActionResult> AddContractType(int? id)
         {
             ViewBag.ContractCategories = await _context.ContractCategories.ToListAsync();
+            ViewBag.DocumentRequirements = await _context.DocumentRequirementLookups.ToListAsync();
+            
             if (id.HasValue)
             {
-                var contractType = await _context.ContractTypes.FindAsync(id.Value);
+                var contractType = await _context.ContractTypes
+                    .Include(c => c.DocumentRequirements)
+                    .FirstOrDefaultAsync(c => c.Id == id.Value);
+                    
                 if (contractType == null)
                 {
                     return NotFound();
                 }
+                
+                ViewBag.SelectedDocumentRequirements = contractType.DocumentRequirements.Select(d => d.Id).ToList();
                 return View("ContractTypeForm", contractType);
             }
             return View("ContractTypeForm", new ContractType());
@@ -106,7 +113,7 @@ namespace SmartTimeCVs.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SaveContractType(ContractType model)
+        public async Task<IActionResult> SaveContractType(ContractType model, List<int> SelectedDocumentRequirements)
         {
             try
             {
@@ -115,11 +122,19 @@ namespace SmartTimeCVs.Web.Controllers
                     if (model.Id == 0)
                     {
                         model.CreatedOn = DateTime.Now;
+                        if (SelectedDocumentRequirements != null && SelectedDocumentRequirements.Any())
+                        {
+                            model.DocumentRequirements = await _context.DocumentRequirementLookups
+                                .Where(r => SelectedDocumentRequirements.Contains(r.Id)).ToListAsync();
+                        }
                         _context.ContractTypes.Add(model);
                     }
                     else
                     {
-                        var existing = await _context.ContractTypes.FindAsync(model.Id);
+                        var existing = await _context.ContractTypes
+                            .Include(c => c.DocumentRequirements)
+                            .FirstOrDefaultAsync(c => c.Id == model.Id);
+                            
                         if (existing != null)
                         {
                             existing.NameEn = model.NameEn;
@@ -134,6 +149,18 @@ namespace SmartTimeCVs.Web.Controllers
                             existing.AuthorizedSignatory = model.AuthorizedSignatory;
                             existing.CommercialNumber = model.CommercialNumber;
                             existing.LastUpdatedOn = DateTime.Now;
+                            
+                            existing.DocumentRequirements.Clear();
+                            if (SelectedDocumentRequirements != null && SelectedDocumentRequirements.Any())
+                            {
+                                var reqs = await _context.DocumentRequirementLookups
+                                    .Where(r => SelectedDocumentRequirements.Contains(r.Id)).ToListAsync();
+                                foreach (var req in reqs)
+                                {
+                                    existing.DocumentRequirements.Add(req);
+                                }
+                            }
+                            
                             _context.ContractTypes.Update(existing);
                         }
                     }
@@ -158,6 +185,68 @@ namespace SmartTimeCVs.Web.Controllers
             if (entity != null)
             {
                 _context.ContractTypes.Remove(entity);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Not found" });
+        }
+
+        public async Task<IActionResult> DocumentRequirements()
+        {
+            var requirements = await _context.DocumentRequirementLookups.ToListAsync();
+            return View(requirements);
+        }
+
+        public async Task<IActionResult> AddDocumentRequirement(int? id)
+        {
+            if (id.HasValue)
+            {
+                var requirement = await _context.DocumentRequirementLookups.FindAsync(id.Value);
+                if (requirement == null)
+                {
+                    return NotFound();
+                }
+                return View("DocumentRequirementForm", requirement);
+            }
+            return View("DocumentRequirementForm", new DocumentRequirementLookup());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveDocumentRequirement(DocumentRequirementLookup model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (model.Id == 0)
+                {
+                    model.CreatedOn = DateTime.Now;
+                    _context.DocumentRequirementLookups.Add(model);
+                }
+                else
+                {
+                    var existing = await _context.DocumentRequirementLookups.FindAsync(model.Id);
+                    if (existing != null)
+                    {
+                        existing.NameEn = model.NameEn;
+                        existing.NameNative = model.NameNative;
+                        existing.IsRequired = model.IsRequired;
+                        existing.LastUpdatedOn = DateTime.Now;
+                        _context.DocumentRequirementLookups.Update(existing);
+                    }
+                }
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(DocumentRequirements));
+            }
+            return View("DocumentRequirementForm", model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteDocumentRequirement(int id)
+        {
+            var entity = await _context.DocumentRequirementLookups.FindAsync(id);
+            if (entity != null)
+            {
+                _context.DocumentRequirementLookups.Remove(entity);
                 await _context.SaveChangesAsync();
                 return Json(new { success = true });
             }

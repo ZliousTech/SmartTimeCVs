@@ -38,5 +38,7 @@ namespace SmartTimeCVs.Web.Core.Models
 
         [MaxLength(100)]
         public string? CommercialNumber { get; set; }
+
+        public ICollection<DocumentRequirementLookup> DocumentRequirements { get; set; } = new List<DocumentRequirementLookup>();
     }
 }

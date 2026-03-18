@@ -60,5 +60,7 @@ namespace SmartTimeCVs.Web.Core.Models
 
         public string? SignedContractUrl { get; set; }
         public string? NationalIdUrl { get; set; }
+
+        public ICollection<ContractAttachment> ContractAttachments { get; set; } = new List<ContractAttachment>();
     }
 }

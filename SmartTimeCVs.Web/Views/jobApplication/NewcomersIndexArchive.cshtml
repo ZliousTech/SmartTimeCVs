@@ -27,6 +27,7 @@
 					<tr class="cyan">
 						<th class="js-no-export js-exclude-search d-none">Id</th>
 						<th>@Localizer["Full Name"]</th>
+						<th>@Localizer["NationalID"]</th>
 						<th>@Localizer["University Certificate"]</th>
 						<th>@Localizer["CV"]</th>
 						<th>@Localizer["Experience Certificates"]</th>
@@ -45,6 +46,7 @@
 							<td scope="row">
 								<span class="list-name">@jobApp.FullName</span>
 							</td>
+							<td>@jobApp.NationalID</td>
 							
 							<!-- University Certificate -->
 							<td>
@@ -119,18 +121,38 @@
 
 							<!-- Other Attachments -->
 							<td>
-								@if(jobApp.AttachmentFiles != null && jobApp.AttachmentFiles.Any())
+								@{
+									var allOtherAttachments = new List<dynamic>();
+									if(jobApp.AttachmentFiles != null && jobApp.AttachmentFiles.Any())
+									{
+										var index = 1;
+										foreach(var file in jobApp.AttachmentFiles)
+										{
+											allOtherAttachments.Add(new { Url = file.AttachmentUrl, Name = $"{Localizer["Attachment"]} #{index}" });
+											index++;
+										}
+									}
+									if(signedContract != null && signedContract.ContractAttachments != null && signedContract.ContractAttachments.Any())
+									{
+										var isRtlCulture = System.Globalization.CultureInfo.CurrentCulture.Name.StartsWith("ar");
+										foreach(var ca in signedContract.ContractAttachments)
+										{
+											var reqName = ca.DocumentRequirementLookup != null ? (isRtlCulture ? ca.DocumentRequirementLookup.NameNative : ca.DocumentRequirementLookup.NameEn) : Localizer["Attachment"].Value;
+											allOtherAttachments.Add(new { Url = ca.FileUrl, Name = reqName });
+										}
+									}
+								}
+
+								@if(allOtherAttachments.Any())
 								{
 									<div class="dropdown">
 										<button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-											<i class="material-icons" style="font-size: 16px; vertical-align: middle;">folder</i> @jobApp.AttachmentFiles.Count() @Localizer["Files"]
+											<i class="material-icons" style="font-size: 16px; vertical-align: middle;">folder</i> @allOtherAttachments.Count @Localizer["Files"]
 										</button>
 										<div class="dropdown-menu">
-											@{ int index = 1; }
-											@foreach(var file in jobApp.AttachmentFiles)
+											@foreach(var item in allOtherAttachments)
 											{
-												<a class="dropdown-item" href="~/images/attachments/@file.AttachmentUrl" target="_blank">@Localizer["Attachment"] #@index</a>
-												index++;
+												<a class="dropdown-item" href="~/images/attachments/@item.Url" target="_blank">@item.Name</a>
 											}
 										</div>
 									</div>

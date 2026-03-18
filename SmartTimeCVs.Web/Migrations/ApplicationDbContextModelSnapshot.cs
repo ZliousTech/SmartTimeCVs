@@ -22,6 +22,21 @@ namespace SmartTimeCVs.Web.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ContractTypeDocumentRequirementLookup", b =>
+                {
+                    b.Property<int>("ContractTypesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DocumentRequirementsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ContractTypesId", "DocumentRequirementsId");
+
+                    b.HasIndex("DocumentRequirementsId");
+
+                    b.ToTable("ContractTypeDocumentRequirementLookup");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -365,6 +380,43 @@ namespace SmartTimeCVs.Web.Migrations
                     b.ToTable("Contracts");
                 });
 
+            modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.ContractAttachment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ContractId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<int>("DocumentRequirementLookupId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FileUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractId");
+
+                    b.HasIndex("DocumentRequirementLookupId");
+
+                    b.ToTable("ContractAttachments");
+                });
+
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.ContractCategory", b =>
                 {
                     b.Property<int>("Id")
@@ -504,6 +556,41 @@ namespace SmartTimeCVs.Web.Migrations
                     b.HasIndex("JobApplicationId");
 
                     b.ToTable("Course");
+                });
+
+            modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.DocumentRequirementLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NameNative")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DocumentRequirementLookups");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.GenderType", b =>
@@ -694,6 +781,9 @@ namespace SmartTimeCVs.Web.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<DateTime?>("HiringDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -756,6 +846,14 @@ namespace SmartTimeCVs.Web.Migrations
                     b.Property<string>("ReasonForLeavingCurrent")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("SystemPassword")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("SystemUserName")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.HasKey("Id");
 
@@ -989,6 +1087,21 @@ namespace SmartTimeCVs.Web.Migrations
                     b.ToTable("WorkExperience");
                 });
 
+            modelBuilder.Entity("ContractTypeDocumentRequirementLookup", b =>
+                {
+                    b.HasOne("SmartTimeCVs.Web.Core.Models.ContractType", null)
+                        .WithMany()
+                        .HasForeignKey("ContractTypesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartTimeCVs.Web.Core.Models.DocumentRequirementLookup", null)
+                        .WithMany()
+                        .HasForeignKey("DocumentRequirementsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1062,6 +1175,25 @@ namespace SmartTimeCVs.Web.Migrations
                     b.Navigation("ContractType");
 
                     b.Navigation("JobApplication");
+                });
+
+            modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.ContractAttachment", b =>
+                {
+                    b.HasOne("SmartTimeCVs.Web.Core.Models.Contract", "Contract")
+                        .WithMany("ContractAttachments")
+                        .HasForeignKey("ContractId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartTimeCVs.Web.Core.Models.DocumentRequirementLookup", "DocumentRequirementLookup")
+                        .WithMany()
+                        .HasForeignKey("DocumentRequirementLookupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contract");
+
+                    b.Navigation("DocumentRequirementLookup");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.Course", b =>
@@ -1153,6 +1285,11 @@ namespace SmartTimeCVs.Web.Migrations
                         .HasForeignKey("JobApplicationId");
 
                     b.Navigation("JobApplication");
+                });
+
+            modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.Contract", b =>
+                {
+                    b.Navigation("ContractAttachments");
                 });
 
             modelBuilder.Entity("SmartTimeCVs.Web.Core.Models.GenderType", b =>

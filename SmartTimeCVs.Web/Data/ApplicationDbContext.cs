@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace SmartTimeCVs.Web.Data
 {
@@ -22,6 +22,8 @@ namespace SmartTimeCVs.Web.Data
         public DbSet<Contract> Contracts { get; set; }
         public DbSet<ContractType> ContractTypes { get; set; }
         public DbSet<ContractCategory> ContractCategories { get; set; }
+        public DbSet<DocumentRequirementLookup> DocumentRequirementLookups { get; set; }
+        public DbSet<ContractAttachment> ContractAttachments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -32,6 +34,7 @@ namespace SmartTimeCVs.Web.Data
             builder.Entity<WorkExperience>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Entity<AttachmentFile>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Entity<Contract>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
+            builder.Entity<ContractAttachment>().Property(p => p.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Entity<Contract>().Property(p => p.MonthlySalary).HasPrecision(18, 2);
             builder.Entity<JobApplication>().Property(p => p.IsShortListed);
             builder.Entity<JobApplication>().Property(p => p.IsExcluded);

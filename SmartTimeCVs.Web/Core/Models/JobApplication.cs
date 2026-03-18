@@ -121,6 +121,18 @@ namespace SmartTimeCVs.Web.Core.Models
 
         #endregion Application Information.
 
+        #region Hiring Details.
+
+        public DateTime? HiringDate { get; set; }
+
+        [MaxLength(250)]
+        public string? SystemUserName { get; set; }
+
+        [MaxLength(250)]
+        public string? SystemPassword { get; set; }
+
+        #endregion Hiring Details.
+
         #region Attachments.
         public string? AttachmentUrl { get; set; }
 

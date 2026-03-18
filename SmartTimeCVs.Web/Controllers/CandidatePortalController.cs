@@ -200,13 +200,31 @@ namespace SmartTimeCVs.Web.Controllers
             // Keep authenticated for postback
             TempData.Keep("AuthenticatedContractId");
 
-            var contract = await _context.Contracts.FindAsync(contractId);
+            var contract = await _context.Contracts
+                .Include(c => c.JobApplication)
+                .Include(c => c.ContractType)
+                .ThenInclude(ct => ct.DocumentRequirements)
+                .FirstOrDefaultAsync(c => c.Id == contractId);
+
             if (contract != null && contract.JobApplicationId.HasValue)
             {
                 await LoadCompanyDataAsync(contract.JobApplicationId.Value);
             }
 
-            return View(new UploadContractRequirementsViewModel { ContractId = contractId });
+            var model = new UploadContractRequirementsViewModel { ContractId = contractId };
+            
+            if (contract?.ContractType?.DocumentRequirements != null)
+            {
+                var isRtl = System.Globalization.CultureInfo.CurrentCulture.Name.StartsWith("ar");
+                model.DynamicRequirements = contract.ContractType.DocumentRequirements.Select(r => new DynamicRequirementViewModel
+                {
+                    RequirementId = r.Id,
+                    RequirementName = isRtl ? r.NameNative : r.NameEn,
+                    IsRequired = r.IsRequired
+                }).ToList();
+            }
+
+            return View(model);
         }
 
         [HttpPost]
@@ -219,14 +237,44 @@ namespace SmartTimeCVs.Web.Controllers
             }
             TempData.Keep("AuthenticatedContractId");
 
-            var contract = await _context.Contracts.Include(c => c.JobApplication).FirstOrDefaultAsync(c => c.Id == model.ContractId);
+            var contract = await _context.Contracts
+                .Include(c => c.JobApplication)
+                .Include(c => c.ContractType)
+                .ThenInclude(ct => ct.DocumentRequirements)
+                .FirstOrDefaultAsync(c => c.Id == model.ContractId);
+
             if (contract != null && contract.JobApplicationId.HasValue)
             {
                 await LoadCompanyDataAsync(contract.JobApplicationId.Value);
             }
 
+            if (model.DynamicRequirements != null)
+            {
+                for (int i = 0; i < model.DynamicRequirements.Count; i++)
+                {
+                    var req = model.DynamicRequirements[i];
+                    if (req.IsRequired && (req.File == null || req.File.Length == 0))
+                    {
+                        ModelState.AddModelError($"DynamicRequirements[{i}].File", $"Please upload the required document: {req.RequirementName}");
+                    }
+                }
+            }
+
             if (!ModelState.IsValid)
             {
+                if (model.DynamicRequirements == null || !model.DynamicRequirements.Any())
+                {
+                    if (contract?.ContractType?.DocumentRequirements != null)
+                    {
+                        var isRtl = System.Globalization.CultureInfo.CurrentCulture.Name.StartsWith("ar");
+                        model.DynamicRequirements = contract.ContractType.DocumentRequirements.Select(r => new DynamicRequirementViewModel
+                        {
+                            RequirementId = r.Id,
+                            RequirementName = isRtl ? r.NameNative : r.NameEn,
+                            IsRequired = r.IsRequired
+                        }).ToList();
+                    }
+                }
                 return View(model);
             }
 
@@ -267,6 +315,34 @@ namespace SmartTimeCVs.Web.Controllers
                     }
 
                     contract.NationalIdUrl = fileName2;
+                }
+
+                // Save Dynamic Requirements
+                if (model.DynamicRequirements != null)
+                {
+                    foreach (var req in model.DynamicRequirements)
+                    {
+                        if (req.File != null && req.File.Length > 0)
+                        {
+                            var ext = Path.GetExtension(req.File.FileName);
+                            var fileName = $"{Guid.NewGuid()}{ext}";
+                            var filePath = Path.Combine(uploadsFolder, fileName);
+                            
+                            using (var fs = new FileStream(filePath, FileMode.Create))
+                            {
+                                await req.File.CopyToAsync(fs);
+                            }
+                            
+                            var attachment = new ContractAttachment
+                            {
+                                ContractId = contract.Id,
+                                DocumentRequirementLookupId = req.RequirementId,
+                                FileUrl = fileName,
+                                CreatedOn = DateTime.Now
+                            };
+                            _context.ContractAttachments.Add(attachment);
+                        }
+                    }
                 }
 
                 contract.IsSigned = true;

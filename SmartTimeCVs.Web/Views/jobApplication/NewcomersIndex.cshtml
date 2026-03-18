@@ -27,22 +27,34 @@
 					<tr class="cyan">
 						<th class="js-no-export js-exclude-search d-none">Id</th>
 						<th>@Localizer["FullName"]</th>
+						<th>@Localizer["NationalID"]</th>
 						<th>@Localizer["Email"]</th>
 						<th>@Localizer["Mobile"]</th>
-						<th>@Localizer["NationalID"]</th>
+                        <th>@Localizer["Date Of Hiring"]</th>
+                        <th>@Localizer["User Name"]</th>
+                        <th>@Localizer["Password"]</th>
+						<th>@Localizer["Action"]</th>
 					</tr>
 				</thead>
 				<tbody>
 					@foreach (var jobApp in Model)
 					{
-						<tr>
+						<tr id="row-@jobApp.Id">
 							<td class="d-none">@jobApp.Id</td>
 							<td scope="row">
 								<span class="list-name">@jobApp.FullName</span>
 							</td>
+							<td>@jobApp.NationalID</td>
 							<td>@jobApp.Email</td>
 							<td>@jobApp.MobileNumber</td>
-							<td>@jobApp.NationalID</td>
+                            <td class="hiring-date">@(jobApp.HiringDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                            <td class="sys-username">@(jobApp.SystemUserName ?? "-")</td>
+                            <td class="sys-password">@(jobApp.SystemPassword ?? "-")</td>
+                            <td>
+                                <button class="btn btn-sm btn-success" onclick="openAcceptModal(@jobApp.Id)">
+                                    @Localizer["Accept"]
+                                </button>
+                            </td>
 						</tr>
 					}
 				</tbody>
@@ -51,8 +63,106 @@
 	</div>
 </div>
 
+<!-- Accept Modal -->
+<div class="modal fade" id="acceptModal" tabindex="-1" role="dialog" aria-labelledby="acceptModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="acceptModalLabel">@Localizer["Hiring Details"]</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="$('#acceptModal').modal('hide')">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="acceptForm">
+                    <input type="hidden" id="acceptAppId" />
+                    
+                    <div class="form-group mb-3">
+                        <label>@Localizer["Date of hiring"]</label>
+                        <input type="date" class="form-control" id="hiringDate" required />
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label>@Localizer["User Name"]</label>
+                        <input type="text" class="form-control" id="sysUsername" required />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label>@Localizer["Password"]</label>
+                        <input type="text" class="form-control" id="sysPassword" required />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label>@Localizer["Confirm Password"]</label>
+                        <input type="text" class="form-control" id="sysConfirmPassword" required />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#acceptModal').modal('hide')">@Localizer["Cancel"]</button>
+                <button type="button" class="btn btn-primary" onclick="submitAcceptDetails()">@Localizer["Save"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <input type="hidden" name="__RequestVerificationToken" value="@antiforgery.GetAndStoreTokens(Context).RequestToken" />
 
 @section Plugins {
 	<partial name="_DataTablesJS" />
+    <script>
+        function openAcceptModal(appId) {
+            $('#acceptAppId').val(appId);
+            $('#hiringDate').val('');
+            $('#sysUsername').val('');
+            $('#sysPassword').val('');
+            $('#sysConfirmPassword').val('');
+            $('#acceptModal').appendTo("body").modal('show');
+        }
+
+        function submitAcceptDetails() {
+            var appId = $('#acceptAppId').val();
+            var hDate = $('#hiringDate').val();
+            var sUser = $('#sysUsername').val();
+            var sPass = $('#sysPassword').val();
+            var sConfirm = $('#sysConfirmPassword').val();
+
+            if (!hDate || !sUser || !sPass || !sConfirm) {
+                Swal.fire('Error', '@Localizer["All fields are required"]', 'error');
+                return;
+            }
+
+            if (sPass !== sConfirm) {
+                Swal.fire('Error', '@Localizer["Passwords do not match"]', 'error');
+                return;
+            }
+
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            $.ajax({
+                url: '@Url.Action("AcceptNewcomer", "JobApplication")',
+                type: 'POST',
+                data: {
+                    id: appId,
+                    hiringDate: hDate,
+                    sysUsername: sUser,
+                    sysPassword: sPass,
+                    __RequestVerificationToken: token
+                },
+                success: function(response) {
+                    $('#acceptModal').modal('hide');
+                    Swal.fire('Success', response.message, 'success');
+                    
+                    // Update table UI
+                    var row = $('#row-' + appId);
+                    row.find('.hiring-date').text(response.hiringDate);
+                    row.find('.sys-username').text(response.sysUsername);
+                    row.find('.sys-password').text(response.sysPassword);
+                },
+                error: function(err) {
+                    Swal.fire('Error', err.responseText || 'An error occurred', 'error');
+                }
+            });
+        }
+    </script>
 }

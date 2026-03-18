@@ -38,6 +38,58 @@
         border-radius: 3px;
         margin-left: 10px;
     }
+
+    /* Custom Select2 Tag Pills (Bootstrap4 Theme) */
+    .select2-container--bootstrap4 .select2-selection--multiple .select2-selection__choice {
+        background-color: #03a9f4 !important; /* Vibrant Blue */
+        border: none !important;
+        border-radius: 50px !important; /* Oval shape */
+        padding: 6px 16px 6px 32px !important; /* Extra padding for text and 'x' */
+        color: #ffffff !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        margin-top: 6px !important;
+        margin-left: 6px !important;
+        position: relative !important;
+        box-shadow: 0 2px 4px rgba(3, 169, 244, 0.2) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    .select2-container--bootstrap4 .select2-selection--multiple .select2-selection__choice__remove {
+        color: #ffffff !important;
+        cursor: pointer !important;
+        display: inline-block !important;
+        font-weight: bold !important;
+        position: absolute !important;
+        left: 10px !important; /* Position 'x' on the left side of the pill */
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        border-right: none !important; /* Remove default select2 border */
+        padding: 0 !important;
+        margin-right: 0 !important;
+        font-size: 18px !important;
+        opacity: 0.8 !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .select2-container--bootstrap4 .select2-selection--multiple .select2-selection__choice__remove:hover {
+        background-color: transparent !important;
+        opacity: 1 !important;
+        transform: translateY(-50%) scale(1.2) !important;
+    }
+
+    .select2-container--bootstrap4.select2-container--focus .select2-selection--multiple {
+        border-color: #03a9f4 !important;
+        box-shadow: 0 0 0 0.2rem rgba(3, 169, 244, 0.15) !important;
+    }
+    
+    .select2-container--bootstrap4 .select2-selection--multiple {
+        min-height: 48px !important;
+        border-radius: 8px !important;
+        border: 1px solid #ced4da !important;
+        padding: 2px 6px !important;
+    }
 </style>
 
 <div class="row clearfix">
@@ -69,6 +121,31 @@
                             <h2 class="card-inside-title mb-2">@Localizer["Contract For"] <span class="text-muted" style="font-size: 11px;">@Localizer["(e.g. Manager, Driver)"]</span></h2>
                             <div class="form-group form-float">
                                 <input asp-for="ContractFor" class="form-control w-100" placeholder="@Localizer["Target Role..."]" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-12 mb-3">
+                            <h2 class="card-inside-title mb-2">@Localizer["Required Documents"]</h2>
+                            <div class="form-group">
+                                <select name="SelectedDocumentRequirements" class="form-control js-select2 w-100" multiple data-placeholder="@Localizer["Select required documents..."]">
+                                    @if(ViewBag.DocumentRequirements != null)
+                                    {
+                                        var selectedReqs = ViewBag.SelectedDocumentRequirements as List<int> ?? new List<int>();
+                                        foreach(var req in (IEnumerable<SmartTimeCVs.Web.Core.Models.DocumentRequirementLookup>)ViewBag.DocumentRequirements)
+                                        {
+                                            if (selectedReqs.Contains(req.Id))
+                                            {
+                                                <option value="@req.Id" selected>@req.NameEn (@req.NameNative)</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@req.Id">@req.NameEn (@req.NameNative)</option>
+                                            }
+                                        }
+                                    }
+                                </select>
                             </div>
                         </div>
                     </div>

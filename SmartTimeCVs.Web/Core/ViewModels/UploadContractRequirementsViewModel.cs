@@ -15,5 +15,15 @@ namespace SmartTimeCVs.Web.Core.ViewModels
         [Required(ErrorMessage = "Please upload your National ID.")]
         [Display(Name = "National ID")]
         public IFormFile NationalIdFile { get; set; } = null!;
+
+        public List<DynamicRequirementViewModel> DynamicRequirements { get; set; } = new List<DynamicRequirementViewModel>();
+    }
+
+    public class DynamicRequirementViewModel
+    {
+        public int RequirementId { get; set; }
+        public string RequirementName { get; set; } = null!;
+        public bool IsRequired { get; set; }
+        public IFormFile? File { get; set; }
     }
 }

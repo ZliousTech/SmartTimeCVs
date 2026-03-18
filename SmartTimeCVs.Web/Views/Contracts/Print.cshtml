@@ -2,10 +2,15 @@
 @model SmartTimeCVs.Web.Core.Models.Contract
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
 @{
-    var currentCulture = System.Globalization.CultureInfo.CurrentCulture;
-    var isRtl = currentCulture.TextInfo.IsRightToLeft;
+    var systemCulture = System.Globalization.CultureInfo.CurrentCulture;
+    var langParam = ViewBag.ContractLang as string;
+    var contractCulture = !string.IsNullOrEmpty(langParam) ? new System.Globalization.CultureInfo(langParam) : systemCulture;
+    
+    var isRtl = systemCulture.TextInfo.IsRightToLeft;
+    var isContractRtl = contractCulture.TextInfo.IsRightToLeft;
     var alignClass = isRtl ? "text-right" : "text-left";
-    var directionStr = isRtl ? "rtl" : "ltr";
+    var systemDirection = isRtl ? "rtl" : "ltr";
+    var contractDirection = isContractRtl ? "rtl" : "ltr";
 
     ViewData["Title"] = Localizer["Print Contract"];
     ViewData["ControllerName"] = "Contracts";
@@ -22,8 +27,8 @@
             color: #000;
             padding: 50px;
             background: #fff;
-            direction: @directionStr;
-            text-align: @(isRtl ? "right" : "left");
+            direction: @contractDirection;
+            text-align: @(isContractRtl ? "right" : "left");
         }
         
         .contract-document h2 {
@@ -96,23 +101,63 @@
     <div class="col-lg-12 col-md-12 col-sm-12">
         <div class="card">
             <div class="card-header @alignClass">
-                <button onclick="window.print();" class="btn btn-primary btn-round btn-print">
-                    <i class="material-icons">print</i> @Localizer["Print Document"]
-                </button>
-                <button onclick="downloadPDF();" class="btn btn-info btn-round btn-print @(isRtl ? "mr-2" : "ml-2")">
-                    <i class="material-icons">picture_as_pdf</i> @Localizer["Download PDF"]
-                </button>
-                <button onclick="sendEmail();" class="btn btn-success btn-round btn-print @(isRtl ? "mr-2" : "ml-2")">
-                    <i class="material-icons">email</i> @Localizer["Email Contract"]
-                </button>
-                <a asp-action="Index" class="btn btn-default btn-round btn-print @(isRtl ? "mr-2" : "ml-2")">@Localizer["Back"]</a>
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <button onclick="window.print();" class="btn btn-primary btn-round btn-print">
+                            <i class="material-icons">print</i> @Localizer["Print Document"]
+                        </button>
+                        <button onclick="downloadPDF();" class="btn btn-info btn-round btn-print @(isRtl ? "mr-2" : "ml-2")">
+                            <i class="material-icons">picture_as_pdf</i> @Localizer["Download PDF"]
+                        </button>
+                        <button onclick="sendEmail();" class="btn btn-success btn-round btn-print @(isRtl ? "mr-2" : "ml-2")">
+                            <i class="material-icons">email</i> @Localizer["Email Contract"]
+                        </button>
+                        <a asp-action="Index" class="btn btn-default btn-round btn-print @(isRtl ? "mr-2" : "ml-2")">@Localizer["Back"]</a>
+                    </div>
+                    <div class="col-md-5 text-end text-right btn-print">
+                        <style>
+                            .btn-language {
+                                border-radius: 50px !important;
+                                padding: 8px 25px !important;
+                                font-weight: bold !important;
+                                transition: all 0.3s ease;
+                            }
+                            .btn-language.active-ar {
+                                background-color: #28a745 !important;
+                                border-color: #28a745 !important;
+                                color: white !important;
+                                box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+                            }
+                            .btn-language.active-en {
+                                background-color: #007bff !important;
+                                border-color: #007bff !important;
+                                color: white !important;
+                                box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+                            }
+                        </style>
+                        <div class="btn-group">
+                            <a href="@Url.Action("Print", new { id = Model.Id, lang = "ar" })" 
+                               class="btn btn-language @(contractCulture.Name.StartsWith("ar") ? "active-ar" : "btn-outline-secondary")">العربية</a>
+                            <a href="@Url.Action("Print", new { id = Model.Id, lang = "en" })" 
+                               class="btn btn-language @(contractCulture.Name.StartsWith("en") ? "active-en" : "btn-outline-secondary") ml-2">English</a>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="body">
-                <div class="contract-document">
+                <div class="contract-document" dir="@contractDirection" style="direction: @contractDirection; text-align: @(isContractRtl ? "right" : "left");">
+                    @{
+                        // Temporarily change culture for the contract body
+                        var originalCulture = System.Globalization.CultureInfo.CurrentCulture;
+                        var originalUiCulture = System.Globalization.CultureInfo.CurrentUICulture;
+                        System.Globalization.CultureInfo.CurrentCulture = contractCulture;
+                        System.Globalization.CultureInfo.CurrentUICulture = contractCulture;
+                    }
+
                     <h2>@Localizer["Work Contract"]</h2>
                     
                     <p>
-                        @Localizer["It is on day"] <strong>@Model.CreatedOn?.ToString("dddd", currentCulture)</strong> 
+                        @Localizer["It is on day"] <strong>@Model.CreatedOn?.ToString("dddd", contractCulture)</strong> 
                         @Localizer["Corresponding to"] <strong>@Model.CreatedOn?.ToString("dd / MM / yyyy")</strong>
                     </p>
 
@@ -134,8 +179,8 @@
                     <h4>@Localizer["Preamble:"]</h4>
                     @if (Model.ContractType != null && (!string.IsNullOrWhiteSpace(Model.ContractType.DescriptionNative) || !string.IsNullOrWhiteSpace(Model.ContractType.DescriptionEn)))
                     {
-                        var isRtlCulture = currentCulture.Name.StartsWith("ar");
-                        var preambleText = isRtlCulture && !string.IsNullOrWhiteSpace(Model.ContractType.DescriptionNative) 
+                        var isContractRtlCulture = contractCulture.Name.StartsWith("ar");
+                        var preambleText = isContractRtlCulture && !string.IsNullOrWhiteSpace(Model.ContractType.DescriptionNative) 
                             ? Model.ContractType.DescriptionNative 
                             : Model.ContractType.DescriptionEn;
                             
@@ -150,8 +195,8 @@
 
                     @if (Model.ContractType != null && (!string.IsNullOrWhiteSpace(Model.ContractType.ClausesNative) || !string.IsNullOrWhiteSpace(Model.ContractType.ClausesEn)))
                     {
-                        var isRtlCulture = currentCulture.Name.StartsWith("ar");
-                        var clausesText = isRtlCulture && !string.IsNullOrWhiteSpace(Model.ContractType.ClausesNative) 
+                        var isContractRtlCulture = contractCulture.Name.StartsWith("ar");
+                        var clausesText = isContractRtlCulture && !string.IsNullOrWhiteSpace(Model.ContractType.ClausesNative) 
                             ? Model.ContractType.ClausesNative 
                             : Model.ContractType.ClausesEn;
 
@@ -166,10 +211,13 @@
                                     {
                                         for (var i = 0; i < clausesDocs.Count; i++)
                                         {
-                                            var titleStr = Convert.ToString(clausesDocs[i].GetProperty("Title").GetString());
-                                            var contentStr = Convert.ToString(clausesDocs[i].GetProperty("Content").GetString());
+                                            var titleProperty = clausesDocs[i].GetProperty("Title");
+                                            var contentProperty = clausesDocs[i].GetProperty("Content");
                                             
-                                            var displayTitle = !string.IsNullOrWhiteSpace(titleStr) ? titleStr : (isRtlCulture ? $"ثانياً: البند {i + 1}" : $"Clause {i + 1}");
+                                            var titleStr = titleProperty.ValueKind != System.Text.Json.JsonValueKind.Null ? titleProperty.GetString() : null;
+                                            var contentStr = contentProperty.ValueKind != System.Text.Json.JsonValueKind.Null ? contentProperty.GetString() : null;
+                                            
+                                            var displayTitle = !string.IsNullOrWhiteSpace(titleStr) ? titleStr : (isContractRtlCulture ? $"ثانياً: البند {i + 1}" : $"Clause {i + 1}");
                                             
                                             <h4>@displayTitle</h4>
                                             <p style="white-space: pre-wrap;">@contentStr</p>
@@ -201,22 +249,27 @@
                     }
                     else
                     {
-                        @* Fallback to displaying a message if there are no clauses attached, though this shouldn't happen usually *@
                         <p class="text-muted">@Localizer["No additional clauses specified for this contract type."]</p>
                     }
 
                     <div class="row signature-area">
-                        <div class="col-md-6 @alignClass">
+                        <div class="col-md-6 @(isContractRtl ? "text-right" : "text-left")">
                             <p><strong>@Localizer["First Party Signature"] (@Model.CompanyName):</strong></p>
                             <p>@Localizer["Name:"] <strong>@Model.RepresentativeName</strong></p>
                             <p>@Localizer["Signature:"] …………………………</p>
                         </div>
-                        <div class="col-md-6 @alignClass">
+                        <div class="col-md-6 @(isContractRtl ? "text-right" : "text-left")">
                             <p><strong>@Localizer["Second Party Signature"] (@Localizer["Employee/Teacher"]):</strong></p>
                             <p>@Localizer["Name:"] <strong>@Model.EmployeeName</strong></p>
                             <p>@Localizer["Signature:"] …………………………</p>
                         </div>
                     </div>
+
+                    @{
+                        // Restore original culture
+                        System.Globalization.CultureInfo.CurrentCulture = originalCulture;
+                        System.Globalization.CultureInfo.CurrentUICulture = originalUiCulture;
+                    }
 
                 </div>
             </div>

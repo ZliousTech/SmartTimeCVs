@@ -361,6 +361,39 @@ namespace SmartTimeCVs.Web.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AcceptNewcomer(int id, DateTime? hiringDate, string? sysUsername, string? sysPassword)
+        {
+            try
+            {
+                var jobApplication = await _context.JobApplication.FindAsync(id);
+
+                if (jobApplication is null)
+                    return NotFound();
+
+                jobApplication.HiringDate = hiringDate;
+                jobApplication.SystemUserName = sysUsername;
+                jobApplication.SystemPassword = sysPassword;
+                jobApplication.LastUpdatedOn = DateTime.Now;
+
+                _context.JobApplication.Update(jobApplication);
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    message = "Hiring details saved successfully",
+                    hiringDate = jobApplication.HiringDate?.ToString("yyyy-MM-dd"),
+                    sysUsername = jobApplication.SystemUserName,
+                    sysPassword = jobApplication.SystemPassword
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         public async Task<IActionResult> NewcomersIndexArchive()
         {
             try
@@ -371,6 +404,8 @@ namespace SmartTimeCVs.Web.Controllers
                     .Include(p => p.WorkExperience)
                     .Include(p => p.AttachmentFiles)
                     .Include(p => p.Contracts)
+                        .ThenInclude(c => c.ContractAttachments)
+                        .ThenInclude(ca => ca.DocumentRequirementLookup)
                     .Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
                     .Where(p => p.Contracts.Any(c => c.IsSigned))
                     .OrderByDescending(p => p.Id)
