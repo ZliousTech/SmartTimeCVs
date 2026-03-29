@@ -118,6 +118,7 @@ namespace SmartTimeCVs.Web.Core.Models
         public bool IsShortListed { get; set; }
         public bool IsExcluded { get; set; }
         public bool IsHolding { get; set; }
+        public bool IsImported { get; set; }
 
         #endregion Application Information.
 

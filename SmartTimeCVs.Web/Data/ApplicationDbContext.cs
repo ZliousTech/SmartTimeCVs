@@ -39,6 +39,7 @@ namespace SmartTimeCVs.Web.Data
             builder.Entity<JobApplication>().Property(p => p.IsShortListed);
             builder.Entity<JobApplication>().Property(p => p.IsExcluded);
             builder.Entity<JobApplication>().Property(p => p.IsHolding);
+            builder.Entity<JobApplication>().Property(p => p.IsImported).HasDefaultValue(false);
             
 
             builder.Entity<JobApplication>()

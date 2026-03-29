@@ -132,6 +132,9 @@ public class JobApplicationViewModel : BaseModel
     [MaxLength(500, ErrorMessage = Errors.MaxLength), Display(Name = "Admin Feedback")]
     public string? AdminFeedback { get; set; }
 
+    [Display(Name = "Is Imported")]
+    public bool IsImported { get; set; }
+
     #endregion Application Information.
 
     #region Hiring Details.
