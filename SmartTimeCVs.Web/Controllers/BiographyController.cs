@@ -231,7 +231,7 @@ namespace SmartTimeCVs.Web.Controllers
                 Console.WriteLine($">>> CREATE POST - EXCEPTION: {ex.Message}");
                 Console.WriteLine($">>> CREATE POST - STACK TRACE: {ex.StackTrace}");
                 ModelState.AddModelError(string.Empty, "An error occurred while saving the data.");
-                return View("Error", new ErrorViewModel { Exception = ex.Message });
+                return StatusCode(500, new { success = false, message = $"An error occurred: {ex.Message}" });
             }
         }
 
@@ -499,7 +499,7 @@ namespace SmartTimeCVs.Web.Controllers
             {
                 await transaction.RollbackAsync();
                 ModelState.AddModelError(string.Empty, "An error occurred while updating the data.");
-                return View("Error", new ErrorViewModel { Exception = ex.Message });
+                return StatusCode(500, new { success = false, message = $"An error occurred: {ex.Message}" });
             }
         }
 

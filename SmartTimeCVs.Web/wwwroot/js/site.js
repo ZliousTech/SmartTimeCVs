@@ -1,4 +1,4 @@
-﻿// Begin DataTables
+// Begin DataTables
 var table;
 var exportedCols = [];
 var excludedsearchCols = [];
@@ -254,8 +254,14 @@ function onModalRequestSuccess(row) {
 	messageToShow = saveMessage;
 }
 
-function onRequestFailure() {
-	showErrorMessage();
+function onRequestFailure(xhr, status, error) {
+	var errorMsg = "Something went wrong";
+	if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+		errorMsg = xhr.responseJSON.message;
+	} else if (xhr && xhr.responseText) {
+		errorMsg = xhr.responseText;
+	}
+	showErrorMessage(errorMsg);
 }
 
 function onRequestComplete() {
