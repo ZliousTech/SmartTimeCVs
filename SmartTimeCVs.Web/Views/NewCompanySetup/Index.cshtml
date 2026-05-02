@@ -1,0 +1,121 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model IEnumerable<SmartTimeCVs.Web.Core.ViewModels.JobApplicationViewModel>
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+    ViewData["Title"] = Localizer["New Company Setup"];
+    ViewData["ControllerName"] = "NewCompanySetup";
+    ViewData["Path"] = $"{Localizer["Newcomers"]} / {Localizer["New Company Setup"]}";
+    ViewData["Icon"] = "business_center";
+    var registrationLink = ViewData["RegistrationLink"]?.ToString();
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/theme/assets/css/plugins/datatables.bootstrap4.min.css" />
+    <style>
+        .link-container {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #00bcd4;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .link-text {
+            font-family: monospace;
+            color: #00bcd4;
+            font-weight: bold;
+            word-break: break-all;
+        }
+    </style>
+}
+
+<div class="row clearfix">
+    <div class="col-lg-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h2 class="theme-main-color"><i class="material-icons align-middle">link</i> @Localizer["Employee Registration Link"]</h2>
+                <small>@Localizer["Copy this link and send it to your employees via WhatsApp or Email."]</small>
+            </div>
+            <div class="card-body">
+                <div class="link-container">
+                    <span id="regLink" class="link-text">@registrationLink</span>
+                    <button class="btn btn-info btn-sm btn-round" onclick="copyLink()">
+                        <i class="material-icons">content_copy</i> @Localizer["Copy Link"]
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mt-4">
+    <div class="card-header">
+        <h2 class="theme-main-color"><i class="material-icons align-middle">people</i> @Localizer["Registered Employees"]</h2>
+    </div>
+    <div class="card-body">
+        <div class="body table-responsive">
+            <table class="table js-datatables" data-document-title="CompanySetupEmployees">
+                <thead>
+                    <tr class="cyan">
+                        <th class="js-no-export js-exclude-search d-none">Id</th>
+                        <th class="js-no-export text-center">@Localizer["Image"]</th>
+                        <th>@Localizer["Full Name"]</th>
+                        <th>@Localizer["User Name"]</th>
+                        <th>@Localizer["Email"]</th>
+                        <th>@Localizer["Mobile Number"]</th>
+                        <th>@Localizer["National ID"]</th>
+                        <th>@Localizer["Status"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var emp in Model)
+                    {
+                        <tr>
+                            <td class="d-none">@emp.Id</td>
+                            <td class="text-center">
+                                <img src="/images/profileImages/@(string.IsNullOrEmpty(emp.ImageUrl) ? "ProfileImagePlaceholder.jpg" : emp.ImageUrl)" 
+                                     class="rounded-circle" width="40" height="40" alt="profile" 
+                                     onerror="this.src='/images/profileImages/ProfileImagePlaceholder.jpg'"/>
+                            </td>
+                            <td>@emp.FullName</td>
+                            <td>@emp.SystemUserName</td>
+                            <td>@emp.Email</td>
+                            <td>@emp.MobileNumber</td>
+                            <td>@emp.NationalID</td>
+                             <td>
+                                @if (string.IsNullOrEmpty(emp.FullName) || emp.FullName.StartsWith("Pending-"))
+                                {
+                                    <span class="badge badge-warning">@Localizer["Incomplete Profile"]</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-success">@Localizer["Completed"]</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Plugins {
+    <partial name="_DataTablesJS" />
+    <script>
+        function copyLink() {
+            var linkText = document.getElementById("regLink").innerText;
+            navigator.clipboard.writeText(linkText).then(function() {
+                Swal.fire({
+                    title: '@Localizer["Copied!"]',
+                    text: '@Localizer["Registration link copied to clipboard."]',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            });
+        }
+    </script>
+}

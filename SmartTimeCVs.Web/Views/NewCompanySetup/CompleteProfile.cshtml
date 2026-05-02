@@ -1,0 +1,289 @@
+@model JobApplicationViewModel
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = Localizer["Personal Information"];
+    ViewData["HideSidebars"] = true;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/theme/assets/css/plugins/bootstrap-select.css" />
+    <link rel="stylesheet" href="~/theme/assets/css/plugins/bootstrap-material-datetimepicker.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
+    <style>
+        .theme-main-color { color: #00bcd4; }
+        .card { border-radius: 15px; overflow: hidden; }
+        .form-control { border-radius: 20px; border: 1px solid #e0e0e0; padding: 10px 20px; height: 45px; }
+        .form-control:focus { border-color: #00bcd4; box-shadow: 0 0 0 0.2rem rgba(0, 188, 212, 0.25); }
+        
+        /* Select2 Oval Styling */
+        .select2-container--default .select2-selection--single {
+            border-radius: 20px !important;
+            border: 1px solid #e0e0e0 !important;
+            height: 45px !important;
+            padding: 8px 15px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 43px !important;
+            right: 10px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 28px !important;
+            color: #495057 !important;
+        }
+        
+        .btn-info { border-radius: 25px; padding: 10px 30px; background-color: #00bcd4; border: none; }
+        .card-inside-title { font-size: 14px; font-weight: bold; color: #555; }
+        .image-upload-container { position: relative; width: 120px; height: 120px; margin: 0 auto 20px; }
+        .image-preview { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #00bcd4; background-size: cover; background-position: center; }
+        .edit-icon { position: absolute; bottom: 0; right: 0; background: #00bcd4; color: white; border-radius: 50%; padding: 8px; cursor: pointer; }
+    </style>
+}
+
+<div class="row clearfix">
+    <div class="col-lg-12">
+        <div class="card shadow">
+            <div class="card-header text-center py-4 bg-white">
+                <h2 class="theme-main-color mb-0"><b>@Localizer["Personal Information"]</b></h2>
+                <p class="text-muted">@Localizer["Please complete your basic information to finish the setup."]</p>
+            </div>
+            <div class="card-body p-4">
+                <form id="profileForm" asp-action="CompleteProfile" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="CompanyId" />
+                    <input type="hidden" asp-for="HighSchoolName" />
+                    <input type="hidden" asp-for="HighSchoolGraduationYear" />
+                    <input type="hidden" asp-for="EnglishLevelId" />
+                    <input type="hidden" asp-for="ComputerSkillsLevelId" />
+                    <input type="hidden" asp-for="ExpectedSalary" />
+                    <input type="hidden" asp-for="ImageUrl" />
+                    <input type="hidden" asp-for="SystemUserName" />
+                    <input type="hidden" asp-for="SystemPassword" />
+
+                    <div class="row clearfix mb-4 text-center">
+                        <div class="col-12">
+                            <div class="image-upload-container">
+                                <div class="image-preview" id="imagePreview" style="background-image: url('/images/profileImages/@(string.IsNullOrEmpty(Model.ImageUrl) ? "ProfileImagePlaceholder.jpg" : Model.ImageUrl)');"></div>
+                                <label class="edit-icon" for="ImageFile">
+                                    <i class="fas fa-camera"></i> <span class="text-danger">*</span>
+                                    <input type="file" asp-for="ImageFile" accept=".jpg, .jpeg, .png" style="display: none;" onchange="previewImage(this)" />
+                                </label>
+                            </div>
+                            <small class="text-danger d-none" id="imageError">@Localizer["Profile image is required"]</small>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title">@Localizer["Full Name"] <span class="text-danger">*</span></h2>
+                            <input type="text" class="form-control" asp-for="FullName" required>
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title">@Localizer["Gender"] <span class="text-danger">*</span></h2>
+                            <select class="form-control js-select2" asp-for="GenderId" asp-items="ViewBag.GenderList"></select>
+                            <span asp-validation-for="GenderId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title">@Localizer["Email"]</h2>
+                            <input type="email" class="form-control bg-light" asp-for="Email" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title">@Localizer["Nationality"] <span class="text-danger">*</span></h2>
+                            <select class="form-control js-select2" asp-for="Nationality" asp-items="ViewBag.NationalityList"></select>
+                            <span asp-validation-for="Nationality" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title">@Localizer["Date Of Birth"] <span class="text-danger">*</span></h2>
+                            <input type="date" class="form-control" asp-for="DateOfBirth" required>
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title">@Localizer["Place Of Birth"] <span class="text-danger">*</span></h2>
+                            <input type="text" class="form-control" asp-for="PlaceOfBirth" required>
+                            <span asp-validation-for="PlaceOfBirth" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title">@Localizer["Mobile Number"] <span class="text-danger">*</span></h2>
+                            <input type="text" class="form-control" asp-for="MobileNumber" required>
+                            <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title">@Localizer["National Number"] <span class="text-danger">*</span></h2>
+                            <input type="text" class="form-control" asp-for="NationalID" required>
+                            <span asp-validation-for="NationalID" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title">@Localizer["Address"] <span class="text-danger">*</span></h2>
+                            <input type="text" class="form-control" asp-for="Address" required>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title">@Localizer["Marital Status"] <span class="text-danger">*</span></h2>
+                            <select class="form-control js-select2" asp-for="MaritalStatusId" asp-items="ViewBag.MaritalStatusList"></select>
+                            <span asp-validation-for="MaritalStatusId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title">@Localizer["Applying For"] <span class="text-danger">*</span></h2>
+                            <select class="form-control js-select2" asp-for="ApplyingFor" asp-items="ViewBag.ApplyingForList">
+                                <option value="">-- @Localizer["Select Category"] --</option>
+                            </select>
+                            <span asp-validation-for="ApplyingFor" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h2 class="card-inside-title">@Localizer["Job Title"] <span class="text-danger">*</span></h2>
+                            <select class="form-control js-select2" id="JobTitleSelect" name="JobTitleSelect">
+                                <option value="">-- @Localizer["Select Title"] --</option>
+                            </select>
+                            <input type="hidden" id="JobTitleValue" asp-for="JobTitle" />
+                            <span asp-validation-for="JobTitle" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix mt-4">
+                        <div class="col-12 text-center">
+                            <button type="submit" class="btn btn-info btn-lg shadow">@Localizer["Save & Finish"]</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/shared/form-select-validator.js" asp-append-version="true"></script>
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $(document).ready(function () {
+            // Re-initialize select2 with original styles/logic
+            $('.js-select2').select2({ width: '100%' });
+
+            $('#ApplyingFor').on('change', function () {
+                var selectedCategoryId = $(this).val();
+                loadJobTitles(selectedCategoryId);
+            });
+
+            function loadJobTitles(applyingForId) {
+                if (!applyingForId) {
+                    $('#JobTitleSelect').empty().append('<option value="">-- @Localizer["Select Title"] --</option>');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Biography/GetJobTitlesByCategory', // Using absolute path
+                    type: 'GET',
+                    data: { categoryGuidID: applyingForId },
+                    success: function (data) {
+                        var jobTitleSelect = $('#JobTitleSelect');
+                        jobTitleSelect.empty();
+                        jobTitleSelect.append('<option value="">-- @Localizer["Select Title"] --</option>');
+
+                        if (data && data.length > 0) {
+                            $.each(data, function (i, item) {
+                                jobTitleSelect.append($('<option>', {
+                                    value: item.value,
+                                    text: item.text
+                                }));
+                            });
+                        }
+                        
+                        // Set value if already present in hidden field (for edit mode)
+                        var existingTitle = $('#JobTitleValue').val();
+                        if(existingTitle) {
+                             // Try to find the option with that text and select it
+                             jobTitleSelect.find('option').each(function(){
+                                 if($(this).text() === existingTitle) $(this).prop('selected', true);
+                             });
+                             jobTitleSelect.trigger('change');
+                        }
+                    }
+                });
+            }
+
+            $('#profileForm').on('submit', function (e) {
+                e.preventDefault();
+                
+                // Update hidden JobTitle text before submission
+                var selectedJobTitleText = $('#JobTitleSelect option:selected').text();
+                $('#JobTitleValue').val(selectedJobTitleText);
+
+                // Validate Image
+                var imageFile = $('#ImageFile')[0].files[0];
+                var existingImageUrl = $('#ImageUrl').val();
+                if (!imageFile && (!existingImageUrl || existingImageUrl === '')) {
+                    $('#imageError').removeClass('d-none');
+                    $('html, body').animate({ scrollTop: 0 }, 'slow');
+                    return false;
+                } else {
+                    $('#imageError').addClass('d-none');
+                }
+
+                var formData = new FormData(this);
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '@Localizer["Success"]',
+                                text: '@Localizer["Profile completed successfully!"]',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                window.location.href = '/NewCompanySetup/Success';
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: '@Localizer["Error"]',
+                                text: response.message || 'Error saving profile'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '@Localizer["Error"]',
+                            text: 'Server error: ' + (xhr.responseText || error)
+                        });
+                    }
+                });
+            });
+
+            // Initial load if category selected
+            var initialCat = $('#ApplyingFor').val();
+            if(initialCat) loadJobTitles(initialCat);
+        });
+    </script>
+}

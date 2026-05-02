@@ -167,5 +167,6 @@ namespace SmartTimeCVs.Web.Core.Models
         #endregion Interview Scheduling.
 
         public string? CompanyId { get; set; }
+        public bool IsFromCompanySetup { get; set; }
     }
 }

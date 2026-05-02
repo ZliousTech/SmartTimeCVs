@@ -1,7 +1,7 @@
-using SmartTimeCVs.Web.Core.Enums;
-
-public class JobApplicationViewModel : BaseModel
+namespace SmartTimeCVs.Web.Core.ViewModels
 {
+    public class JobApplicationViewModel : BaseModel
+    {
     #region Basic Information.
 
     public int Id { get; set; }
@@ -24,6 +24,7 @@ public class JobApplicationViewModel : BaseModel
     [Display(Name = "Date of Birth")]
     public DateTime? DateOfBirth { get; set; }
 
+    [Required]
     [MaxLength(500, ErrorMessage = Errors.MaxLength), Display(Name = "Place Of Birth")]
     public string PlaceOfBirth { get; set; } = null!;
 
@@ -31,16 +32,20 @@ public class JobApplicationViewModel : BaseModel
     public int GenderId { get; set; } = (int)GenderTypeEnum.Male;
     public GenderType? Gender { get; set; }
 
+    [Required]
     [MaxLength(500, ErrorMessage = Errors.MaxLength), Display(Name = "Address")]
     public string Address { get; set; } = null!;
 
+    [Required]
     [MaxLength(18, ErrorMessage = Errors.MaxLength), Display(Name = "NationalID")]
     [Remote("AllowNationalID", "Biography", AdditionalFields = nameof(Id), ErrorMessage = Errors.Duplicated)]
     public string NationalID { get; set; } = null!;
 
+    [Required]
     [MaxLength(15, ErrorMessage = Errors.MaxLength), Display(Name = "MobileNumber")]
     public string MobileNumber { get; set; } = null!;
 
+    [Required]
     [MaxLength(250, ErrorMessage = Errors.MaxLength), Display(Name = "Nationality")]
     public string Nationality { get; set; } = null!;
 
@@ -165,4 +170,5 @@ public class JobApplicationViewModel : BaseModel
     #endregion Attachment.
 
     public string? CompanyId { get; set; }
+    }
 }

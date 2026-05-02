@@ -1,0 +1,81 @@
+@model RegisterViewModel
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
+
+@{
+    Layout = "_Layout"; 
+    ViewData["Title"] = Localizer["Employee Sign Up"];
+    ViewData["HideSidebars"] = true;
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 mt-5">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-info text-white text-center py-4">
+                    <h3 class="mb-0">@Localizer["Welcome to SmartTime"]</h3>
+                    <p class="mb-0">@Localizer["Please create your account to continue"]</p>
+                </div>
+                <div class="card-body p-5">
+                    <form asp-action="Register" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="CompanyId" />
+
+                        <div class="form-group mb-4">
+                            <label asp-for="UserName" class="form-label">@Localizer["User Name"]</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="material-icons">person</i></span>
+                                </div>
+                                <input asp-for="UserName" class="form-control" placeholder="@Localizer["Enter username"]" required />
+                            </div>
+                            <span asp-validation-for="UserName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Email" class="form-label">@Localizer["Email Address"]</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="material-icons">email</i></span>
+                                </div>
+                                <input asp-for="Email" type="email" class="form-control" placeholder="@Localizer["Enter email"]" required />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Password" class="form-label">@Localizer["Password"]</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="material-icons">lock</i></span>
+                                </div>
+                                <input asp-for="Password" type="password" class="form-control" placeholder="@Localizer["Enter password"]" required />
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="ConfirmPassword" class="form-label">@Localizer["Confirm Password"]</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="material-icons">lock_outline</i></span>
+                                </div>
+                                <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="@Localizer["Re-enter password"]" required />
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+
+                        <div class="text-danger mb-3" asp-validation-summary="ModelOnly"></div>
+
+                        <button type="submit" class="btn btn-info btn-block btn-lg shadow">
+                            @Localizer["Next: Complete Profile"]
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
