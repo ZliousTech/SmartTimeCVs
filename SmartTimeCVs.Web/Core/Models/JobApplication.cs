@@ -29,6 +29,9 @@ namespace SmartTimeCVs.Web.Core.Models
         [MaxLength(500)]
         public string Address { get; set; } = null!;
 
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
+
         [MaxLength(18)]
         public string NationalID { get; set; } = null!;
 

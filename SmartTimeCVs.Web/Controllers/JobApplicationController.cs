@@ -34,6 +34,7 @@ namespace SmartTimeCVs.Web.Controllers
                     .OrderByDescending(p => p.Id)
                     .Where(p => !p.IsShortListed && !p.IsExcluded && !p.IsHolding)
                     .Where(p => !p.InterviewSchedules.Any(s => !s.IsDeleted))
+                    .Where(p => !p.IsFromCompanySetup)
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -65,6 +66,7 @@ namespace SmartTimeCVs.Web.Controllers
                     .JobApplication.Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
                     .OrderByDescending(p => p.Id)
                     .Where(p => p.IsShortListed == true)
+                    .Where(p => !p.IsFromCompanySetup)
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -96,6 +98,7 @@ namespace SmartTimeCVs.Web.Controllers
                     .JobApplication.Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
                     .OrderByDescending(p => p.Id)
                     .Where(p => p.IsExcluded == true)
+                    .Where(p => !p.IsFromCompanySetup)
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -127,6 +130,7 @@ namespace SmartTimeCVs.Web.Controllers
                     .JobApplication.Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
                     .OrderByDescending(p => p.Id)
                     .Where(p => p.IsHolding == true)
+                    .Where(p => !p.IsFromCompanySetup)
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -348,6 +352,7 @@ namespace SmartTimeCVs.Web.Controllers
                     .JobApplication
                     .Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
                     .Where(p => _context.Contracts.Any(c => c.JobApplicationId == p.Id && c.IsSigned))
+                    .Where(p => !p.IsFromCompanySetup)
                     .OrderByDescending(p => p.Id)
                     .AsNoTracking()
                     .ToListAsync();
@@ -408,6 +413,7 @@ namespace SmartTimeCVs.Web.Controllers
                         .ThenInclude(ca => ca.DocumentRequirementLookup)
                     .Where(p => p.CompanyId == GlobalVariablesService.CompanyId)
                     .Where(p => p.Contracts.Any(c => c.IsSigned))
+                    .Where(p => !p.IsFromCompanySetup)
                     .OrderByDescending(p => p.Id)
                     .AsNoTracking()
                     .ToListAsync();

@@ -67,7 +67,7 @@
 								<span class="text-muted">@(jobApp.ApplyingFor ?? string.Empty)</span>
 							</td>
 							<td class="js-td-status"><span class="badge badge-@(jobApp.IsDeleted? "danger" : "success") js-status">@(jobApp.IsDeleted ? "Deleted" : "Available")</span></td>
-							<td>@jobApp.DateOfBirth?.ToDateOfBirth()</td>
+							<td>@jobApp.CreatedOn?.ToString("dd MMM yyyy")</td>
 							<td>@jobApp.MobileNumber</td>
 							@* <td><span class="list-name">@jobApp.Email</span></td> *@
 							<td><span class="text-muted">@(jobApp.ApplyingFor ?? string.Empty)</span></td>

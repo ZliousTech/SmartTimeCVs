@@ -7,9 +7,14 @@ namespace SmartTimeCVs.Web.Core.ViewModels
     {
         [Required]
         public string CompanyId { get; set; } = null!;
+
+        [Required]
+        [Display(Name = "Full Name")]
+        public string FullName { get; set; } = null!;
         
         [Required]
         [Remote(action: "VerifyUserName", controller: "NewCompanySetup")]
+        [RegularExpression(@"^\S*$", ErrorMessage = "User name cannot contain spaces.")]
         [Display(Name = "User Name")]
         public string UserName { get; set; } = null!;
         
@@ -19,6 +24,9 @@ namespace SmartTimeCVs.Web.Core.ViewModels
         
         [Required]
         [DataType(DataType.Password)]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "Password must be at least 8 characters long.")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$", 
+            ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character.")]
         public string Password { get; set; } = null!;
         
         [Required]

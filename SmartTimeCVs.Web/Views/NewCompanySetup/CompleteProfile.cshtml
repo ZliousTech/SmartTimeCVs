@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="~/theme/assets/css/plugins/bootstrap-select.css" />
     <link rel="stylesheet" href="~/theme/assets/css/plugins/bootstrap-material-datetimepicker.css" />
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         .theme-main-color { color: #00bcd4; }
         .card { border-radius: 15px; overflow: hidden; }
@@ -38,6 +39,66 @@
         .image-upload-container { position: relative; width: 120px; height: 120px; margin: 0 auto 20px; }
         .image-preview { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #00bcd4; background-size: cover; background-position: center; }
         .edit-icon { position: absolute; bottom: 0; right: 0; background: #00bcd4; color: white; border-radius: 50%; padding: 8px; cursor: pointer; }
+
+        /* Map Picker */
+        .map-picker-wrapper {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,188,212,0.15);
+            border: 2px solid #e0f7fa;
+            transition: border-color 0.3s;
+        }
+        .map-picker-wrapper:hover { border-color: #00bcd4; }
+        #locationMap { height: 260px; width: 100%; }
+        .map-search-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .map-search-bar input {
+            flex: 1;
+            border-radius: 20px;
+            border: 1px solid #e0e0e0;
+            padding: 8px 16px;
+            height: 40px;
+            font-size: 13px;
+        }
+        .map-search-bar input:focus { outline: none; border-color: #00bcd4; }
+        .btn-map-action {
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            height: 40px;
+            white-space: nowrap;
+        }
+        .btn-map-search { background: #00bcd4; color: #fff; }
+        .btn-map-search:hover { background: #0097a7; }
+        .btn-map-gps { background: #e0f7fa; color: #00838f; border: 1px solid #b2ebf2; }
+        .btn-map-gps:hover { background: #b2ebf2; }
+        .map-coords-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
+            border: 1px solid #b2ebf2;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 12px;
+            color: #00695c;
+            font-weight: 600;
+            margin-top: 6px;
+            transition: all 0.3s;
+        }
+        .map-coords-badge.hidden { opacity: 0; pointer-events: none; }
+        .map-pin-pulse {
+            position: relative;
+            display: inline-block;
+        }
+        .leaflet-marker-icon { filter: hue-rotate(170deg); }
     </style>
 }
 
@@ -128,14 +189,47 @@
 
                     <div class="row clearfix">
                         <div class="col-md-6 mb-3">
-                            <h2 class="card-inside-title">@Localizer["Address"] <span class="text-danger">*</span></h2>
-                            <input type="text" class="form-control" asp-for="Address" required>
-                            <span asp-validation-for="Address" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6 mb-3">
                             <h2 class="card-inside-title">@Localizer["Marital Status"] <span class="text-danger">*</span></h2>
                             <select class="form-control js-select2" asp-for="MaritalStatusId" asp-items="ViewBag.MaritalStatusList"></select>
                             <span asp-validation-for="MaritalStatusId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix mb-4">
+                        <div class="col-md-12">
+                            <h2 class="card-inside-title">@Localizer["Address"] &amp; @Localizer["Home Location"] <span class="text-danger">*</span></h2>
+                            
+                            <!-- Address Text -->
+                            <input type="text" class="form-control mb-3" asp-for="Address"
+                                   placeholder="@Localizer["Your address will be filled automatically when you pick on the map"]"
+                                   required id="addressInput">
+                            <span asp-validation-for="Address" class="text-danger"></span>
+
+                            <!-- Hidden lat/lng -->
+                            <input type="hidden" asp-for="Latitude" id="latInput" />
+                            <input type="hidden" asp-for="Longitude" id="lngInput" />
+
+                            <!-- Map Search Bar -->
+                            <div class="map-search-bar mt-3">
+                                <input type="text" id="mapSearchInput" placeholder="@Localizer["Search for your area..."]" />
+                                <button type="button" class="btn-map-action btn-map-search" onclick="searchMapLocation()">
+                                    <i class="fas fa-search"></i> @Localizer["Search"]
+                                </button>
+                                <button type="button" class="btn-map-action btn-map-gps" onclick="useMyLocation()" id="gpsBtn">
+                                    <i class="fas fa-crosshairs"></i> @Localizer["My Location"]
+                                </button>
+                            </div>
+
+                            <!-- Map Container -->
+                            <div class="map-picker-wrapper mt-3" style="border-radius: 15px; overflow: hidden; border: 1px solid #e0e0e0; width: 100%;">
+                                <div id="locationMap" style="height: 300px; width: 100%;"></div>
+                            </div>
+
+                            <!-- Coordinates Badge -->
+                            <div class="map-coords-badge hidden mt-2" id="coordsBadge">
+                                <i class="fas fa-map-marker-alt" style="color:#00bcd4"></i>
+                                <span id="coordsText">--</span>
+                            </div>
                         </div>
                     </div>
 
@@ -170,6 +264,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="~/js/shared/form-select-validator.js" asp-append-version="true"></script>
     <script>
         function previewImage(input) {
@@ -285,5 +380,135 @@
             var initialCat = $('#ApplyingFor').val();
             if(initialCat) loadJobTitles(initialCat);
         });
+
+        // ─── MAP PICKER ───────────────────────────────────────────────
+        var map, marker;
+        var savedLat = @(Model.Latitude.HasValue ? Model.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "null");
+        var savedLng = @(Model.Longitude.HasValue ? Model.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "null");
+
+        var defaultLat = savedLat || 24.7136;
+        var defaultLng = savedLng || 46.6753;
+        var defaultZoom = savedLat ? 15 : 5;
+
+        function initMap() {
+            map = L.map('locationMap').setView([defaultLat, defaultLng], defaultZoom);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Custom marker icon
+            var customIcon = L.divIcon({
+                html: '<div style="width:36px;height:36px;background:linear-gradient(135deg,#00bcd4,#0097a7);border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 4px 15px rgba(0,188,212,0.5);border:3px solid white;"></div>',
+                className: '',
+                iconSize: [36, 36],
+                iconAnchor: [18, 36]
+            });
+
+            if (savedLat && savedLng) {
+                marker = L.marker([savedLat, savedLng], { icon: customIcon, draggable: true }).addTo(map);
+                updateCoordsDisplay(savedLat, savedLng);
+                marker.on('dragend', function(e) {
+                    var pos = e.target.getLatLng();
+                    setLocation(pos.lat, pos.lng, customIcon);
+                });
+            }
+
+            map.on('click', function(e) {
+                setLocation(e.latlng.lat, e.latlng.lng, customIcon);
+            });
+        }
+
+        function setLocation(lat, lng, icon) {
+            if (marker) map.removeLayer(marker);
+            var customIcon = icon || L.divIcon({
+                html: '<div style="width:36px;height:36px;background:linear-gradient(135deg,#00bcd4,#0097a7);border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 4px 15px rgba(0,188,212,0.5);border:3px solid white;"></div>',
+                className: '',
+                iconSize: [36, 36],
+                iconAnchor: [18, 36]
+            });
+            marker = L.marker([lat, lng], { icon: customIcon, draggable: true }).addTo(map);
+            marker.on('dragend', function(e) {
+                var pos = e.target.getLatLng();
+                setLocation(pos.lat, pos.lng);
+            });
+            $('#latInput').val(lat.toFixed(7));
+            $('#lngInput').val(lng.toFixed(7));
+            updateCoordsDisplay(lat, lng);
+            reverseGeocode(lat, lng);
+        }
+
+        function updateCoordsDisplay(lat, lng) {
+            var badge = document.getElementById('coordsBadge');
+            badge.classList.remove('hidden');
+            document.getElementById('coordsText').textContent =
+                parseFloat(lat).toFixed(5) + ', ' + parseFloat(lng).toFixed(5);
+        }
+
+        function reverseGeocode(lat, lng) {
+            fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng)
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.display_name) {
+                        $('#addressInput').val(data.display_name);
+                    }
+                }).catch(() => {});
+        }
+
+        function searchMapLocation() {
+            var query = document.getElementById('mapSearchInput').value.trim();
+            if (!query) return;
+            fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query) + '&limit=1')
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        var lat = parseFloat(data[0].lat);
+                        var lng = parseFloat(data[0].lon);
+                        map.setView([lat, lng], 15);
+                        setLocation(lat, lng);
+                    } else {
+                        alert('@Localizer["Location not found. Please try a different search."]');
+                    }
+                });
+        }
+
+        document.getElementById('mapSearchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); searchMapLocation(); }
+        });
+
+        function useMyLocation() {
+            var btn = document.getElementById('gpsBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+            if (!navigator.geolocation) {
+                alert('@Localizer["Geolocation is not supported by your browser."]');
+                btn.innerHTML = '<i class="fas fa-crosshairs"></i> @Localizer["My Location"]';
+                btn.disabled = false;
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                var lat = pos.coords.latitude;
+                var lng = pos.coords.longitude;
+                map.setView([lat, lng], 16);
+                setLocation(lat, lng);
+                btn.innerHTML = '<i class="fas fa-check"></i> @Localizer["Located!"]';
+                btn.style.background = '#c8e6c9';
+                btn.style.color = '#2e7d32';
+                setTimeout(function() {
+                    btn.innerHTML = '<i class="fas fa-crosshairs"></i> @Localizer["My Location"]';
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.disabled = false;
+                }, 2500);
+            }, function() {
+                alert('@Localizer["Unable to retrieve your location. Please allow location access."]');
+                btn.innerHTML = '<i class="fas fa-crosshairs"></i> @Localizer["My Location"]';
+                btn.disabled = false;
+            });
+        }
+
+        // Init map after DOM is ready
+        window.addEventListener('load', function() { initMap(); });
     </script>
 }

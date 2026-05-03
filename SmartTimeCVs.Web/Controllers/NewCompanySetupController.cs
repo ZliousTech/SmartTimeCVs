@@ -60,6 +60,73 @@ namespace SmartTimeCVs.Web.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveEmployee(int id)
+        {
+            try
+            {
+                var employee = await _context.JobApplication.FirstOrDefaultAsync(x => x.Id == id && x.CompanyId == GlobalVariablesService.CompanyId);
+                if (employee == null) return NotFound();
+
+                employee.CandidateStatus = CandidateStatus.Hired;
+                employee.LastUpdatedOn = DateTime.Now;
+
+                // Ensure they have a signed contract so they are picked up by the Senior's API and treated as full employees
+                var hasContract = await _context.Contracts.AnyAsync(c => c.JobApplicationId == employee.Id);
+                if (!hasContract)
+                {
+                    var dummyContract = new Contract
+                    {
+                        JobApplicationId = employee.Id,
+                        EmployeeName = employee.FullName ?? "New Employee",
+                        EmployeeNationalId = employee.NationalID ?? "N/A",
+                        JobTitle = employee.JobTitle ?? "Employee",
+                        IsSigned = true, // Critical flag for the Senior's API
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddYears(1),
+                        ContractDuration = "1 Year",
+                        ProbationPeriod = "3 Months",
+                        EmployeeAddress = employee.Address ?? "N/A",
+                        RepresentativeName = "System Admin",
+                        RepresentativeTitle = "Admin",
+                        CompanyName = "SmartTime",
+                        CreatedOn = DateTime.Now
+                    };
+                    _context.Contracts.Add(dummyContract);
+                }
+                
+                _context.JobApplication.Update(employee);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteEmployee(int id)
+        {
+            try
+            {
+                var employee = await _context.JobApplication.FirstOrDefaultAsync(x => x.Id == id && x.CompanyId == GlobalVariablesService.CompanyId);
+                if (employee == null) return NotFound();
+
+                _context.JobApplication.Remove(employee);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
         // Employee View: Initial Registration (Sign Up)
         [HttpGet]
         public async Task<IActionResult> Register(string companyId)
@@ -97,11 +164,19 @@ namespace SmartTimeCVs.Web.Controllers
                     return View(model);
                 }
 
-                // Call external API safely (Fail-open if API is disabled or down)
-                var isAvailableExternally = await CheckExternalUserNameAvailabilityAsync(model.UserName);
-                if (!isAvailableExternally)
+                try
                 {
-                    ModelState.AddModelError("UserName", "This user name is already registered in the main company system.");
+                    // Call external API safely
+                    var isAvailableExternally = await CheckExternalUserNameAvailabilityAsync(model.UserName);
+                    if (!isAvailableExternally)
+                    {
+                        ModelState.AddModelError("UserName", "This user name is already registered in the main company system.");
+                        return View(model);
+                    }
+                }
+                catch (Exception)
+                {
+                    ModelState.AddModelError(string.Empty, "We are currently experiencing server issues. Please try again later.");
                     return View(model);
                 }
 
@@ -112,7 +187,7 @@ namespace SmartTimeCVs.Web.Controllers
                     SystemPassword = model.Password,
                     CompanyId = model.CompanyId,
                     IsFromCompanySetup = true,
-                    FullName = "Pending-" + Guid.NewGuid().ToString().Substring(0, 8), 
+                    FullName = model.FullName, 
                     ImageUrl = "",
                     PlaceOfBirth = "",
                     Address = "",
@@ -149,11 +224,18 @@ namespace SmartTimeCVs.Web.Controllers
                 return Json("This user name is already taken locally.");
             }
 
-            // Then check external API
-            var isAvailableExternally = await CheckExternalUserNameAvailabilityAsync(userName);
-            if (!isAvailableExternally)
+            try
             {
-                return Json("This user name is already registered in the main company system.");
+                // Then check external API
+                var isAvailableExternally = await CheckExternalUserNameAvailabilityAsync(userName);
+                if (!isAvailableExternally)
+                {
+                    return Json("This user name is already registered in the main company system.");
+                }
+            }
+            catch (Exception)
+            {
+                return Json("We are currently experiencing server issues. Please try again later.");
             }
 
             return Json(true);
@@ -193,14 +275,14 @@ namespace SmartTimeCVs.Web.Controllers
                     }
                 }
                 
-                // If API fails or returns non-success code, fail-open (allow registration)
-                // so we don't block users if the external system is down.
-                return true;
+                // If API fails or returns non-success code, fail-closed (block registration)
+                // so we don't allow duplicates if the external system is down.
+                throw new Exception("We are currently experiencing server issues. Please try again later.");
             }
             catch
             {
-                // In case of timeout or network error, we fail-open.
-                return true;
+                // In case of timeout or network error, we fail-closed.
+                throw new Exception("We are currently experiencing server issues. Please try again later.");
             }
         }
 

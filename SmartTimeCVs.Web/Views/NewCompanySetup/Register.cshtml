@@ -21,6 +21,17 @@
                         <input type="hidden" asp-for="CompanyId" />
 
                         <div class="form-group mb-4">
+                            <label asp-for="FullName" class="form-label">@Localizer["Full Name"]</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="material-icons">account_circle</i></span>
+                                </div>
+                                <input asp-for="FullName" class="form-control" placeholder="@Localizer["Enter your full name"]" required />
+                            </div>
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
                             <label asp-for="UserName" class="form-label">@Localizer["User Name"]</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -50,6 +61,9 @@
                                 </div>
                                 <input asp-for="Password" type="password" class="form-control" placeholder="@Localizer["Enter password"]" required />
                             </div>
+                            <small class="form-text text-muted">
+                                @Localizer["Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."]
+                            </small>
                             <span asp-validation-for="Password" class="text-danger small"></span>
                         </div>
 

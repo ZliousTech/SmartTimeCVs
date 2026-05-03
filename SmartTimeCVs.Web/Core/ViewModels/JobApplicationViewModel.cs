@@ -36,6 +36,9 @@ namespace SmartTimeCVs.Web.Core.ViewModels
     [MaxLength(500, ErrorMessage = Errors.MaxLength), Display(Name = "Address")]
     public string Address { get; set; } = null!;
 
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
+
     [Required]
     [MaxLength(18, ErrorMessage = Errors.MaxLength), Display(Name = "NationalID")]
     [Remote("AllowNationalID", "Biography", AdditionalFields = nameof(Id), ErrorMessage = Errors.Duplicated)]
@@ -52,6 +55,8 @@ namespace SmartTimeCVs.Web.Core.ViewModels
     [Display(Name = "MaritalStatus")]
     public int MaritalStatusId { get; set; } = (int)MaritalStatusTypeEnum.Single;
     public MaritalStatusType? MaritalStatus { get; set; }
+
+    public SmartTimeCVs.Web.Core.Enums.CandidateStatus? CandidateStatus { get; set; }
 
     [Required]
     [Display(Name = "Expected Salary")]

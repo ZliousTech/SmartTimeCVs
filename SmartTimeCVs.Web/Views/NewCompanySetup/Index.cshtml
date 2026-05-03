@@ -32,6 +32,7 @@
 }
 
 <div class="row clearfix">
+    @Html.AntiForgeryToken()
     <div class="col-lg-12">
         <div class="card shadow-sm">
             <div class="card-header">
@@ -67,6 +68,7 @@
                         <th>@Localizer["Mobile Number"]</th>
                         <th>@Localizer["National ID"]</th>
                         <th>@Localizer["Status"]</th>
+                        <th class="js-no-export text-center">@Localizer["Actions"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -84,15 +86,37 @@
                             <td>@emp.Email</td>
                             <td>@emp.MobileNumber</td>
                             <td>@emp.NationalID</td>
-                             <td>
+                            <td>
                                 @if (string.IsNullOrEmpty(emp.FullName) || emp.FullName.StartsWith("Pending-"))
                                 {
                                     <span class="badge badge-warning">@Localizer["Incomplete Profile"]</span>
                                 }
-                                else
+                                else if (emp.CandidateStatus == SmartTimeCVs.Web.Core.Enums.CandidateStatus.Hired)
                                 {
                                     <span class="badge badge-success">@Localizer["Completed"]</span>
                                 }
+                                else
+                                {
+                                    <span class="badge badge-info">@Localizer["Pending Approval"]</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        @Localizer["Action"]
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        @if (emp.CandidateStatus != SmartTimeCVs.Web.Core.Enums.CandidateStatus.Hired)
+                                        {
+                                            <a class="dropdown-item" href="javascript:void(0);" onclick="approveEmployee(@emp.Id)">
+                                                <i class="material-icons text-success align-middle" style="font-size: 18px;">check_circle</i> @Localizer["Approve"]
+                                            </a>
+                                        }
+                                        <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="deleteEmployee(@emp.Id)">
+                                            <i class="material-icons align-middle" style="font-size: 18px;">delete</i> @Localizer["Delete"]
+                                        </a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     }
@@ -115,6 +139,72 @@
                     timer: 2000,
                     showConfirmButton: false
                 });
+            });
+        }
+
+        function approveEmployee(id) {
+            Swal.fire({
+                title: '@Localizer["Are you sure?"]',
+                text: '@Localizer["You are about to approve this employee."]',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '@Localizer["Yes, Approve"]',
+                cancelButtonText: '@Localizer["Cancel"]'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/NewCompanySetup/ApproveEmployee',
+                        type: 'POST',
+                        data: {
+                            id: id,
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire('@Localizer["Approved!"]', '@Localizer["Employee has been approved."]', 'success')
+                                .then(() => window.location.reload());
+                            } else {
+                                Swal.fire('Error', res.message, 'error');
+                            }
+                        },
+                        error: function (err) {
+                            Swal.fire('Error', 'Failed to approve employee.', 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        function deleteEmployee(id) {
+            Swal.fire({
+                title: '@Localizer["Are you sure?"]',
+                text: '@Localizer["This will delete the employee record completely."]',
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonText: '@Localizer["Yes, Delete"]',
+                cancelButtonText: '@Localizer["Cancel"]'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/NewCompanySetup/DeleteEmployee',
+                        type: 'POST',
+                        data: {
+                            id: id,
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire('@Localizer["Deleted!"]', '@Localizer["Employee has been deleted."]', 'success')
+                                .then(() => window.location.reload());
+                            } else {
+                                Swal.fire('Error', res.message, 'error');
+                            }
+                        },
+                        error: function (err) {
+                            Swal.fire('Error', 'Failed to delete employee.', 'error');
+                        }
+                    });
+                }
             });
         }
     </script>
