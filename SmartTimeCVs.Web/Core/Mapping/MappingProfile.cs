@@ -12,7 +12,9 @@
             .ReverseMap()
             .ForMember(dest => dest.WorkExperience, opt => opt.MapFrom(src => src.WorkExperiences))
             .ForMember(dest => dest.Univesity, opt => opt.MapFrom(src => src.Universities))
-            .ForMember(dest => dest.Course, opt => opt.MapFrom(src => src.Courses));
+            .ForMember(dest => dest.Course, opt => opt.MapFrom(src => src.Courses))
+            // Owned by sync / senior pipeline: do not overwrite from form defaults (stays false until pull sets true).
+            .ForMember(dest => dest.IsImported, opt => opt.Ignore());
 
             // University
             CreateMap<University, UniversityViewModel>().ReverseMap();

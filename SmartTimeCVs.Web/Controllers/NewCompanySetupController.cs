@@ -66,36 +66,48 @@ namespace SmartTimeCVs.Web.Controllers
         {
             try
             {
-                var employee = await _context.JobApplication.FirstOrDefaultAsync(x => x.Id == id && x.CompanyId == GlobalVariablesService.CompanyId);
+                var employee = await _context.JobApplication.FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.CompanyId == GlobalVariablesService.CompanyId &&
+                    x.IsFromCompanySetup);
                 if (employee == null) return NotFound();
+                if (employee.CandidateStatus == CandidateStatus.Hired || employee.CandidateStatus == CandidateStatus.Rejected)
+                    return BadRequest(new { success = false, message = "Invalid state for approval." });
 
                 employee.CandidateStatus = CandidateStatus.Hired;
                 employee.LastUpdatedOn = DateTime.Now;
+                // Align with Personal Information / newcomers: hiring metadata for the external API (same JobApplication row).
+                employee.HiringDate ??= DateTime.Now;
+                employee.IsImported = false;
 
-                // Ensure they have a signed contract so they are picked up by the Senior's API and treated as full employees
-                var hasContract = await _context.Contracts.AnyAsync(c => c.JobApplicationId == employee.Id);
-                if (!hasContract)
-                {
-                    var dummyContract = new Contract
-                    {
-                        JobApplicationId = employee.Id,
-                        EmployeeName = employee.FullName ?? "New Employee",
-                        EmployeeNationalId = employee.NationalID ?? "N/A",
-                        JobTitle = employee.JobTitle ?? "Employee",
-                        IsSigned = true, // Critical flag for the Senior's API
-                        StartDate = DateTime.Now,
-                        EndDate = DateTime.Now.AddYears(1),
-                        ContractDuration = "1 Year",
-                        ProbationPeriod = "3 Months",
-                        EmployeeAddress = employee.Address ?? "N/A",
-                        RepresentativeName = "System Admin",
-                        RepresentativeTitle = "Admin",
-                        CompanyName = "SmartTime",
-                        CreatedOn = DateTime.Now
-                    };
-                    _context.Contracts.Add(dummyContract);
-                }
-                
+                _context.JobApplication.Update(employee);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectEmployee(int id)
+        {
+            try
+            {
+                var employee = await _context.JobApplication.FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.CompanyId == GlobalVariablesService.CompanyId &&
+                    x.IsFromCompanySetup);
+                if (employee == null) return NotFound();
+                if (employee.CandidateStatus == CandidateStatus.Hired || employee.CandidateStatus == CandidateStatus.Rejected)
+                    return BadRequest(new { success = false, message = "Invalid state for rejection." });
+
+                employee.CandidateStatus = CandidateStatus.Rejected;
+                employee.LastUpdatedOn = DateTime.Now;
+
                 _context.JobApplication.Update(employee);
                 await _context.SaveChangesAsync();
 
@@ -113,8 +125,13 @@ namespace SmartTimeCVs.Web.Controllers
         {
             try
             {
-                var employee = await _context.JobApplication.FirstOrDefaultAsync(x => x.Id == id && x.CompanyId == GlobalVariablesService.CompanyId);
+                var employee = await _context.JobApplication.FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.CompanyId == GlobalVariablesService.CompanyId &&
+                    x.IsFromCompanySetup);
                 if (employee == null) return NotFound();
+                if (employee.CandidateStatus != CandidateStatus.Rejected)
+                    return BadRequest(new { success = false, message = "Only rejected registrations can be deleted." });
 
                 _context.JobApplication.Remove(employee);
                 await _context.SaveChangesAsync();
@@ -187,6 +204,7 @@ namespace SmartTimeCVs.Web.Controllers
                     SystemPassword = model.Password,
                     CompanyId = model.CompanyId,
                     IsFromCompanySetup = true,
+                    IsImported = false,
                     FullName = model.FullName, 
                     ImageUrl = "",
                     PlaceOfBirth = "",
@@ -292,6 +310,7 @@ namespace SmartTimeCVs.Web.Controllers
         {
             var application = await _context.JobApplication.FindAsync(id);
             if (application == null) return NotFound();
+            if (!application.IsFromCompanySetup) return NotFound();
 
             // Fallback for older records or URL params
             if (string.IsNullOrEmpty(application.CompanyId) && !string.IsNullOrEmpty(companyId))
@@ -325,6 +344,8 @@ namespace SmartTimeCVs.Web.Controllers
                     .FirstOrDefaultAsync(j => j.Id == model.Id);
 
                 if (application == null) return NotFound();
+                if (!application.IsFromCompanySetup)
+                    return Json(new { success = false, message = "Invalid application." });
 
                 // Validation (These are not asked in the simplified New Company Setup view)
                 ModelState.Remove("ExpectedSalary");

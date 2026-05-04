@@ -59,7 +59,10 @@ namespace SmartTimeCVs.Web.Controllers
             {
                 var customer = await _context.JobApplication
                         .Include(j => j.JobOffer)
-                        .FirstOrDefaultAsync(j => j.CompanyId == GlobalVariablesService.CompanyId && j.MobileNumber.Equals(mobileNumber));
+                        .FirstOrDefaultAsync(j =>
+                            j.CompanyId == GlobalVariablesService.CompanyId &&
+                            !j.IsFromCompanySetup &&
+                            j.MobileNumber.Equals(mobileNumber));
 
                 if (customer is null)
                 {
@@ -246,6 +249,9 @@ namespace SmartTimeCVs.Web.Controllers
                 if (jobApp is null)
                     return NotFound();
 
+                if (jobApp.IsFromCompanySetup)
+                    return NotFound();
+
                 var realtedUniversites = await _context.University.Where(u => u.JobApplicationId == id).ToListAsync();
                 var realtedCourses = await _context.Course.Where(c => c.JobApplicationId == id).ToListAsync();
                 var realtedWorkExperiences = await _context.WorkExperience.Where(e => e.JobApplicationId == id).ToListAsync();
@@ -294,6 +300,9 @@ namespace SmartTimeCVs.Web.Controllers
                     .FirstOrDefaultAsync(j => j.Id == model.Id);
 
                 if (jobApplication == null)
+                    return NotFound();
+
+                if (jobApplication.IsFromCompanySetup)
                     return NotFound();
 
                 model.CompanyId = GlobalVariablesService.CompanyId;

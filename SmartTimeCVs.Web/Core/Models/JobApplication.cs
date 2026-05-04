@@ -121,6 +121,10 @@ namespace SmartTimeCVs.Web.Core.Models
         public bool IsShortListed { get; set; }
         public bool IsExcluded { get; set; }
         public bool IsHolding { get; set; }
+
+        /// <summary>
+        /// True when this application was pulled/synced from an external system; false when it was created locally and not imported.
+        /// </summary>
         public bool IsImported { get; set; }
 
         #endregion Application Information.

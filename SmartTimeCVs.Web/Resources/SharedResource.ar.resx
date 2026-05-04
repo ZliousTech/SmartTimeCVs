@@ -420,6 +420,21 @@
   <data name="Rejected" xml:space="preserve">
     <value>مرفوض</value>
   </data>
+  <data name="Approved" xml:space="preserve">
+    <value>مقبول</value>
+  </data>
+  <data name="You are about to reject this employee." xml:space="preserve">
+    <value>أنت على وشك رفض هذا الموظف.</value>
+  </data>
+  <data name="Yes, Reject" xml:space="preserve">
+    <value>نعم، ارفض</value>
+  </data>
+  <data name="Rejected!" xml:space="preserve">
+    <value>تم الرفض!</value>
+  </data>
+  <data name="Employee has been rejected." xml:space="preserve">
+    <value>تم رفض الموظف.</value>
+  </data>
   <data name="Re-interview" xml:space="preserve">
     <value>إعادة مقابلة</value>
   </data>

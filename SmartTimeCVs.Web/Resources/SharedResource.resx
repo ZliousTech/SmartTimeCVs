@@ -420,6 +420,24 @@
   <data name="Rejected" xml:space="preserve">
     <value>Rejected</value>
   </data>
+  <data name="Approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="reject" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="You are about to reject this employee." xml:space="preserve">
+    <value>You are about to reject this employee.</value>
+  </data>
+  <data name="Yes, Reject" xml:space="preserve">
+    <value>Yes, Reject</value>
+  </data>
+  <data name="Rejected!" xml:space="preserve">
+    <value>Rejected!</value>
+  </data>
+  <data name="Employee has been rejected." xml:space="preserve">
+    <value>Employee has been rejected.</value>
+  </data>
   <data name="Re-interview" xml:space="preserve">
     <value>Re-interview</value>
   </data>

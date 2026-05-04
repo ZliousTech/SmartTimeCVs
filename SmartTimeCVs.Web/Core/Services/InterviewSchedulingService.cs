@@ -24,6 +24,15 @@ namespace SmartTimeCVs.Web.Core.Services
 
         public async Task<InterviewSchedule> ScheduleInterviewAsync(ScheduleInterviewViewModel model)
         {
+            var jobApplication = await _context.JobApplication
+                .FirstOrDefaultAsync(j => j.Id == model.JobApplicationId);
+
+            if (jobApplication == null)
+                throw new InvalidOperationException("Job application not found.");
+
+            if (jobApplication.IsFromCompanySetup)
+                throw new InvalidOperationException("Interviews are not scheduled for New Company Setup employees.");
+
             // Create the schedule entity
             var schedule = new InterviewSchedule
             {
@@ -44,18 +53,11 @@ namespace SmartTimeCVs.Web.Core.Services
             // Add to database
             _context.InterviewSchedule.Add(schedule);
 
-            // Update job application status
-            var jobApplication = await _context.JobApplication
-                .FirstOrDefaultAsync(j => j.Id == model.JobApplicationId);
-
-            if (jobApplication != null)
-            {
-                jobApplication.CandidateStatus = CandidateStatus.InterviewScheduled;
-                jobApplication.IsShortListed = false;
-                jobApplication.IsExcluded = false;
-                jobApplication.IsHolding = false;
-                jobApplication.LastUpdatedOn = DateTime.Now;
-            }
+            jobApplication.CandidateStatus = CandidateStatus.InterviewScheduled;
+            jobApplication.IsShortListed = false;
+            jobApplication.IsExcluded = false;
+            jobApplication.IsHolding = false;
+            jobApplication.LastUpdatedOn = DateTime.Now;
 
             await _context.SaveChangesAsync();
 
@@ -98,7 +100,7 @@ namespace SmartTimeCVs.Web.Core.Services
             
             var schedules = await _context.InterviewSchedule
                 .Include(s => s.JobApplication)
-                .Where(s => s.CompanyId == companyId && !s.IsDeleted)
+                .Where(s => s.CompanyId == companyId && !s.IsDeleted && !s.JobApplication.IsFromCompanySetup)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -117,7 +119,7 @@ namespace SmartTimeCVs.Web.Core.Services
 
             var schedules = await _context.InterviewSchedule
                 .Include(s => s.JobApplication)
-                .Where(s => s.CompanyId == companyId && !s.IsDeleted && s.TestDate.HasValue)
+                .Where(s => s.CompanyId == companyId && !s.IsDeleted && s.TestDate.HasValue && !s.JobApplication.IsFromCompanySetup)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -153,8 +155,8 @@ namespace SmartTimeCVs.Web.Core.Services
 
             var schedules = await _context.InterviewSchedule
                 .Include(s => s.JobApplication)
-                .Where(s => s.CompanyId == companyId && !s.IsDeleted && 
-                            !s.InterviewResult.HasValue && 
+                .Where(s => s.CompanyId == companyId && !s.IsDeleted && !s.JobApplication.IsFromCompanySetup &&
+                            !s.InterviewResult.HasValue &&
                             s.InterviewDate < upperLimit)
                 .AsNoTracking()
                 .ToListAsync();
@@ -195,9 +197,9 @@ namespace SmartTimeCVs.Web.Core.Services
             
             var schedules = await _context.InterviewSchedule
                 .Include(s => s.JobApplication)
-                .Where(s => s.CompanyId == companyId && !s.IsDeleted && 
-                            s.TestDate.HasValue && 
-                            !s.TestResult.HasValue && 
+                .Where(s => s.CompanyId == companyId && !s.IsDeleted && !s.JobApplication.IsFromCompanySetup &&
+                            s.TestDate.HasValue &&
+                            !s.TestResult.HasValue &&
                             s.TestDate < upperLimit)
                 .AsNoTracking()
                 .ToListAsync();
@@ -227,7 +229,7 @@ namespace SmartTimeCVs.Web.Core.Services
             var schedules = await _context.InterviewSchedule
                 .Include(s => s.JobApplication)
                 .ThenInclude(j => j.JobOffer)
-                .Where(s => s.CompanyId == companyId && !s.IsDeleted)
+                .Where(s => s.CompanyId == companyId && !s.IsDeleted && !s.JobApplication.IsFromCompanySetup)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -295,7 +297,7 @@ namespace SmartTimeCVs.Web.Core.Services
             var schedule = await _context.InterviewSchedule
                 .Include(s => s.JobApplication)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(s => s.Id == scheduleId);
+                .FirstOrDefaultAsync(s => s.Id == scheduleId && !s.JobApplication.IsFromCompanySetup);
 
             if (schedule == null) return null;
 
@@ -327,6 +329,9 @@ namespace SmartTimeCVs.Web.Core.Services
                 .FirstOrDefaultAsync(s => s.Id == model.Id.Value);
 
             if (schedule == null) throw new KeyNotFoundException("Schedule not found.");
+
+            if (schedule.JobApplication.IsFromCompanySetup)
+                throw new InvalidOperationException("Cannot update schedules for New Company Setup employees.");
 
             // Update fields
             // Update fields
@@ -360,7 +365,7 @@ namespace SmartTimeCVs.Web.Core.Services
         {
             return await _context.InterviewSchedule
                 .Include(s => s.JobApplication)
-                .FirstOrDefaultAsync(s => s.Id == id);
+                .FirstOrDefaultAsync(s => s.Id == id && !s.JobApplication.IsFromCompanySetup);
         }
 
         public async Task<ScheduleInterviewViewModel?> GetScheduleViewModelAsync(int jobApplicationId)
@@ -369,7 +374,7 @@ namespace SmartTimeCVs.Web.Core.Services
                 .AsNoTracking()
                 .FirstOrDefaultAsync(j => j.Id == jobApplicationId);
 
-            if (jobApplication == null)
+            if (jobApplication == null || jobApplication.IsFromCompanySetup)
                 return null;
 
             return new ScheduleInterviewViewModel

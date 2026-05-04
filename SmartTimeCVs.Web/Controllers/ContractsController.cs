@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using SmartTimeCVs.Web.Core.Extensions;
 using SmartTimeCVs.Web.Core.Models;
 using SmartTimeCVs.Web.Core.Services;
 using SmartTimeCVs.Web.Data;
@@ -25,6 +26,7 @@ namespace SmartTimeCVs.Web.Controllers
         {
             var contracts = await _context.Contracts
                 .Include(c => c.JobApplication)
+                .Where(c => c.JobApplicationId == null || !c.JobApplication!.IsFromCompanySetup)
                 .OrderByDescending(c => c.CreatedOn)
                 .ToListAsync();
             return View(contracts);
@@ -42,6 +44,14 @@ namespace SmartTimeCVs.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CompanyName,CompanyAddress,CommercialNumber,RepresentativeName,RepresentativeTitle,EmployeeName,EmployeeNationalId,EmployeeAddress,JobTitle,ContractDuration,StartDate,EndDate,ProbationPeriod,MonthlySalary,SalaryPaymentDay,JobApplicationId,ContractTypeId")] Contract contract)
         {
+            if (contract.JobApplicationId.HasValue)
+            {
+                var linkedApp = await _context.JobApplication.AsNoTracking()
+                    .FirstOrDefaultAsync(j => j.Id == contract.JobApplicationId);
+                if (linkedApp != null && linkedApp.IsFromCompanySetup)
+                    ModelState.AddModelError(string.Empty, "This job application is not valid for contracts from this screen.");
+            }
+
             if (ModelState.IsValid)
             {
                 contract.CreatedOn = DateTime.Now;
@@ -49,6 +59,7 @@ namespace SmartTimeCVs.Web.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.ContractTypes = await _context.ContractTypes.ToListAsync();
             return View(contract);
         }
 
@@ -72,6 +83,9 @@ namespace SmartTimeCVs.Web.Controllers
                 return NotFound();
             }
 
+            if (contract.JobApplicationId.HasValue && contract.JobApplication != null && contract.JobApplication.IsFromCompanySetup)
+                return NotFound();
+
             return View(contract);
         }
 
@@ -81,7 +95,8 @@ namespace SmartTimeCVs.Web.Controllers
         {
             var applications = await _context.JobApplication
                 .Include(j => j.JobOffer)
-                .Where(j => j.JobOffer != null 
+                .ExcludeNewCompanySetup()
+                .Where(j => j.JobOffer != null
                          && j.JobOffer.Status == Core.Enums.JobOfferStatus.Accepted
                          && !_context.Contracts.Any(c => c.JobApplicationId == j.Id))
                 .Select(j => new 
@@ -128,6 +143,9 @@ namespace SmartTimeCVs.Web.Controllers
 
             if (contract == null || contract.JobApplication == null || string.IsNullOrEmpty(contract.JobApplication.Email))
                 return Json(new { success = false, message = _localizer["Contract or Employee Email not found"].Value ?? "Contract or Employee Email not found" });
+
+            if (contract.JobApplication.IsFromCompanySetup)
+                return Json(new { success = false, message = _localizer["Invalid contract"].Value ?? "Invalid contract" });
 
             var subject = (_localizer["Work Contract"].Value ?? "Work Contract") + " - " + contract.CompanyName;
             var request = HttpContext.Request;

@@ -1,4 +1,5 @@
 @using Microsoft.AspNetCore.Mvc.Localization
+@using SmartTimeCVs.Web.Core.Enums
 @model IEnumerable<SmartTimeCVs.Web.Core.ViewModels.JobApplicationViewModel>
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
 
@@ -87,13 +88,17 @@
                             <td>@emp.MobileNumber</td>
                             <td>@emp.NationalID</td>
                             <td>
-                                @if (string.IsNullOrEmpty(emp.FullName) || emp.FullName.StartsWith("Pending-"))
+                                @if (emp.CandidateStatus == CandidateStatus.Rejected)
+                                {
+                                    <span class="badge badge-danger">@Localizer["Rejected"]</span>
+                                }
+                                else if (emp.CandidateStatus == CandidateStatus.Hired)
+                                {
+                                    <span class="badge badge-success">@Localizer["Approved"]</span>
+                                }
+                                else if (string.IsNullOrEmpty(emp.FullName) || emp.FullName.StartsWith("Pending-"))
                                 {
                                     <span class="badge badge-warning">@Localizer["Incomplete Profile"]</span>
-                                }
-                                else if (emp.CandidateStatus == SmartTimeCVs.Web.Core.Enums.CandidateStatus.Hired)
-                                {
-                                    <span class="badge badge-success">@Localizer["Completed"]</span>
                                 }
                                 else
                                 {
@@ -101,22 +106,39 @@
                                 }
                             </td>
                             <td class="text-center">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        @Localizer["Action"]
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right">
-                                        @if (emp.CandidateStatus != SmartTimeCVs.Web.Core.Enums.CandidateStatus.Hired)
-                                        {
+                                @if (emp.CandidateStatus == CandidateStatus.Hired)
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                                else if (emp.CandidateStatus == CandidateStatus.Rejected)
+                                {
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @Localizer["Action"]
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="deleteEmployee(@emp.Id)">
+                                                <i class="material-icons align-middle" style="font-size: 18px;">delete</i> @Localizer["Delete"]
+                                            </a>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @Localizer["Action"]
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-right">
                                             <a class="dropdown-item" href="javascript:void(0);" onclick="approveEmployee(@emp.Id)">
                                                 <i class="material-icons text-success align-middle" style="font-size: 18px;">check_circle</i> @Localizer["Approve"]
                                             </a>
-                                        }
-                                        <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="deleteEmployee(@emp.Id)">
-                                            <i class="material-icons align-middle" style="font-size: 18px;">delete</i> @Localizer["Delete"]
-                                        </a>
+                                            <a class="dropdown-item text-warning" href="javascript:void(0);" onclick="rejectEmployee(@emp.Id)">
+                                                <i class="material-icons align-middle" style="font-size: 18px;">cancel</i> @Localizer["reject"]
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
+                                }
                             </td>
                         </tr>
                     }
@@ -169,6 +191,39 @@
                         },
                         error: function (err) {
                             Swal.fire('Error', 'Failed to approve employee.', 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        function rejectEmployee(id) {
+            Swal.fire({
+                title: '@Localizer["Are you sure?"]',
+                text: '@Localizer["You are about to reject this employee."]',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '@Localizer["Yes, Reject"]',
+                cancelButtonText: '@Localizer["Cancel"]'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/NewCompanySetup/RejectEmployee',
+                        type: 'POST',
+                        data: {
+                            id: id,
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire('@Localizer["Rejected!"]', '@Localizer["Employee has been rejected."]', 'success')
+                                .then(() => window.location.reload());
+                            } else {
+                                Swal.fire('Error', res.message, 'error');
+                            }
+                        },
+                        error: function (err) {
+                            Swal.fire('Error', 'Failed to reject employee.', 'error');
                         }
                     });
                 }

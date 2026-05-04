@@ -15,6 +15,13 @@ namespace SmartTimeCVs.Web.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>Recruitment grid and related actions — excludes New Company Setup employees.</summary>
+        private JobApplication? GetRecruitmentPoolApplication(int id) =>
+            _context.JobApplication.FirstOrDefault(x =>
+                x.Id == id &&
+                x.CompanyId == GlobalVariablesService.CompanyId &&
+                !x.IsFromCompanySetup);
+
         public async Task<IActionResult> Index(bool shortlistedOnly = false)
         {
             //string CompanyGuidID;
@@ -149,7 +156,7 @@ namespace SmartTimeCVs.Web.Controllers
             try
             {
                 ViewData["FromFinalResults"] = fromFinalResults;
-                var job = _context.JobApplication.FirstOrDefault(x => x.Id == id);
+                var job = GetRecruitmentPoolApplication(id);
                 if (job == null) return NotFound();
 
                 var uni = _context.University.Where(x => x.JobApplicationId == job.Id).ToList();
@@ -192,7 +199,7 @@ namespace SmartTimeCVs.Web.Controllers
         {
             try
             {
-                var job = _context.JobApplication.FirstOrDefault(x => x.Id == id);
+                var job = GetRecruitmentPoolApplication(id);
                 if (job == null) return NotFound();
 
                 var uni = _context.University.Where(x => x.JobApplicationId == job.Id).ToList();
@@ -232,7 +239,7 @@ namespace SmartTimeCVs.Web.Controllers
 
         public IActionResult CreateShortlist(int id)
         {
-            var job = _context.JobApplication.FirstOrDefault(x => x.Id == id);
+            var job = GetRecruitmentPoolApplication(id);
 
             if (job == null)
                 return NotFound();
@@ -249,7 +256,7 @@ namespace SmartTimeCVs.Web.Controllers
 
         public IActionResult CreateExclude(int id)
         {
-            var job = _context.JobApplication.FirstOrDefault(x => x.Id == id);
+            var job = GetRecruitmentPoolApplication(id);
 
             if (job == null)
                 return NotFound();
@@ -266,7 +273,7 @@ namespace SmartTimeCVs.Web.Controllers
 
         public IActionResult CreateHolding(int id)
         {
-            var job = _context.JobApplication.FirstOrDefault(x => x.Id == id);
+            var job = GetRecruitmentPoolApplication(id);
 
             if (job == null)
                 return NotFound();
@@ -290,6 +297,9 @@ namespace SmartTimeCVs.Web.Controllers
                 var jobApplication = await _context.JobApplication.FindAsync(id);
 
                 if (jobApplication is null)
+                    return NotFound();
+
+                if (jobApplication.CompanyId != GlobalVariablesService.CompanyId || jobApplication.IsFromCompanySetup)
                     return NotFound();
 
                 var relatedUniversities = await _context
@@ -377,6 +387,9 @@ namespace SmartTimeCVs.Web.Controllers
                 if (jobApplication is null)
                     return NotFound();
 
+                if (jobApplication.CompanyId != GlobalVariablesService.CompanyId || jobApplication.IsFromCompanySetup)
+                    return NotFound();
+
                 jobApplication.HiringDate = hiringDate;
                 jobApplication.SystemUserName = sysUsername;
                 jobApplication.SystemPassword = sysPassword;
@@ -436,7 +449,10 @@ namespace SmartTimeCVs.Web.Controllers
                     .Include(x => x.Course)
                     .Include(x => x.WorkExperience)
                     .Include(x => x.AttachmentFiles)
-                    .FirstOrDefaultAsync(x => x.Id == id);
+                    .FirstOrDefaultAsync(x =>
+                        x.Id == id &&
+                        x.CompanyId == GlobalVariablesService.CompanyId &&
+                        !x.IsFromCompanySetup);
 
                 if (jobApplication == null)
                     return NotFound();

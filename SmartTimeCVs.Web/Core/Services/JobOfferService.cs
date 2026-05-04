@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SmartTimeCVs.Web.Core.Enums;
+using SmartTimeCVs.Web.Core.Extensions;
 using SmartTimeCVs.Web.Core.Models;
 using SmartTimeCVs.Web.Core.ViewModels;
 using SmartTimeCVs.Web.Data;
@@ -28,6 +29,7 @@ namespace SmartTimeCVs.Web.Core.Services
             {
                 var application = await _context.JobApplication
                     .Include(j => j.JobOffer)
+                    .ExcludeNewCompanySetup()
                     .FirstOrDefaultAsync(j => j.Id == jobApplicationId);
 
                 if (application == null) return null;
@@ -84,6 +86,13 @@ namespace SmartTimeCVs.Web.Core.Services
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                var targetApplication = await _context.JobApplication.AsNoTracking()
+                    .FirstOrDefaultAsync(j => j.Id == model.JobApplicationId);
+                if (targetApplication == null)
+                    throw new InvalidOperationException("Job application not found.");
+                if (targetApplication.IsFromCompanySetup)
+                    throw new InvalidOperationException("Job offers are not used for New Company Setup employees.");
+
                 JobOffer offer;
 
                 if (model.Id.HasValue && model.Id.Value > 0)
@@ -166,6 +175,9 @@ namespace SmartTimeCVs.Web.Core.Services
 
                 if (offer == null) return false;
 
+                if (offer.JobApplication != null && offer.JobApplication.IsFromCompanySetup)
+                    return false;
+
                 // 1. Update Offer Status
                 offer.Status = JobOfferStatus.Sent;
                 offer.SentOn = DateTime.Now;
@@ -212,6 +224,9 @@ namespace SmartTimeCVs.Web.Core.Services
                     .FirstOrDefaultAsync(o => o.Id == jobOfferId);
 
                 if (offer == null) return false;
+
+                if (offer.JobApplication != null && offer.JobApplication.IsFromCompanySetup)
+                    return false;
 
                 offer.Status = accepted ? JobOfferStatus.Accepted : JobOfferStatus.Rejected;
                 offer.RespondedOn = DateTime.Now;
