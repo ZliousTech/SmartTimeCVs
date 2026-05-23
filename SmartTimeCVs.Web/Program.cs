@@ -21,6 +21,15 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(2);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = "SmartTimeCVs.Session";
+});
+
 builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(MappingProfile)));
 
 builder.Services.AddControllersWithViews();
@@ -46,6 +55,7 @@ builder.Services.AddScoped<ISmsService, SmsService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IInterviewSchedulingService, InterviewSchedulingService>();
 builder.Services.AddScoped<IJobOfferService, JobOfferService>();
+builder.Services.AddScoped<SmartTimeCVs.Web.Core.Services.CompanySetupImport.ICompanySetupImportService, SmartTimeCVs.Web.Core.Services.CompanySetupImport.CompanySetupImportService>();
 
 var app = builder.Build();
 
@@ -93,6 +103,8 @@ if (localizationOptions != null)
     app.UseRequestLocalization(localizationOptions);
 
 app.UseRouting();
+
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();

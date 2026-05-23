@@ -1,6 +1,7 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @using SmartTimeCVs.Web.Core.Enums
-@model IEnumerable<SmartTimeCVs.Web.Core.ViewModels.JobApplicationViewModel>
+@using SmartTimeCVs.Web.Core.Services.CompanySetupImport
+@model SmartTimeCVs.Web.Core.ViewModels.NewCompanySetupIndexViewModel
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SmartTimeCVs.Web.SharedResource> Localizer
 
 @{
@@ -9,6 +10,11 @@
     ViewData["Path"] = $"{Localizer["Newcomers"]} / {Localizer["New Company Setup"]}";
     ViewData["Icon"] = "business_center";
     var registrationLink = ViewData["RegistrationLink"]?.ToString();
+    var isRtl = System.Globalization.CultureInfo.CurrentCulture.Name.StartsWith("ar");
+    var batch = Model.ImportBatch;
+    var hasPreview = batch != null && (batch.SuccessRows.Count > 0 || batch.FailedRows.Count > 0);
+    var successCount = batch?.SuccessRows.Count ?? 0;
+    var failedCount = batch?.FailedRows.Count ?? 0;
 }
 
 @section Styles {
@@ -29,11 +35,91 @@
             font-weight: bold;
             word-break: break-all;
         }
+        .import-page .card.shadow-sm { box-shadow: 0 2px 12px rgba(0,0,0,.06) !important; border: none; border-radius: 12px; }
+        .import-hero {
+            background: linear-gradient(135deg, #00bcd4 0%, #0097a7 55%, #006064 100%);
+            border-radius: 12px; color: #fff; padding: 22px 26px; margin-bottom: 22px;
+            display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+        }
+        .import-hero-icon {
+            width: 56px; height: 56px; border-radius: 14px; background: rgba(255,255,255,.18);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .import-hero-icon .material-icons { font-size: 30px; }
+        .import-hero h4 { margin: 0 0 4px; font-weight: 700; font-size: 1.15rem; }
+        .import-hero p { margin: 0; opacity: .92; font-size: 13px; max-width: 640px; }
+        .import-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
+        .import-toolbar .btn-tool {
+            display: inline-flex; align-items: center; gap: 6px;
+            border: 1px solid #00bcd4; color: #00bcd4; background: #fff;
+            padding: 8px 18px; border-radius: 30px; font-size: 13px; font-weight: 600;
+            transition: all .2s; text-decoration: none !important;
+        }
+        .import-toolbar .btn-tool:hover { background: #00bcd4; color: #fff; }
+        .import-upload-zone {
+            border: 2px dashed #b2ebf2; border-radius: 12px; padding: 20px; background: #fafdfe;
+        }
+        .import-file-wrap input[type="file"] {
+            height: 40px; padding: 8px 14px; border-radius: 30px; border: 1px solid #ced4da; width: 100%;
+        }
+        .import-file-wrap input[type="file"]::file-selector-button {
+            border: none; background: #00bcd4; color: #fff; padding: 6px 16px; border-radius: 20px;
+            margin-inline-end: 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+        }
+        .btn-cvs-primary {
+            background: linear-gradient(135deg, #00bcd4, #0097a7) !important; color: #fff !important; border: none !important;
+            padding: 10px 24px !important; border-radius: 30px !important; font-size: 13px !important; font-weight: 700 !important;
+        }
+        .btn-cvs-danger {
+            background: #fff !important; color: #e53935 !important; border: 1px solid #e53935 !important;
+            padding: 10px 24px !important; border-radius: 30px !important; font-size: 13px !important; font-weight: 600 !important;
+        }
+        .import-stat-row { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+        .import-stat-card {
+            flex: 1; min-width: 160px; display: flex; align-items: center; gap: 14px;
+            padding: 16px 20px; border-radius: 12px; background: #fff; border: 1px solid #e3eef1;
+        }
+        .import-stat-card.success .stat-icon { color: #43a047; }
+        .import-stat-card.danger .stat-icon { color: #e53935; }
+        .import-stat-card .stat-value { font-size: 22px; font-weight: 700; }
+        .import-stat-card .stat-label { font-size: 12px; color: #6c757d; }
+        .import-alert { display: flex; gap: 10px; padding: 14px 18px; border-radius: 10px; margin-bottom: 16px; }
+        .import-alert.danger { background: #ffebee; color: #c62828; }
+        .import-alert.success { background: #e8f5e9; color: #2e7d32; }
+        .import-columns-grid {
+            display: none; margin-top: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px;
+        }
+        .import-columns-grid.show { display: grid; }
+        .import-col-chip {
+            font-size: 11px; background: #fff; border: 1px solid #b2ebf2; color: #006064;
+            padding: 5px 10px; border-radius: 6px;
+        }
+        .import-col-chip.required { border-color: #00bcd4; background: #e0f7fa; font-weight: 600; }
+        .import-actions-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+        .js-import-table thead tr.cyan { background-color: #00bcd4 !important; color: #fff !important; }
+        .js-import-table thead th { color: #fff !important; font-weight: 600 !important; }
     </style>
 }
 
+@Html.AntiForgeryToken()
+
+@if (TempData["ImportError"] != null)
+{
+    <div class="import-alert danger" role="alert">
+        <i class="material-icons">error_outline</i>
+        <div>@TempData["ImportError"]</div>
+    </div>
+}
+@if (TempData["ImportSuccess"] != null)
+{
+    <div class="import-alert success" role="alert">
+        <i class="material-icons">check_circle</i>
+        <div>@TempData["ImportSuccess"]</div>
+    </div>
+}
+
 <div class="row clearfix">
-    @Html.AntiForgeryToken()
     <div class="col-lg-12">
         <div class="card shadow-sm">
             <div class="card-header">
@@ -50,6 +136,187 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="import-page mt-4">
+    <div class="import-hero">
+        <div class="import-hero-icon"><i class="material-icons">upload_file</i></div>
+        <div>
+            <h4>@(isRtl ? "استيراد الموظفين من Excel" : "Import employees from Excel")</h4>
+            <p>@(isRtl
+                ? "حمّل القالب، املأ بيانات الموظفين، ثم ارفع الملف للمعاينة قبل الحفظ في قائمة المسجّلين."
+                : "Download the template, fill employee data, then upload for preview before saving to registered employees.")</p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="import-toolbar">
+                <a asp-action="DownloadImportTemplate" class="btn-tool">
+                    <i class="material-icons">download</i>
+                    @(isRtl ? "تحميل القالب" : "Download template")
+                </a>
+            </div>
+            <p class="text-muted small mb-2">
+                @(isRtl ? "الصف الأول: أسماء الأعمدة. جميع الحقول إلزامية." : "Row 1: column headers. All fields are required.")
+            </p>
+            <button type="button" class="btn btn-link btn-sm p-0 mb-2" id="toggleColumns">
+                @(isRtl ? "عرض الأعمدة" : "Show columns") ▾
+            </button>
+            <div class="import-columns-grid" id="columnsGrid">
+                @foreach (var col in Model.ColumnNames)
+                {
+                    <span class="import-col-chip required">@col</span>
+                }
+            </div>
+
+            <form asp-action="UploadImport" method="post" enctype="multipart/form-data" class="mt-3">
+                @Html.AntiForgeryToken()
+                <div class="import-upload-zone">
+                    <div class="row align-items-end">
+                        <div class="col-lg-8 col-md-8 mb-3 mb-lg-0">
+                            <label class="font-weight-bold small">@(isRtl ? "ملف Excel" : "Excel file") <span class="text-danger">*</span></label>
+                            <div class="import-file-wrap">
+                                <input type="file" name="file" accept=".xlsx" required />
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4">
+                            <button type="submit" class="btn btn-cvs-primary btn-block">
+                                <i class="material-icons align-middle" style="font-size:18px;">visibility</i>
+                                @(isRtl ? "معاينة" : "Preview")
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (hasPreview)
+    {
+        <div class="import-stat-row">
+            <div class="import-stat-card success">
+                <div class="stat-icon"><i class="material-icons">check_circle</i></div>
+                <div>
+                    <div class="stat-value">@successCount</div>
+                    <div class="stat-label">@(isRtl ? "جاهز للاستيراد" : "Ready to import")</div>
+                </div>
+            </div>
+            <div class="import-stat-card danger">
+                <div class="stat-icon"><i class="material-icons">cancel</i></div>
+                <div>
+                    <div class="stat-value">@failedCount</div>
+                    <div class="stat-label">@(isRtl ? "فاشل" : "Failed")</div>
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(batch!.FileName))
+            {
+                <div class="import-stat-card">
+                    <div class="stat-icon"><i class="material-icons">description</i></div>
+                    <div>
+                        <div class="stat-value" style="font-size:14px;">@batch.FileName</div>
+                        <div class="stat-label">@(isRtl ? "ملف المعاينة" : "Preview file")</div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (batch!.SuccessRows.Count > 0)
+        {
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="text-success mb-0"><i class="material-icons align-middle">check_circle</i> @(isRtl ? "سيتم استيرادهم" : "Will be imported")</h5>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table table-bordered js-import-table js-datatables-success" style="width:100%">
+                        <thead>
+                            <tr class="cyan">
+                                <th>#</th>
+                                <th>@(isRtl ? "صف" : "Row")</th>
+                                <th>@Localizer["Full Name"]</th>
+                                <th>@Localizer["User Name"]</th>
+                                <th>@Localizer["Email"]</th>
+                                <th>@Localizer["National ID"]</th>
+                                <th>@Localizer["Mobile Number"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{ var idx = 0; }
+                            @foreach (var row in batch.SuccessRows)
+                            {
+                                idx++;
+                                <tr>
+                                    <td>@idx</td>
+                                    <td>@row.RowNumber</td>
+                                    <td><strong>@row.FullName</strong></td>
+                                    <td>@row.SystemUserName</td>
+                                    <td>@row.Email</td>
+                                    <td><code>@row.NationalID</code></td>
+                                    <td>@row.Data.MobileNumber</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        @if (batch.FailedRows.Count > 0)
+        {
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="text-danger mb-0"><i class="material-icons align-middle">report_problem</i> @(isRtl ? "لن يُستورد" : "Will not be imported")</h5>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table table-bordered js-import-table js-datatables-failed" style="width:100%">
+                        <thead>
+                            <tr class="cyan">
+                                <th>#</th>
+                                <th>@(isRtl ? "صف" : "Row")</th>
+                                <th>@Localizer["National ID"]</th>
+                                <th>@Localizer["Full Name"]</th>
+                                <th>@(isRtl ? "السبب" : "Reason")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{ var fidx = 0; }
+                            @foreach (var row in batch.FailedRows)
+                            {
+                                fidx++;
+                                <tr>
+                                    <td>@fidx</td>
+                                    <td>@row.RowNumber</td>
+                                    <td><code>@row.NationalID</code></td>
+                                    <td>@(row.EmployeeName ?? "—")</td>
+                                    <td><span class="text-danger">@row.Reason</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        <div class="import-actions-bar mb-4">
+            @if (batch.SuccessRows.Count > 0)
+            {
+                <form asp-action="ConfirmImport" method="post" class="m-0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-cvs-primary">
+                        <i class="material-icons align-middle" style="font-size:18px;">done_all</i>
+                        @(isRtl ? "قبول وحفظ" : "Accept & save")
+                    </button>
+                </form>
+            }
+            <form asp-action="CancelImport" method="post" class="m-0">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-cvs-danger">
+                    <i class="material-icons align-middle" style="font-size:18px;">close</i>
+                    @(isRtl ? "إلغاء المعاينة" : "Cancel preview")
+                </button>
+            </form>
+        </div>
+    }
 </div>
 
 <div class="card shadow-sm mt-4">
@@ -73,13 +340,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var emp in Model)
+                    @foreach (var emp in Model.Employees)
                     {
                         <tr>
                             <td class="d-none">@emp.Id</td>
                             <td class="text-center">
-                                <img src="/images/profileImages/@(string.IsNullOrEmpty(emp.ImageUrl) ? "ProfileImagePlaceholder.jpg" : emp.ImageUrl)" 
-                                     class="rounded-circle" width="40" height="40" alt="profile" 
+                                <img src="/images/profileImages/@(string.IsNullOrEmpty(emp.ImageUrl) ? "ProfileImagePlaceholder.jpg" : emp.ImageUrl)"
+                                     class="rounded-circle" width="40" height="40" alt="profile"
                                      onerror="this.src='/images/profileImages/ProfileImagePlaceholder.jpg'"/>
                             </td>
                             <td>@emp.FullName</td>
@@ -113,7 +380,7 @@
                                 else if (emp.CandidateStatus == CandidateStatus.Rejected)
                                 {
                                     <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <button class="btn btn-sm btn-outline-info dropdown-toggle" type="button" data-toggle="dropdown">
                                             @Localizer["Action"]
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right">
@@ -126,7 +393,7 @@
                                 else
                                 {
                                     <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <button class="btn btn-sm btn-outline-info dropdown-toggle" type="button" data-toggle="dropdown">
                                             @Localizer["Action"]
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right">
@@ -151,6 +418,10 @@
 @section Plugins {
     <partial name="_DataTablesJS" />
     <script>
+        $('#toggleColumns').on('click', function () {
+            $('#columnsGrid').toggleClass('show');
+        });
+
         function copyLink() {
             var linkText = document.getElementById("regLink").innerText;
             navigator.clipboard.writeText(linkText).then(function() {
@@ -189,7 +460,7 @@
                                 Swal.fire('Error', res.message, 'error');
                             }
                         },
-                        error: function (err) {
+                        error: function () {
                             Swal.fire('Error', 'Failed to approve employee.', 'error');
                         }
                     });
@@ -222,7 +493,7 @@
                                 Swal.fire('Error', res.message, 'error');
                             }
                         },
-                        error: function (err) {
+                        error: function () {
                             Swal.fire('Error', 'Failed to reject employee.', 'error');
                         }
                     });
@@ -255,7 +526,7 @@
                                 Swal.fire('Error', res.message, 'error');
                             }
                         },
-                        error: function (err) {
+                        error: function () {
                             Swal.fire('Error', 'Failed to delete employee.', 'error');
                         }
                     });

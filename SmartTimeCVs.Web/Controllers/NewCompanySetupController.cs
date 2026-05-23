@@ -8,9 +8,11 @@ using SmartTimeCVs.Web.Helpers;
 using SmartTimeCVs.Web.Core.Services;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SmartTimeCVs.Web.Core.Enums;
+using System.Globalization;
 using System.Threading;
 using Common.Base;
 using SmartTimeCVs.Web.Core.Dtos;
+using SmartTimeCVs.Web.Core.Services.CompanySetupImport;
 using System.Net.Http;
 using System.Text.Json;
 
@@ -23,18 +25,26 @@ namespace SmartTimeCVs.Web.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> _localizer;
         private readonly IConfiguration _configuration;
+        private readonly ICompanySetupImportService _importService;
 
         private readonly List<string> _allowedExtensions = new() { ".jpg", ".jpeg", ".png" };
         private readonly List<string> _allowedAttachmentExtensions = new() { ".jpg", ".jpeg", ".png", ".pdf", ".docx" };
         private const int _maxAllowedSize = 5242880; // 5 MB.
 
-        public NewCompanySetupController(ApplicationDbContext context, IMapper mapper, IWebHostEnvironment webHostEnvironment, Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> localizer, IConfiguration configuration)
+        public NewCompanySetupController(
+            ApplicationDbContext context,
+            IMapper mapper,
+            IWebHostEnvironment webHostEnvironment,
+            Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> localizer,
+            IConfiguration configuration,
+            ICompanySetupImportService importService)
         {
             _context = context;
             _mapper = mapper;
             _webHostEnvironment = webHostEnvironment;
             _localizer = localizer;
             _configuration = configuration;
+            _importService = importService;
         }
 
         // Admin View: List of employees registered through this setup
@@ -42,22 +52,135 @@ namespace SmartTimeCVs.Web.Controllers
         {
             try
             {
+                var companyId = GlobalVariablesService.CompanyId;
                 var employees = await _context.JobApplication
-                    .Where(p => p.CompanyId == GlobalVariablesService.CompanyId && p.IsFromCompanySetup)
+                    .Where(p => p.CompanyId == companyId && p.IsFromCompanySetup)
                     .OrderByDescending(p => p.Id)
                     .ToListAsync();
 
-                var viewModel = _mapper.Map<List<JobApplicationViewModel>>(employees);
+                var batch = CompanySetupImportSession.GetBatch(HttpContext.Session);
+                if (batch != null && !string.Equals(batch.CompanyId, companyId, StringComparison.OrdinalIgnoreCase))
+                {
+                    CompanySetupImportSession.Clear(HttpContext.Session);
+                    batch = null;
+                }
+
+                var pageModel = new NewCompanySetupIndexViewModel
+                {
+                    Employees = _mapper.Map<List<JobApplicationViewModel>>(employees),
+                    ImportBatch = batch
+                };
 
                 var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
-                ViewData["RegistrationLink"] = $"{baseUrl}/NewCompanySetup/Register?companyId={GlobalVariablesService.CompanyId}";
+                ViewData["RegistrationLink"] = $"{baseUrl}/NewCompanySetup/Register?companyId={companyId}";
 
-                return View(viewModel);
+                return View(pageModel);
             }
             catch (Exception ex)
             {
                 return View("Error", new ErrorViewModel { Exception = ex.Message });
             }
+        }
+
+        [HttpGet]
+        public IActionResult DownloadImportTemplate()
+        {
+            var bytes = _importService.BuildTemplateWorkbook();
+            return File(bytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "NewCompanySetupEmployees.xlsx");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadImport(IFormFile? file)
+        {
+            var companyId = GlobalVariablesService.CompanyId;
+            if (string.IsNullOrWhiteSpace(companyId))
+            {
+                TempData["ImportError"] = "Company context is missing.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (file == null || file.Length == 0)
+            {
+                TempData["ImportError"] = CultureInfo.CurrentUICulture.Name.StartsWith("ar", StringComparison.OrdinalIgnoreCase)
+                    ? "يرجى اختيار ملف Excel."
+                    : "Please select an Excel file.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!string.Equals(Path.GetExtension(file.FileName), ".xlsx", StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["ImportError"] = CultureInfo.CurrentUICulture.Name.StartsWith("ar", StringComparison.OrdinalIgnoreCase)
+                    ? "يُقبل فقط ملفات .xlsx"
+                    : "Only .xlsx files are accepted.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (file.Length > 10 * 1024 * 1024)
+            {
+                TempData["ImportError"] = CultureInfo.CurrentUICulture.Name.StartsWith("ar", StringComparison.OrdinalIgnoreCase)
+                    ? "حجم الملف كبير جداً (الحد الأقصى 10 ميجابايت)."
+                    : "File is too large (max 10 MB).";
+                return RedirectToAction(nameof(Index));
+            }
+
+            await using var stream = file.OpenReadStream();
+            var parseResult = await _importService.ParseAndPreviewAsync(stream, file.FileName, companyId);
+
+            if (!parseResult.IsValid || parseResult.Batch == null)
+            {
+                TempData["ImportError"] = parseResult.ErrorMessage;
+                return RedirectToAction(nameof(Index));
+            }
+
+            CompanySetupImportSession.SetBatch(HttpContext.Session, parseResult.Batch);
+            var isAr = CultureInfo.CurrentUICulture.Name.StartsWith("ar", StringComparison.OrdinalIgnoreCase);
+            TempData["ImportSuccess"] = isAr
+                ? $"تم تحليل الملف: {parseResult.Batch.SuccessRows.Count} جاهز للاستيراد، {parseResult.Batch.FailedRows.Count} فاشل."
+                : $"File parsed: {parseResult.Batch.SuccessRows.Count} ready to import, {parseResult.Batch.FailedRows.Count} failed.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmImport()
+        {
+            var companyId = GlobalVariablesService.CompanyId;
+            var batch = CompanySetupImportSession.GetBatch(HttpContext.Session);
+            if (batch == null)
+            {
+                TempData["ImportError"] = CultureInfo.CurrentUICulture.Name.StartsWith("ar", StringComparison.OrdinalIgnoreCase)
+                    ? "لا توجد معاينة استيراد للتأكيد."
+                    : "No import preview to confirm.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var result = await _importService.ConfirmBatchAsync(batch, companyId ?? "");
+            if (result.Success)
+            {
+                CompanySetupImportSession.Clear(HttpContext.Session);
+                TempData["ImportSuccess"] = result.Message;
+            }
+            else
+            {
+                TempData["ImportError"] = result.Message;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CancelImport()
+        {
+            CompanySetupImportSession.Clear(HttpContext.Session);
+            TempData["ImportSuccess"] = CultureInfo.CurrentUICulture.Name.StartsWith("ar", StringComparison.OrdinalIgnoreCase)
+                ? "تم إلغاء معاينة الاستيراد."
+                : "Import preview cancelled.";
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
