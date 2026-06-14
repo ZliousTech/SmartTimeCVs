@@ -1187,7 +1187,8 @@
         // let marker;
         // let autocomplete;
         // let geocoder;
-        let currentStep = 0;
+        let currentStep = @(ViewBag.ResumeStep ?? 0);
+        const enableStepSave = @((ViewBag.EnableStepSave ?? true) ? "true" : "false");
         let universitiesIndex = @((Model?.Universities?.Count ?? 0));
         let coursesIndex = @((Model?.Courses?.Count ?? 0));
         let workExperienceIndex = @((Model?.WorkExperiences?.Count ?? 0));
@@ -1350,9 +1351,14 @@
             document.getElementById("submitBtn").classList.toggle("d-none", n !== steps.length - 1);
         }
 
-        function nextPrev(n) {
+        async function nextPrev(n) {
             const currentStepDiv = document.getElementsByClassName("form-step")[currentStep];
             if (n === 1 && !validateCurrentStep(currentStepDiv)) return;
+
+            if (n === 1 && currentStep < 6 && enableStepSave) {
+                const saved = await saveBiographyStepBeforeNext(currentStep + 1);
+                if (!saved) return;
+            }
 
             const steps = document.getElementsByClassName("form-step");
             if (currentStep + n >= steps.length || currentStep + n < 0) return;

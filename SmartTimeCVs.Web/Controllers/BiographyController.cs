@@ -84,6 +84,90 @@ namespace SmartTimeCVs.Web.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveStep(int step, JobApplicationViewModel model)
+        {
+            if (step < 1 || step > 6)
+                return JsonError("Invalid step.", "validation", 400);
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                ModelState.Clear();
+                await HydrateModelIdFromExistingDraftAsync(model);
+                ValidateSaveStep(step, model);
+
+                if (!ModelState.IsValid)
+                    return JsonError(GetFirstModelError() ?? "Please check the required fields.", "validation", 400);
+
+                var duplicateError = await GetDuplicateFieldErrorAsync(model, step == 1);
+                if (duplicateError is not null)
+                    return JsonError(duplicateError, "validation", 400);
+
+                var jobApplication = await ResolveDraftApplicationAsync(model, step);
+                if (jobApplication is null)
+                {
+                    if (!string.IsNullOrWhiteSpace(model.MobileNumber))
+                    {
+                        var hasSubmittedApplication = await _context.JobApplication.AnyAsync(j =>
+                            j.CompanyId == GlobalVariablesService.CompanyId &&
+                            !j.IsFromCompanySetup &&
+                            j.MobileNumber == model.MobileNumber &&
+                            !j.IsDraft);
+
+                        if (hasSubmittedApplication)
+                            return JsonError("An application with this mobile number already exists.", "validation", 400);
+                    }
+
+                    return JsonError("Please complete the first step before continuing.", "validation", 400);
+                }
+
+                switch (step)
+                {
+                    case 1:
+                        await ApplyStep1Async(jobApplication, model);
+                        break;
+                    case 2:
+                        await ApplyStep2Async(jobApplication, model);
+                        break;
+                    case 3:
+                        ApplyStep3(jobApplication, model);
+                        break;
+                    case 4:
+                        ApplyStep4(jobApplication, model);
+                        break;
+                    case 5:
+                        await ApplyStep5Async(jobApplication, model);
+                        break;
+                    case 6:
+                        await ApplyStep6Async(jobApplication, model);
+                        break;
+                }
+
+                if (!ModelState.IsValid)
+                    return JsonError(GetFirstModelError() ?? "Please check the required fields.", "validation", 400);
+
+                jobApplication.IsDraft = true;
+                jobApplication.LastCompletedStep = step;
+                jobApplication.LastUpdatedOn = DateTime.Now;
+
+                if (jobApplication.Id == 0)
+                    await _context.JobApplication.AddAsync(jobApplication);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return Json(new { success = true, id = jobApplication.Id, message = Messages.Saved });
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return JsonError("Server error. Please try again in a moment.", "server", 500);
+            }
+        }
+
         public IActionResult Create(bool isFromJobApplicationView = false, string mobileNumber = "")
         {
             try
@@ -92,6 +176,8 @@ namespace SmartTimeCVs.Web.Controllers
 
                 var initJobApplicationWithMobileNumber = !string.IsNullOrWhiteSpace(mobileNumber) ? new JobApplicationViewModel { MobileNumber = mobileNumber } : null;
 
+                ViewBag.ResumeStep = 0;
+                ViewBag.EnableStepSave = true;
                 return View("Form", PopulateViewModel(initJobApplicationWithMobileNumber));
             }
             catch (Exception ex)
@@ -109,9 +195,13 @@ namespace SmartTimeCVs.Web.Controllers
             try
             {
                 Console.WriteLine(">>> CREATE POST - Method entered");
+
+                await HydrateModelIdFromExistingDraftAsync(model);
+                if (model.Id > 0)
+                    return await Edit(model);
+
                 if (!ModelState.IsValid)
                 {
-                    // DEBUG: Log ModelState errors to terminal
                     foreach (var entry in ModelState.Where(e => e.Value!.Errors.Any()))
                     {
                         foreach (var err in entry.Value!.Errors)
@@ -119,7 +209,7 @@ namespace SmartTimeCVs.Web.Controllers
                             Console.WriteLine($">>> VALIDATION ERROR - Field: [{entry.Key}] Error: [{err.ErrorMessage}]");
                         }
                     }
-                    return View("Form", PopulateViewModel(model));
+                    return BadRequest(new { success = false, errorType = "validation", message = "Please check the required fields." });
                 }
 
                 Console.WriteLine(">>> CREATE POST - ModelState is VALID, proceeding...");
@@ -130,7 +220,7 @@ namespace SmartTimeCVs.Web.Controllers
                 {
                     var imageFileName = await ProcessFileAsync(model.ImageFile, "profileImages", "ImageFile");
                     if (!ModelState.IsValid)
-                        return View("Form", PopulateViewModel(model));
+                        return JsonValidationErrorFromModelState();
                     model.ImageUrl = imageFileName;
                 }
 
@@ -142,7 +232,7 @@ namespace SmartTimeCVs.Web.Controllers
                 {
                     var attachmentFileName = await ProcessFileAsync(model.AttachmentFile, "cvAttachments", "AttachmentFiles", true);
                     if (!ModelState.IsValid)
-                        return View("Form", PopulateViewModel(model));
+                        return JsonValidationErrorFromModelState();
                     model.AttachmentUrl = attachmentFileName;
                 }
 
@@ -157,7 +247,7 @@ namespace SmartTimeCVs.Web.Controllers
                     {
                         var attachmentFileName = await ProcessFileAsync(workExperienceAttachment, "workExperienceAttachments", "WorkExperienceAttachmentFile", true);
                         if (!ModelState.IsValid)
-                            return View("Form", PopulateViewModel(model));
+                            return JsonValidationErrorFromModelState();
                         workExperience.AttachmentUrl = attachmentFileName;
                     }
                 }
@@ -173,7 +263,7 @@ namespace SmartTimeCVs.Web.Controllers
                     {
                         var attachmentFileName = await ProcessFileAsync(universityAttachment, "universityAttachments", "UniversityAttachmentFile", true);
                         if (!ModelState.IsValid)
-                            return View("Form", PopulateViewModel(model));
+                            return JsonValidationErrorFromModelState();
                         university.AttachmentUrl = attachmentFileName;
                     }
                 }
@@ -189,7 +279,7 @@ namespace SmartTimeCVs.Web.Controllers
                     {
                         var attachmentFileName = await ProcessFileAsync(attachmentFile, "attachments", "AttachmentFiles", true);
                         if (!ModelState.IsValid)
-                            return View("Form", PopulateViewModel(model));
+                            return JsonValidationErrorFromModelState();
                         attachment.AttachmentUrl = attachmentFileName;
                     }
                 }
@@ -201,6 +291,9 @@ namespace SmartTimeCVs.Web.Controllers
                 jobApplication.CompanyId = GlobalVariablesService.CompanyId;
                 jobApplication.CreatedOn = DateTime.Now;
                 jobApplication.LastUpdatedOn = DateTime.Now;
+                jobApplication.IsDraft = false;
+                jobApplication.LastCompletedStep = 7;
+                jobApplication.CandidateStatus = CandidateStatus.Applied;
 
                 // Map and link Universites
                 var universites = _mapper.Map<List<University>>(model.Universities);
@@ -233,8 +326,7 @@ namespace SmartTimeCVs.Web.Controllers
                 await transaction.RollbackAsync();
                 Console.WriteLine($">>> CREATE POST - EXCEPTION: {ex.Message}");
                 Console.WriteLine($">>> CREATE POST - STACK TRACE: {ex.StackTrace}");
-                ModelState.AddModelError(string.Empty, "An error occurred while saving the data.");
-                return StatusCode(500, new { success = false, message = $"An error occurred: {ex.Message}" });
+                return StatusCode(500, new { success = false, errorType = "server", message = "Server error. Please try again in a moment." });
             }
         }
 
@@ -271,6 +363,11 @@ namespace SmartTimeCVs.Web.Controllers
                 if (realtedAttachments is not null)
                     viewModel.AttachmentFiles = _mapper.Map<List<AttachmentFileViewModel>>(realtedAttachments);
 
+                ViewBag.ResumeStep = jobApp.IsDraft && jobApp.LastCompletedStep > 0
+                    ? Math.Min(jobApp.LastCompletedStep, 6)
+                    : 0;
+                ViewBag.EnableStepSave = jobApp.IsDraft;
+
                 return View("Form", PopulateViewModel(viewModel));
             }
             catch (Exception ex)
@@ -289,7 +386,7 @@ namespace SmartTimeCVs.Web.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return View("Form", PopulateViewModel(model));
+                    return BadRequest(new { success = false, errorType = "validation", message = "Please check the required fields." });
                 }
 
                 var jobApplication = await _context.JobApplication
@@ -313,7 +410,7 @@ namespace SmartTimeCVs.Web.Controllers
                 {
                     var imageFileName = await ProcessFileAsync(model.ImageFile, "profileImages", "ImageFile");
                     if (!ModelState.IsValid)
-                        return View("Form", PopulateViewModel(model));
+                        return JsonValidationErrorFromModelState();
 
                     model.ImageUrl = imageFileName;
                 }
@@ -330,7 +427,7 @@ namespace SmartTimeCVs.Web.Controllers
                 {
                     var attachmentFileName = await ProcessFileAsync(model.AttachmentFile, "cvAttachments", "AttachmentFiles", true);
                     if (!ModelState.IsValid)
-                        return View("Form", PopulateViewModel(model));
+                        return JsonValidationErrorFromModelState();
 
                     model.AttachmentUrl = attachmentFileName;
                 }
@@ -355,11 +452,11 @@ namespace SmartTimeCVs.Web.Controllers
                         var attachmentFileName = await ProcessFileAsync(workExperienceAttachment, "workExperienceAttachments", "WorkExperienceAttachmentFile", true);
 
                         if (!ModelState.IsValid)
-                            return View("Form", PopulateViewModel(model));
+                            return JsonValidationErrorFromModelState();
 
                         workExperienceList[workExperienceIndex].AttachmentUrl = attachmentFileName;
                     }
-                    else
+                    else if (workExperienceIndex < originalWorkExperienceList.Count)
                     {
                         workExperienceList[workExperienceIndex].AttachmentUrl = originalWorkExperienceList[workExperienceIndex].AttachmentUrl;
                     }
@@ -383,7 +480,7 @@ namespace SmartTimeCVs.Web.Controllers
                         var attachmentFileName = await ProcessFileAsync(universityAttachment, "universityAttachments", "UniversityAttachmentFile", true);
 
                         if (!ModelState.IsValid)
-                            return View("Form", PopulateViewModel(model));
+                            return JsonValidationErrorFromModelState();
 
                         universityList[universityIndex].AttachmentUrl = attachmentFileName;
                     }
@@ -411,11 +508,11 @@ namespace SmartTimeCVs.Web.Controllers
                         var attachmentFileName = await ProcessFileAsync(attachment, "attachments", "AttachmentFiles", true);
 
                         if (!ModelState.IsValid)
-                            return View("Form", PopulateViewModel(model));
+                            return JsonValidationErrorFromModelState();
 
                         attachmentList[attachmentIndex].AttachmentUrl = attachmentFileName;
                     }
-                    else
+                    else if (attachmentIndex < originalAttachmentList.Count)
                     {
                         attachmentList[attachmentIndex].AttachmentUrl = originalAttachmentList[attachmentIndex].AttachmentUrl;
                     }
@@ -428,6 +525,13 @@ namespace SmartTimeCVs.Web.Controllers
                 // Update job application data using AutoMapper
                 _mapper.Map(model, jobApplication);
                 jobApplication.LastUpdatedOn = DateTime.Now;
+
+                if (jobApplication.IsDraft)
+                {
+                    jobApplication.IsDraft = false;
+                    jobApplication.LastCompletedStep = 7;
+                    jobApplication.CandidateStatus = CandidateStatus.Applied;
+                }
 
                 #region Prepare universities for update.
 
@@ -504,11 +608,10 @@ namespace SmartTimeCVs.Web.Controllers
                 return Json(new { success = true, message = Messages.Updated });
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await transaction.RollbackAsync();
-                ModelState.AddModelError(string.Empty, "An error occurred while updating the data.");
-                return StatusCode(500, new { success = false, message = $"An error occurred: {ex.Message}" });
+                return StatusCode(500, new { success = false, errorType = "server", message = "Server error. Please try again in a moment." });
             }
         }
 
@@ -848,6 +951,449 @@ namespace SmartTimeCVs.Web.Controllers
             //    new SelectListItem { Value = "Librarian", Text = "Librarian" },
             //    new SelectListItem { Value = "IT Support", Text = "IT Support" }
             //};
+        }
+
+        private async Task HydrateModelIdFromExistingDraftAsync(JobApplicationViewModel model)
+        {
+            if (model.Id > 0 || string.IsNullOrWhiteSpace(model.MobileNumber))
+                return;
+
+            var existingDraft = await _context.JobApplication
+                .AsNoTracking()
+                .FirstOrDefaultAsync(j =>
+                    j.CompanyId == GlobalVariablesService.CompanyId &&
+                    !j.IsFromCompanySetup &&
+                    j.MobileNumber == model.MobileNumber &&
+                    j.IsDraft);
+
+            if (existingDraft is not null)
+                model.Id = existingDraft.Id;
+        }
+
+        private IActionResult JsonValidationErrorFromModelState() =>
+            BadRequest(new { success = false, errorType = "validation", message = GetFirstModelError() ?? "Please check the required fields." });
+
+        private IActionResult JsonError(string message, string errorType, int statusCode) =>
+            StatusCode(statusCode, new { success = false, errorType, message });
+
+        private string? GetFirstModelError() =>
+            ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).FirstOrDefault(e => !string.IsNullOrWhiteSpace(e));
+
+        private void ValidateSaveStep(int step, JobApplicationViewModel model)
+        {
+            switch (step)
+            {
+                case 1:
+                    RequireField(model.FullName, nameof(model.FullName));
+                    RequireField(model.Email, nameof(model.Email));
+                    RequireField(model.PlaceOfBirth, nameof(model.PlaceOfBirth));
+                    RequireField(model.Address, nameof(model.Address));
+                    RequireField(model.NationalID, nameof(model.NationalID));
+                    RequireField(model.MobileNumber, nameof(model.MobileNumber));
+                    RequireField(model.Nationality, nameof(model.Nationality));
+                    RequireField(model.ApplyingFor, nameof(model.ApplyingFor));
+                    RequireField(model.JobTitle, nameof(model.JobTitle));
+
+                    if (!model.DateOfBirth.HasValue)
+                        ModelState.AddModelError(nameof(model.DateOfBirth), "Date of Birth is required.");
+
+                    if (model.ExpectedSalary < 1)
+                        ModelState.AddModelError(nameof(model.ExpectedSalary), "Expected Salary is required.");
+
+                    if (model.Id == 0 && model.ImageFile is null)
+                        ModelState.AddModelError(nameof(model.ImageFile), "Profile image is required.");
+                    break;
+
+                case 2:
+                    RequireField(model.HighSchoolName, nameof(model.HighSchoolName));
+
+                    if (model.HighSchoolGraduationYear <= 0)
+                        ModelState.AddModelError(nameof(model.HighSchoolGraduationYear), "High School Graduation Year is required.");
+
+                    for (var i = 0; i < model.Universities.Count; i++)
+                    {
+                        var university = model.Universities[i];
+                        if (string.IsNullOrWhiteSpace(university.UniversityName))
+                            ModelState.AddModelError($"Universities[{i}].UniversityName", "University Name is required.");
+                        if (string.IsNullOrWhiteSpace(university.Collage))
+                            ModelState.AddModelError($"Universities[{i}].Collage", "Collage / Specialization Name is required.");
+                        if (university.UniversityGraduationYear <= 0)
+                            ModelState.AddModelError($"Universities[{i}].UniversityGraduationYear", "University Graduation Year is required.");
+                    }
+                    break;
+
+                case 3:
+                    if (model.EnglishLevelId <= 0)
+                        ModelState.AddModelError(nameof(model.EnglishLevelId), "English Level is required.");
+
+                    if (model.ComputerSkillsLevelId <= 0)
+                        ModelState.AddModelError(nameof(model.ComputerSkillsLevelId), "Computer Skills Level is required.");
+
+                    for (var i = 0; i < model.Courses.Count; i++)
+                    {
+                        var course = model.Courses[i];
+                        if (string.IsNullOrWhiteSpace(course.CourseName))
+                            ModelState.AddModelError($"Courses[{i}].CourseName", "Course Name is required.");
+                        if (string.IsNullOrWhiteSpace(course.CourseAddress))
+                            ModelState.AddModelError($"Courses[{i}].CourseAddress", "Course Address is required.");
+                        if (!course.From.HasValue)
+                            ModelState.AddModelError($"Courses[{i}].From", "From date is required.");
+                        if (!course.To.HasValue)
+                            ModelState.AddModelError($"Courses[{i}].To", "To date is required.");
+                    }
+                    break;
+
+                case 4:
+                    RequireField(model.CurrentEmployerName, nameof(model.CurrentEmployerName));
+                    RequireField(model.CurrentEmployerAddress, nameof(model.CurrentEmployerAddress));
+                    RequireField(model.CurrentJobDescription, nameof(model.CurrentJobDescription));
+                    RequireField(model.ReasonForLeavingCurrent, nameof(model.ReasonForLeavingCurrent));
+
+                    if (!model.CurrentFrom.HasValue)
+                        ModelState.AddModelError(nameof(model.CurrentFrom), "From date is required.");
+                    if (!model.CurrentTo.HasValue)
+                        ModelState.AddModelError(nameof(model.CurrentTo), "To date is required.");
+                    if (!model.ReadyToJoinFrom.HasValue)
+                        ModelState.AddModelError(nameof(model.ReadyToJoinFrom), "Ready To Join From is required.");
+                    break;
+
+                case 5:
+                    for (var i = 0; i < model.WorkExperiences.Count; i++)
+                    {
+                        var experience = model.WorkExperiences[i];
+                        if (string.IsNullOrWhiteSpace(experience.EmployerName))
+                            ModelState.AddModelError($"WorkExperiences[{i}].EmployerName", "Employer Name is required.");
+                        if (!experience.From.HasValue)
+                            ModelState.AddModelError($"WorkExperiences[{i}].From", "From date is required.");
+                        if (!experience.To.HasValue)
+                            ModelState.AddModelError($"WorkExperiences[{i}].To", "To date is required.");
+                        if (string.IsNullOrWhiteSpace(experience.ReasonForLeaving))
+                            ModelState.AddModelError($"WorkExperiences[{i}].ReasonForLeaving", "Reason for Leaving is required.");
+                    }
+                    break;
+
+                case 6:
+                    break;
+            }
+        }
+
+        private void RequireField(string? value, string fieldName)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                ModelState.AddModelError(fieldName, $"{fieldName} is required.");
+        }
+
+        private async Task<string?> GetDuplicateFieldErrorAsync(JobApplicationViewModel model, bool checkAll)
+        {
+            if (!checkAll)
+                return null;
+
+            if (!string.IsNullOrWhiteSpace(model.FullName))
+            {
+                var nameExists = await _context.JobApplication.AnyAsync(j =>
+                    j.CompanyId == GlobalVariablesService.CompanyId &&
+                    !j.IsFromCompanySetup &&
+                    j.FullName.Trim().ToLower() == model.FullName.Trim().ToLower() &&
+                    j.Id != model.Id);
+
+                if (nameExists)
+                    return "Full Name is already used.";
+            }
+
+            if (!string.IsNullOrWhiteSpace(model.Email))
+            {
+                var emailExists = await _context.JobApplication.AnyAsync(j =>
+                    j.CompanyId == GlobalVariablesService.CompanyId &&
+                    !j.IsFromCompanySetup &&
+                    j.Email.Trim().ToLower() == model.Email.Trim().ToLower() &&
+                    j.Id != model.Id);
+
+                if (emailExists)
+                    return "Email is already used.";
+            }
+
+            if (!string.IsNullOrWhiteSpace(model.NationalID))
+            {
+                var nationalIdExists = await _context.JobApplication.AnyAsync(j =>
+                    j.NationalID.Trim().ToLower() == model.NationalID.Trim().ToLower() &&
+                    j.Id != model.Id);
+
+                if (nationalIdExists)
+                    return "National Number is already used.";
+            }
+
+            return null;
+        }
+
+        private async Task<JobApplication?> ResolveDraftApplicationAsync(JobApplicationViewModel model, int step)
+        {
+            if (model.Id > 0)
+            {
+                return await _context.JobApplication
+                    .Include(j => j.Univesity)
+                    .Include(j => j.Course)
+                    .Include(j => j.WorkExperience)
+                    .Include(j => j.AttachmentFiles)
+                    .FirstOrDefaultAsync(j =>
+                        j.Id == model.Id &&
+                        j.CompanyId == GlobalVariablesService.CompanyId &&
+                        !j.IsFromCompanySetup &&
+                        j.IsDraft);
+            }
+
+            if (!string.IsNullOrWhiteSpace(model.MobileNumber))
+            {
+                var existingDraft = await _context.JobApplication
+                    .Include(j => j.Univesity)
+                    .Include(j => j.Course)
+                    .Include(j => j.WorkExperience)
+                    .Include(j => j.AttachmentFiles)
+                    .FirstOrDefaultAsync(j =>
+                        j.CompanyId == GlobalVariablesService.CompanyId &&
+                        !j.IsFromCompanySetup &&
+                        j.MobileNumber == model.MobileNumber);
+
+                if (existingDraft is not null)
+                {
+                    if (!existingDraft.IsDraft)
+                        return null;
+
+                    model.Id = existingDraft.Id;
+                    return existingDraft;
+                }
+            }
+
+            if (step != 1)
+                return null;
+
+            return new JobApplication
+            {
+                CompanyId = GlobalVariablesService.CompanyId,
+                CreatedOn = DateTime.Now,
+                ImageUrl = "ProfileImagePlaceholder.jpg",
+                HighSchoolName = string.Empty,
+                IsDraft = true
+            };
+        }
+
+        private async Task ApplyStep1Async(JobApplication jobApplication, JobApplicationViewModel model)
+        {
+            if (model.ImageFile != null)
+            {
+                var imageFileName = await ProcessFileAsync(model.ImageFile, "profileImages", "ImageFile");
+                if (!ModelState.IsValid)
+                    return;
+
+                jobApplication.ImageUrl = imageFileName;
+            }
+            else if (string.IsNullOrWhiteSpace(jobApplication.ImageUrl))
+            {
+                jobApplication.ImageUrl = "ProfileImagePlaceholder.jpg";
+            }
+
+            jobApplication.FullName = model.FullName;
+            jobApplication.Email = model.Email;
+            jobApplication.DateOfBirth = model.DateOfBirth;
+            jobApplication.PlaceOfBirth = model.PlaceOfBirth;
+            jobApplication.GenderId = model.GenderId;
+            jobApplication.Address = model.Address;
+            jobApplication.Latitude = model.Latitude;
+            jobApplication.Longitude = model.Longitude;
+            jobApplication.NationalID = model.NationalID;
+            jobApplication.MobileNumber = model.MobileNumber;
+            jobApplication.Nationality = model.Nationality;
+            jobApplication.MaritalStatusId = model.MaritalStatusId;
+            jobApplication.ExpectedSalary = model.ExpectedSalary;
+            jobApplication.ApplyingFor = model.ApplyingFor;
+            jobApplication.JobTitle = model.JobTitle;
+        }
+
+        private async Task ApplyStep2Async(JobApplication jobApplication, JobApplicationViewModel model)
+        {
+            jobApplication.HighSchoolName = model.HighSchoolName;
+            jobApplication.HighSchoolGraduationYear = model.HighSchoolGraduationYear;
+
+            var universityList = model.Universities.ToList();
+            var originalUniversityList = jobApplication.Univesity.ToList();
+
+            for (var universityIndex = 0; universityIndex < universityList.Count; universityIndex++)
+            {
+                var universityAttachment = universityList[universityIndex].AttachmentFile;
+
+                if (universityAttachment != null)
+                {
+                    var attachmentFileName = await ProcessFileAsync(universityAttachment, "universityAttachments", "UniversityAttachmentFile", true);
+                    if (!ModelState.IsValid)
+                        return;
+
+                    universityList[universityIndex].AttachmentUrl = attachmentFileName;
+                }
+                else if (universityIndex < originalUniversityList.Count)
+                {
+                    universityList[universityIndex].AttachmentUrl = originalUniversityList[universityIndex].AttachmentUrl;
+                }
+            }
+
+            await ReplaceUniversitiesAsync(jobApplication, universityList);
+        }
+
+        private void ApplyStep3(JobApplication jobApplication, JobApplicationViewModel model)
+        {
+            jobApplication.EnglishLevelId = model.EnglishLevelId;
+            jobApplication.OtherLanguage = model.OtherLanguage;
+            jobApplication.OtherLanguageLevelId = model.OtherLanguageLevelId;
+            jobApplication.ComputerSkillsLevelId = model.ComputerSkillsLevelId;
+
+            ReplaceCourses(jobApplication, model.Courses);
+        }
+
+        private void ApplyStep4(JobApplication jobApplication, JobApplicationViewModel model)
+        {
+            jobApplication.CurrentEmployerName = model.CurrentEmployerName;
+            jobApplication.CurrentEmployerAddress = model.CurrentEmployerAddress;
+            jobApplication.CurrentJobDescription = model.CurrentJobDescription;
+            jobApplication.CurrentSalary = model.CurrentSalary;
+            jobApplication.CurrentFrom = model.CurrentFrom;
+            jobApplication.CurrentTo = model.CurrentTo;
+            jobApplication.ReasonForLeavingCurrent = model.ReasonForLeavingCurrent;
+            jobApplication.ReadyToJoinFrom = model.ReadyToJoinFrom;
+        }
+
+        private async Task ApplyStep5Async(JobApplication jobApplication, JobApplicationViewModel model)
+        {
+            var workExperienceList = model.WorkExperiences.ToList();
+            var originalWorkExperienceList = jobApplication.WorkExperience.ToList();
+
+            for (var workExperienceIndex = 0; workExperienceIndex < workExperienceList.Count; workExperienceIndex++)
+            {
+                var workExperienceAttachment = workExperienceList[workExperienceIndex].AttachmentFile;
+
+                if (workExperienceAttachment != null)
+                {
+                    var attachmentFileName = await ProcessFileAsync(workExperienceAttachment, "workExperienceAttachments", "WorkExperienceAttachmentFile", true);
+                    if (!ModelState.IsValid)
+                        return;
+
+                    workExperienceList[workExperienceIndex].AttachmentUrl = attachmentFileName;
+                }
+                else if (workExperienceIndex < originalWorkExperienceList.Count)
+                {
+                    workExperienceList[workExperienceIndex].AttachmentUrl = originalWorkExperienceList[workExperienceIndex].AttachmentUrl;
+                }
+            }
+
+            await ReplaceWorkExperiencesAsync(jobApplication, workExperienceList);
+        }
+
+        private async Task ApplyStep6Async(JobApplication jobApplication, JobApplicationViewModel model)
+        {
+            var attachmentList = model.AttachmentFiles.ToList();
+            var originalAttachmentList = jobApplication.AttachmentFiles.ToList();
+
+            for (var attachmentIndex = 0; attachmentIndex < attachmentList.Count; attachmentIndex++)
+            {
+                var attachment = attachmentList[attachmentIndex].AttachmentFile;
+
+                if (attachment != null)
+                {
+                    var attachmentFileName = await ProcessFileAsync(attachment, "attachments", "AttachmentFiles", true);
+                    if (!ModelState.IsValid)
+                        return;
+
+                    attachmentList[attachmentIndex].AttachmentUrl = attachmentFileName;
+                }
+                else if (attachmentIndex < originalAttachmentList.Count)
+                {
+                    attachmentList[attachmentIndex].AttachmentUrl = originalAttachmentList[attachmentIndex].AttachmentUrl;
+                    attachmentList[attachmentIndex].Id = originalAttachmentList[attachmentIndex].Id;
+                }
+            }
+
+            await ReplaceAttachmentFilesAsync(jobApplication, attachmentList);
+        }
+
+        private async Task ReplaceUniversitiesAsync(JobApplication jobApplication, List<UniversityViewModel> universities)
+        {
+            if (jobApplication.Id > 0)
+            {
+                var existingUniversities = await _context.University
+                    .Where(w => w.JobApplicationId == jobApplication.Id)
+                    .ToListAsync();
+
+                _context.University.RemoveRange(existingUniversities);
+            }
+
+            var newUniversities = _mapper.Map<List<University>>(universities);
+            newUniversities.ForEach(u =>
+            {
+                u.JobApplicationId = jobApplication.Id;
+                u.LastUpdatedOn = DateTime.Now;
+            });
+
+            jobApplication.Univesity = newUniversities;
+        }
+
+        private void ReplaceCourses(JobApplication jobApplication, List<CourseViewModel> courses)
+        {
+            if (jobApplication.Id > 0)
+            {
+                var existingCourses = _context.Course
+                    .Where(w => w.JobApplicationId == jobApplication.Id)
+                    .ToList();
+
+                _context.Course.RemoveRange(existingCourses);
+            }
+
+            var newCourses = _mapper.Map<List<Course>>(courses);
+            newCourses.ForEach(c =>
+            {
+                c.JobApplicationId = jobApplication.Id;
+                c.LastUpdatedOn = DateTime.Now;
+            });
+
+            jobApplication.Course = newCourses;
+        }
+
+        private async Task ReplaceWorkExperiencesAsync(JobApplication jobApplication, List<WorkExperienceViewModel> workExperiences)
+        {
+            if (jobApplication.Id > 0)
+            {
+                var existingWorkExperiences = await _context.WorkExperience
+                    .Where(w => w.JobApplicationId == jobApplication.Id)
+                    .ToListAsync();
+
+                _context.WorkExperience.RemoveRange(existingWorkExperiences);
+            }
+
+            var newWorkExperiences = _mapper.Map<List<WorkExperience>>(workExperiences);
+            newWorkExperiences.ForEach(e =>
+            {
+                e.JobApplicationId = jobApplication.Id;
+                e.LastUpdatedOn = DateTime.Now;
+            });
+
+            jobApplication.WorkExperience = newWorkExperiences;
+        }
+
+        private async Task ReplaceAttachmentFilesAsync(JobApplication jobApplication, List<AttachmentFileViewModel> attachmentFiles)
+        {
+            if (jobApplication.Id > 0)
+            {
+                var existingAttachments = await _context.AttachmentFile
+                    .Where(a => a.JobApplicationId == jobApplication.Id)
+                    .ToListAsync();
+
+                _context.AttachmentFile.RemoveRange(existingAttachments);
+            }
+
+            var newAttachments = _mapper.Map<List<AttachmentFile>>(attachmentFiles);
+            newAttachments.ForEach(a =>
+            {
+                a.JobApplicationId = jobApplication.Id;
+                a.LastUpdatedOn = DateTime.Now;
+            });
+
+            jobApplication.AttachmentFiles = newAttachments;
         }
 
         private async Task<string> ProcessFileAsync(IFormFile file, string folderName, string fieldName, bool isAttachemnt = false)

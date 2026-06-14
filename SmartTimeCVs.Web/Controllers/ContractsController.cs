@@ -96,6 +96,7 @@ namespace SmartTimeCVs.Web.Controllers
             var applications = await _context.JobApplication
                 .Include(j => j.JobOffer)
                 .ExcludeNewCompanySetup()
+                .ExcludeDrafts()
                 .Where(j => j.JobOffer != null
                          && j.JobOffer.Status == Core.Enums.JobOfferStatus.Accepted
                          && !_context.Contracts.Any(c => c.JobApplicationId == j.Id))

@@ -175,5 +175,15 @@ namespace SmartTimeCVs.Web.Core.Models
 
         public string? CompanyId { get; set; }
         public bool IsFromCompanySetup { get; set; }
+
+        /// <summary>
+        /// True while the candidate is still filling the multi-step application form.
+        /// </summary>
+        public bool IsDraft { get; set; }
+
+        /// <summary>
+        /// Last step successfully saved (1-7). Used to resume an in-progress application.
+        /// </summary>
+        public int LastCompletedStep { get; set; }
     }
 }

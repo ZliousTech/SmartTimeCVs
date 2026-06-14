@@ -14,7 +14,9 @@
             .ForMember(dest => dest.Univesity, opt => opt.MapFrom(src => src.Universities))
             .ForMember(dest => dest.Course, opt => opt.MapFrom(src => src.Courses))
             // Owned by sync / senior pipeline: do not overwrite from form defaults (stays false until pull sets true).
-            .ForMember(dest => dest.IsImported, opt => opt.Ignore());
+            .ForMember(dest => dest.IsImported, opt => opt.Ignore())
+            .ForMember(dest => dest.IsDraft, opt => opt.Ignore())
+            .ForMember(dest => dest.LastCompletedStep, opt => opt.Ignore());
 
             // University
             CreateMap<University, UniversityViewModel>().ReverseMap();

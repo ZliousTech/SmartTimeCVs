@@ -10,5 +10,8 @@ namespace SmartTimeCVs.Web.Core.Extensions
     {
         public static IQueryable<JobApplication> ExcludeNewCompanySetup(this IQueryable<JobApplication> query) =>
             query.Where(j => !j.IsFromCompanySetup);
+
+        public static IQueryable<JobApplication> ExcludeDrafts(this IQueryable<JobApplication> query) =>
+            query.Where(j => !j.IsDraft);
     }
 }

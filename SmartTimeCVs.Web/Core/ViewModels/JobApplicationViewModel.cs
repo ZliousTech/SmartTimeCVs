@@ -175,5 +175,8 @@ namespace SmartTimeCVs.Web.Core.ViewModels
     #endregion Attachment.
 
     public string? CompanyId { get; set; }
+
+    public bool IsDraft { get; set; }
+    public int LastCompletedStep { get; set; }
     }
 }

@@ -166,6 +166,81 @@ function showErrorMessage(message = "Something went wrong") {
 	});
 }
 
+function resolveAjaxErrorMessage(xhr, statusOrResponse, error) {
+	if (typeof statusOrResponse === "object" && statusOrResponse !== null && statusOrResponse.message)
+		return statusOrResponse.message;
+
+	if (!xhr)
+		return "Something went wrong. Please try again.";
+
+	if (!navigator.onLine || xhr.status === 0)
+		return "Connection problem. Check your internet and try again.";
+
+	if (xhr.status >= 500)
+		return "Server error. Please try again in a moment.";
+
+	if (xhr.status === 408 || xhr.status === 504)
+		return "Request timed out. Check your connection and try again.";
+
+	if (xhr.responseJSON) {
+		if (xhr.responseJSON.message)
+			return xhr.responseJSON.message;
+		if (xhr.responseJSON.errorType === "validation")
+			return "Please check the required fields.";
+	}
+
+	return "Something went wrong. Please try again.";
+}
+
+function saveBiographyStepBeforeNext(stepNumber) {
+	return new Promise(function (resolve) {
+		var selectedJobCategoryText = $('#ApplyingFor option:selected').text();
+		$('#ApplyingForText').val(selectedJobCategoryText);
+
+		var selectedJobTitleText = $('#JobTitle option:selected').text();
+		$('#JobTitleText').val(selectedJobTitleText);
+
+		var formEl = document.getElementById('form');
+		if (!formEl) {
+			resolve(true);
+			return;
+		}
+
+		var formData = new FormData(formEl);
+		formData.append('step', stepNumber);
+
+		var $nextBtn = $('#nextBtn');
+		$nextBtn.prop('disabled', true);
+
+		$.ajax({
+			url: '/Biography/SaveStep',
+			type: 'POST',
+			data: formData,
+			processData: false,
+			contentType: false,
+			success: function (response) {
+				if (response && response.success) {
+					if (response.id && !$('input[name="Id"]').length) {
+						$('#form').prepend('<input type="hidden" name="Id" value="' + response.id + '" />');
+						$('#form').attr('action', '/Biography/Edit');
+					}
+					resolve(true);
+				} else {
+					showErrorMessage(resolveAjaxErrorMessage(null, response));
+					resolve(false);
+				}
+			},
+			error: function (xhr, status, error) {
+				showErrorMessage(resolveAjaxErrorMessage(xhr, status, error));
+				resolve(false);
+			},
+			complete: function () {
+				$nextBtn.prop('disabled', false);
+			}
+		});
+	});
+}
+
 function showSuccessMessageWithAnimation(row, message = "Saved Successfully") {
 	row.removeClass('animate__animated animate__flash');
 	Swal.fire({
@@ -255,13 +330,7 @@ function onModalRequestSuccess(row) {
 }
 
 function onRequestFailure(xhr, status, error) {
-	var errorMsg = "Something went wrong";
-	if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
-		errorMsg = xhr.responseJSON.message;
-	} else if (xhr && xhr.responseText) {
-		errorMsg = xhr.responseText;
-	}
-	showErrorMessage(errorMsg);
+	showErrorMessage(resolveAjaxErrorMessage(xhr, status, error));
 }
 
 function onRequestComplete() {

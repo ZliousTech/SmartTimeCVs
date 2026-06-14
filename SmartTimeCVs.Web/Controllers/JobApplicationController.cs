@@ -42,6 +42,7 @@ namespace SmartTimeCVs.Web.Controllers
                     .Where(p => !p.IsShortListed && !p.IsExcluded && !p.IsHolding)
                     .Where(p => !p.InterviewSchedules.Any(s => !s.IsDeleted))
                     .Where(p => !p.IsFromCompanySetup)
+                    .Where(p => !p.IsDraft)
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -74,6 +75,7 @@ namespace SmartTimeCVs.Web.Controllers
                     .OrderByDescending(p => p.Id)
                     .Where(p => p.IsShortListed == true)
                     .Where(p => !p.IsFromCompanySetup)
+                    .Where(p => !p.IsDraft)
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -106,6 +108,7 @@ namespace SmartTimeCVs.Web.Controllers
                     .OrderByDescending(p => p.Id)
                     .Where(p => p.IsExcluded == true)
                     .Where(p => !p.IsFromCompanySetup)
+                    .Where(p => !p.IsDraft)
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -138,6 +141,7 @@ namespace SmartTimeCVs.Web.Controllers
                     .OrderByDescending(p => p.Id)
                     .Where(p => p.IsHolding == true)
                     .Where(p => !p.IsFromCompanySetup)
+                    .Where(p => !p.IsDraft)
                     .AsNoTracking()
                     .ToListAsync();
 
